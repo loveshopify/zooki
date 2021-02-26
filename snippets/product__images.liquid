@@ -1,0 +1,123 @@
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image %}
+  {% capture list %}
+    {% for image in product.images %}
+      {% comment %}Loop through images only once{% endcomment %}
+      {{ image.id }}`~`{{ image.alt }}`~`{{ image | img_url: '50x' }}`~`{{ image | img_url: '200x' }}`~`{{ image | img_url: '400x' }}`~`{{ image | img_url: '600x' }}`~`{{ image | img_url: '800x' }}`~`{{ image | img_url: '1200x' }}`~`{{ image | img_url: '2000x' }}`~`{{-image.width-}}px`~`{{-image.height-}}px{% if forloop.last == false %}^{% endif %}
+    {% endfor %}
+  {% endcapture %}
+  {% assign image_list = list | split: "^" %}
+
+<div class="product-gallery
+            product-gallery--{{ object.settings.thumbnail_position }}
+            product-gallery--image-amount-{{ product.images.size }}">
+  <div class="product-gallery__main">
+
+      {% for image_item in image_list %}
+        {% assign image = image_item | split: "`~`" %}
+        {% capture image_id %}{{ image[0] | strip }}{% endcapture %}
+        {% capture image_alt %}{{ image[1] | strip }}{% endcapture %}
+        {% unless image_alt == 'variant' %}
+          {% capture image_50x %}{{ image[2] }}{% endcapture %}
+          {% capture image_200x %}{{ image[3] }}{% endcapture %}
+          {% capture image_400x %}{{ image[4] }}{% endcapture %}
+          {% capture image_600x %}{{ image[5] }}{% endcapture %}
+          {% capture image_800x %}{{ image[6] }}{% endcapture %}
+          {% capture image_1200x %}{{ image[7] }}{% endcapture %}
+          {% capture image_2000x %}{{ image[8] }}{% endcapture %}
+          {% capture original_image_width %}{{- image[9] -}}{% endcapture %}
+          {% capture original_image_height %}{{- image[10] -}}{% endcapture %}
+
+          {% comment %} Check alt text for video iframe {% endcomment %}
+          <div class="product-gallery__image"
+                data-title="{% if image_alt contains 'youtube' or image_alt contains 'vimeo' %}{{ product.title }}{% else %}{{ image_alt | escape }}{% endif %}"
+                data-image-height="{{ original_image_height | strip }}"
+                data-image-width="{{ original_image_width | strip }}">
+
+            {% if image_alt contains 'youtube' or image_alt contains 'vimeo' %}
+              <div class="product-gallery__video" data-title="{{ product.title | escape }}">
+                {{ image_alt }}
+              </div>
+            {% else %}
+              {% if object.settings.enable_product_lightbox and product.images.size > 0 %}
+                <a  class="product-gallery__link"
+                    href="{{ image_2000x }}"
+                    data-fancybox="{{ id }}">
+              {% endif %}
+              <div class="image__container" style="max-width: {{original_image_width}}">
+                {% if product.images.size > 0 %}
+                <img  src="{{ image_50x }}"
+                      alt="{{ image_alt | escape }}"
+                      class=" lazyload lazyload--fade-in"
+                      data-index="{{ forloop.index0 }}"
+                      data-image-id="{{ image_id }}"
+                      data-sizes="auto"
+                      data-src="{{ image_2000x }}"
+                      srcset="{{ image_200x }} 200w,
+                              {{ image_400x }} 400w,
+                              {{ image_600x }} 600w,
+                              {{ image_800x }} 800w,
+                              {{ image_1200x }} 1200w,
+                              {{ image_2000x }} 2000w"
+                      />
+                <noscript>
+                  <img  src="{{ image_1200x }}"
+                        alt="{{ image_alt | escape }}"
+                        class="lazyloaded lazyload fallbackImage" />
+                </noscript>
+                {% else %}
+                  <img src="{{ image | img_url: 'master' }}" />
+                {% endif %}
+              </div>
+              {% if object.settings.enable_product_lightbox and product.images.size > 0 %}
+                </a>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endunless %}
+      {% endfor %}
+  </div>
+  {% if object.settings.thumbnail_position != blank %}
+    {% if object.settings.thumbnail_position != 'no-thumbnails' and product.images.size > 1 %}
+    <div class="product-gallery__thumbnails
+                product-gallery__thumbnails--{{ object.settings.thumbnail_position }}
+                is-slide-nav--{{ object.settings.enable_thumbnail_slider }}
+                {% if object.settings.enable_thumbnail_slider == false %}
+                  container equal-columns--outside-trim
+                  is-justify-center
+                {% endif %}">
+        {% for image_item in image_list %}
+          {% assign image = image_item | split: "`~`" %}
+          {% capture image_id %}{{ image[0] | strip }}{% endcapture %}
+          {% capture image_alt %}{{ image[1] | strip }}{% endcapture %}
+          {% unless image_alt == 'variant' %}
+            {% capture image_50x %}{{ image[2] }}{% endcapture %}
+            {% capture image_200x %}{{ image[3] }}{% endcapture %}
+            {% capture image_400x %}{{ image[4] }}{% endcapture %}
+            {% capture image_600x %}{{ image[5] }}{% endcapture %}
+            {% capture image_800x %}{{ image[6] }}{% endcapture %}
+            {% capture image_1200x %}{{ image[7] }}{% endcapture %}
+            {% capture image_2000x %}{{ image[8] }}{% endcapture %}
+            <div class="product-gallery__thumbnail one-fifth column
+                  data-title="{{ image_alt | escape }}">
+                <img  src="{{ image_400x }}"
+                      alt="{{ image_alt | escape }}"
+                      data-index="{{ forloop.index0 }}"
+                      data-image-id="{{ image_id }}"
+                      data-featured-image="{{featured_image.id}}"
+                      />
+            </div>
+          {% endunless %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+

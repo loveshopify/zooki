@@ -1,0 +1,106 @@
+{% assign id = section.id %}
+{% assign custom_css = section.settings.custom_css %}
+
+
+
+{%style%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%endstyle%}
+
+
+
+<div id="announcement">
+    {% if section.settings.left-img != blank %}
+    <div class="ann-img" style="background-image: url({{ section.settings.left-img | img_url: '500x' }});"></div>
+    <div class="ann-img-vert-1" style="background-image: url({{ section.settings.upper-img | img_url: '500x' }});"></div>
+    {% endif %}
+
+    <div class="text-container">
+        <h2> {{ section.settings.text-box-title }} </h2>
+        <p> {{ section.settings.text-box-content }} </p>
+        <button><a href="{{ section.settings.link }}" class="ann--btn"> {{ section.settings.linktext }} </a></button>
+    </div>
+
+    {% if section.settings.right-img != blank %}
+    <div class="ann-img" style="background-image: url({{ section.settings.right-img | img_url: '1920x' }});"></div>
+    <div class="ann-img-vert-2" style="background-image: url({{ section.settings.lower-img | img_url: '1920x' }});"></div>
+    {% endif %}
+
+</div>
+
+
+
+{% schema %}
+{
+"name" : "Announcement",
+"settings": [
+{
+"type": "image_picker",
+"id": "left-img",
+"label": "Choose left image for horizontal view"
+},
+{
+"type": "image_picker",
+"id": "upper-img",
+"label": "Choose upper image for vertical view"
+},
+{
+"type": "text",
+"id": "text-box-title",
+"label": "Left promotion heading",
+"default": "Title"
+},
+{
+"type": "richtext",
+"id": "text-box-content",
+"label": "Add custom text below",
+"default": "<p>Add your text here</p>"
+},
+{
+"id": "link",
+"type": "url",
+"label": "Button link"
+},
+{
+"id": "linktext",
+"type": "text",
+"label": "Button text",
+"default": "Click here"
+},
+{
+"type": "image_picker",
+"id": "right-img",
+"label": "Choose right image for horizontal view"
+},
+{
+"type": "image_picker",
+"id": "lower-img",
+"label": "Choose lower image for vertical view"
+},
+{
+"type": "textarea",
+"id": "custom_css",
+"label": "Custom CSS"
+}
+
+]
+,
+"presets": [
+{
+"name":"Announcement",
+"category": "Little Vitamin"
+}
+]
+}
+
+
+{% endschema %}
+
+
+
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

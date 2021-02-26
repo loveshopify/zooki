@@ -1,0 +1,175 @@
+{% comment %}
+** Divider - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% include 'include-divider' %}
+
+{% schema %}
+  {
+    "name": "Divider",
+    "class": "divider-section",
+    "settings": [
+      {
+        "type": "select",
+        "id": "divider_style",
+        "label": "Style",
+        "options": [
+          {
+            "value": "short",
+            "label": "Short horizontal"
+          },
+          {
+            "value": "long",
+            "label": "Long horizontal"
+          },
+          {
+            "value": "vertical",
+            "label": "Vertical"
+          }
+        ],
+        "default": "short"
+      },
+      {
+        "type": "range",
+        "id": "divider_width",
+        "label": "Width",
+        "min": 0,
+        "max": 5,
+        "default": 2,
+        "unit": "px"
+      },
+      {
+        "type": "color",
+        "id": "divider_color",
+        "label": "Color",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "select",
+        "id": "alignment",
+        "label": "Alignment",
+        "options": [
+          {
+            "value": "start",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "end",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "select",
+        "id": "animation",
+        "label": "Animation",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "fadeIn",
+            "label": "Fade in"
+          },
+          {
+            "value": "fadeInDown",
+            "label": "Fade in down"
+          },
+          {
+            "value": "fadeInLeft",
+            "label": "Fade in left"
+          },
+          {
+            "value": "fadeInRight",
+            "label": "Fade in right"
+          },
+          {
+            "value": "slideInLeft",
+            "label": "Slide in left"
+          },
+          {
+            "value": "slideInRight",
+            "label": "Slide in right"
+          },
+          {
+            "value": "zoomIn",
+            "label": "Zoom in"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Divider",
+        "category": "Layout",
+        "settings": {
+
+        }
+      }
+    ]
+  }
+{% endschema %}

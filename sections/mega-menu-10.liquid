@@ -1,0 +1,410 @@
+{% comment %}
+** Mega menu - static **
+- Static section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="mega-menu__section mega-menu__{{ section.id }}">
+
+  {% include 'include-mega-menu' %}
+
+  {% comment %}JavaScript{% endcomment %}
+  <script
+    type="application/json"
+    data-section-id="{{ section.id }}"
+    data-section-data
+  >
+    {
+      "parent_link": {{ section.settings.parent_link | handleize | json }},
+      "section_id": {{ section.id | json }}
+    }
+  </script>
+  <script src="{{ 'z__jsMegaMenu.js' | asset_url }}"></script>
+</section>
+
+{% schema %}
+
+{
+  "name": "Mega menu 10",
+  "class": "mega-menu-section mega-menu-10 jsMegaMenu",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Mega menu",
+      "info": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360021253094)"
+    },
+    {
+      "type": "text",
+      "id": "parent_link",
+      "label": "Link title",
+      "info": "The mega menu will appear below this parent link."
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mega_menu_border",
+      "label": "Show borders",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "mega_menu_background_color",
+      "label": "Background",
+      "default": "#f6f6f6"
+    },
+    {
+      "type": "color",
+      "id": "mega_menu_text_color",
+      "label": "Text",
+      "default": "#404040"
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mega_bottom_bar",
+      "label": "Show bottom bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "mega_bottom_bar_icon",
+      "label": "Icon",
+      "placeholder": "Enter icon name",
+      "info": "[Icon list](https://help.outofthesandbox.com/hc/en-us/articles/360021570294)"
+    },
+    {
+      "type": "text",
+      "id": "mega_bottom_bar_text",
+      "label": "Text",
+      "default": "Add your deal, information or promotional text"
+    },
+    {
+      "type": "url",
+      "id": "mega_bottom_bar_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Base size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "regular",
+          "label": "Regular"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "regular"
+    },
+    {
+      "type": "color",
+      "id": "bottom_banner_bg",
+      "label": "Background",
+      "default": "#007ace"
+    },
+    {
+      "type": "color",
+      "id": "bottom_banner_text",
+      "label": "Text",
+      "default": "#efefef"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "html_content",
+          "label": "HTML",
+          "default": "<div class='container is-flex is-justify-center'><h2 class='title'>Your own custom HTML</h2></div>"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu_1",
+          "label": "Menu",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "url",
+          "id": "menu_1_link",
+          "label": "Menu heading link"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "600 x 600px recommended"
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "Image link"
+        },
+        {
+          "type": "richtext",
+          "id": "image_caption",
+          "label": "Text",
+          "default": "<p>Image caption appears here</p>"
+        }
+      ]
+    },
+    {
+      "type": "mixed",
+      "name": "Mixed",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Top content"
+        },
+        {
+          "type": "text",
+          "id": "richtext_top",
+          "label": "Heading",
+          "default": "Your headline"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_top",
+          "label": "Image",
+          "info": "600 x 600px recommended"
+        },
+        {
+          "type": "url",
+          "id": "image_link_top",
+          "label": "Image link"
+        },
+        {
+          "type": "richtext",
+          "id": "image_caption_top",
+          "label": "Text"
+        },
+        {
+          "type": "header",
+          "content": "Navigation"
+        },
+        {
+          "type": "link_list",
+          "id": "menu_1",
+          "label": "Menu 1",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "url",
+          "id": "menu_1_link",
+          "label": "Menu 1 heading link",
+          "info": "Add a link to the title of the menu."
+        },
+        {
+          "type": "link_list",
+          "id": "menu_2",
+          "label": "Menu 2",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "url",
+          "id": "menu_2_link",
+          "label": "Menu 2 heading link",
+          "info": "Add a link to the title of the menu."
+        },
+        {
+          "type": "link_list",
+          "id": "menu_3",
+          "label": "Menu 3",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "url",
+          "id": "menu_3_link",
+          "label": "Menu 3 heading link",
+          "info": "Add a link to the title of the menu."
+        },
+        {
+          "type": "link_list",
+          "id": "menu_4",
+          "label": "Menu 4",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "url",
+          "id": "menu_4_link",
+          "label": "Menu 4 heading link",
+          "info": "Add a link to the title of the menu."
+        },
+        {
+          "type": "header",
+          "content": "Bottom content"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_bottom",
+          "label": "Image",
+          "info": "600 x 600px recommended"
+        },
+        {
+          "type": "url",
+          "id": "image_link_bottom",
+          "label": "Image link"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext_bottom",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "featured_product",
+      "name": "Featured product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "featured_product",
+          "label": "Product"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext_bottom",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "featured_promo",
+      "name": "Featured promotion",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "600 x 600px recommended"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext",
+          "label": "Text",
+          "default": "<p>Add description and links to your promotion</p>"
+        },
+        {
+          "type": "color",
+          "id": "bgr_color",
+          "label": "Background",
+          "default": "#EEEEEE"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "#000000"
+        },
+        {
+          "type": "header",
+          "content": "Button"
+        },
+        {
+          "type": "url",
+          "id": "promo_link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Label",
+          "default": "Shop now"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        }
+      ]
+    },
+    {
+      "type": "empty_column",
+      "name": "Empty column"
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "menu"
+      },
+      {
+        "type": "featured_promo"
+      },
+      {
+        "type": "mixed"
+      },
+      {
+        "type": "empty_column"
+      },
+      {
+        "type": "image"
+      },
+      {
+        "type": "featured_product"
+      }
+    ]
+  }
+}
+
+{% endschema %}

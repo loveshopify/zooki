@@ -1,0 +1,172 @@
+<div class="iai-container">
+    <div class="iai-inner-container">
+        <h2>{{ section.settings.heading }}</h2>
+        <div class="iai-txt-img">
+            <!-- FIRST TEXT AREA -->
+            <div class="iai-f-txt">
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-1 }}</h4>
+                    <p>{{ section.settings.sub-txt-1 }}</p>
+                </div>
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-2 }}</h4>
+                    <p>{{ section.settings.sub-txt-2 }}</p>
+                </div>
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-3 }}</h4>
+                    <p>{{ section.settings.sub-txt-3 }}</p>
+                </div>
+            </div>
+            <!-- IMAGE IN THE MIDDLE -->
+            <div class="iai-img">
+                {% render 'rimage', image: section.settings.img, size: '1920x' %}
+            </div>
+
+            <!-- SECOND TEXT AREA -->
+
+            <div class="iai-s-txt">
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-4 }}</h4>
+                    <p>{{ section.settings.sub-txt-4 }}</p>
+                </div>
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-5 }}</h4>
+                    <p>{{ section.settings.sub-txt-5 }}</p>
+                </div>
+                <div class="iai-txt-area">
+                    <h4>{{ section.settings.sub-title-6 }}</h4>
+                    <p>{{ section.settings.sub-txt-6 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="iai-btns">
+        <button class="trigger-ing"><span>Ingredients</span></button>
+        <button class="trigger-nut"><span>Nutritional information</span></button>
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- MODAL Ingredients -->
+<div class="ing-modal">
+    <div class="ing-modal-content">
+        <span class="ing-close-button">×</span>
+        <h2>{{ section.settings.ing-modal-title }}</h2>
+        <div class="ing-content">{{ section.settings.ing-modal-content }}</div>
+    </div>
+</div>
+
+
+<!-- MODAL Nutiotions -->
+<div class="nut-modal">
+    <div class="nut-modal-content">
+        <span class="nut-close-button">×</span>
+        <h2>{{ section.settings.nut-modal-title }}</h2>
+        <div class="nut-content">{{ section.settings.nut-modal-content }}</div>
+    </div>
+</div>
+
+
+
+{% schema %}
+{
+"name": "Image and icons",
+"settings": [
+{
+"type": "text",
+"id": "heading",
+"label": "Section title"
+},
+{
+"type": "text",
+"id": "sub-title-1",
+"label": "First subtitle on left side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-1",
+"label": "Text for first subtitle"
+},
+{
+"type": "text",
+"id": "sub-title-2",
+"label": "Second subtitle on left side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-2",
+"label": "Text for second subtitle"
+},
+{
+"type": "text",
+"id": "sub-title-3",
+"label": "Third subtitle on left side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-3",
+"label": "Text for third subtitle"
+},
+{
+"type": "image_picker",
+"id": "img",
+"label": "Image in center"
+},
+{
+"type": "text",
+"id": "sub-title-4",
+"label": "Fourth subtitle on right side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-4",
+"label": "Text for fourth subtitle"
+},
+{
+"type": "text",
+"id": "sub-title-5",
+"label": "Fifth subtitle on right side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-5",
+"label": "Text for fifth subtitle"
+},
+{
+"type": "text",
+"id": "sub-title-6",
+"label": "Sixth subtitle on right side"
+},
+{
+"type": "textarea",
+"id": "sub-txt-6",
+"label": "Text for sixth subtitle"
+},
+{
+"type": "text",
+"id": "ing-modal-title",
+"label": "Ingredients modal title"
+},
+{
+"type": "html",
+"id": "ing-modal-content",
+"label": "Enter HTML here"
+},
+{
+"type": "text",
+"id": "nut-modal-title",
+"label": "Nutrition modal title"
+},
+{
+"type": "html",
+"id": "nut-modal-content",
+"label": "Enter HTML here"
+}
+]
+}
+{% endschema %}

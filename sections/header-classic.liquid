@@ -1,0 +1,489 @@
+{% comment %}
+** Header 1 Classic - static **
+- Static section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign logo = section.settings.logo %}
+{% assign overlay_logo = section.settings.overlay_logo %}
+{% assign mobile_logo = section.settings.mobile_logo %}
+{% comment %} Advanced {% endcomment %}
+{% assign width = section.settings.width %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign header_alpha = settings.header_background | color_extract: 'alpha' %}
+{% assign overlay_alpha = section.settings.overlay_background | color_extract: 'alpha' %}
+{% assign overlay_link_alpha = section.settings.overlay_link_color | color_extract: 'alpha' %}
+{% assign overlay_link_hover_alpha = section.settings.overlay_link_hover_color | color_extract: 'alpha' %}
+
+{% comment %} Opacity level {% endcomment %}
+{% if header_alpha != 0 %}
+  {% assign sticky_background_alpha = section.settings.sticky_background_opacity | divided_by: 100.00 %}
+  {% assign overlay_background_alpha = section.settings.overlay_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .header__logo,
+  .logo__content {
+    width: {{ section.settings.logo_width }}px;
+  }
+
+  .is-sticky .header__logo {
+    width: {{ section.settings.scroll_logo_width }}px;
+  }
+
+  {%- if section.settings.enable_overlay -%}
+    [data-enable_overlay="true"] .header {
+      background-color: {%- if overlay_alpha != 0 -%}{{ section.settings.overlay_background | color_modify: 'alpha', overlay_background_alpha }}{%- else -%}{{ settings.header_background | color_modify: 'alpha', overlay_background_alpha }}{%- endif -%};
+    }
+
+    [data-enable_overlay="true"] .header__logo,
+    .overlay-logo__content {
+      width: {{ section.settings.overlay_logo_width }}px;
+    }
+
+    [data-enable_overlay="true"] .header__link,
+    [data-enable_overlay="true"] .select select {
+      color: {%- if overlay_link_alpha != 0 -%}{{ section.settings.overlay_link_color }}{%- endif -%};
+      fill: {%- if overlay_link_alpha != 0 -%}{{ section.settings.overlay_link_color }}{%- endif -%};
+      {% if section.settings.show_text_shadow %}
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .4);
+      {% endif %}
+    }
+
+    [data-enable_overlay="true"] .header__link:hover,
+    [data-enable_overlay="true"] .header__link.is-active,
+    [data-enable_overlay="true"] .select select:hover {
+      color: {%- if overlay_link_hover_alpha != 0 -%}{{ section.settings.overlay_link_hover_color }}{%- endif -%};
+      fill: {%- if overlay_link_hover_alpha != 0 -%}{{ section.settings.overlay_link_hover_color }}{%- endif -%};
+    }
+  {%- endif -%}
+  {%- if section.settings.enable_sticky -%}
+    .header-sticky-wrapper.is-sticky .header {
+      background-color: {{ settings.header_background | color_modify: 'alpha', sticky_background_alpha }};
+    }
+
+    #mobile-header-sticky-wrapper.is-sticky .mobile-header {
+      background-color: {{ settings.header_background | color_modify: 'alpha', sticky_background_alpha }};
+    }
+
+    .mobile-menu--opened #mobile-header-sticky-wrapper.is-sticky .mobile-header {
+      background-color: {{ settings.header_background }};
+    }
+  {%- endif -%}
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% include 'header__structured-data' %}
+
+{% comment %} HTML markup {% endcomment %}
+<div class="is-relative {{ css_class }}" data-enable_overlay="{{ section.settings.enable_overlay }}" data-enable_sticky="{{ section.settings.enable_sticky }}">
+  {% comment %}
+  <header id="header" class="header dropdown-style-{{ settings.dropdown_style }} box-shadow-{{ settings.show_dropdown_shadow }}">
+    <section class="section
+                    is-width-{{ width }}">
+      <div class="container">
+        <div class="navbar is-align-center is-justify-space-between vertical-alignment-{{ section.settings.vertical_alignment }} one-whole column">
+          <div class="header__brand">
+            {% if section.settings.enable_overlay and section.settings.overlay_logo != blank %}
+              {% if template contains 'index' %}
+                <h1 class="visuallyhidden">{{ shop.name }}</h1>
+              {% endif %}
+              <div class="overlay-logo__content">
+                <a class="header__logo header__link overlay-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                  {% include 'image-element', image: section.settings.overlay_logo, alt: section.settings.overlay_logo.alt, additional_classes: 'overlay-logo', back_to_basics: true %}
+                </a>
+              </div>
+              <div class="logo__content">
+                {% if section.settings.logo != blank %}
+                  <h1 class="visuallyhidden">{{ shop.name }}</h1>
+                  <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                    <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/YourZooki_logo_140px_width.svg?v=1600194994" alt="" class="primary-logo">
+                  </a>
+                {% else %}
+                  <h1 class="header__logo-text">
+                    <a href="{{ shop.url }}" class="header__link primary-brand">
+                      {{ shop.name }}
+                    </a>
+                  </h1>
+                {% endif %}
+              </div>
+            {% elsif section.settings.logo != blank %}
+              {% if template contains 'index' %}
+                <h1 class="visuallyhidden">{{ shop.name }}</h1>
+              {% endif %}
+              <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/YourZooki_logo_140px_width.svg?v=1600194994" alt="" class="primary-logo">
+              </a>
+            {% else %}
+              {% if template contains 'index' %}
+                <h1 class="header__logo-text">
+                  <a href="{{ shop.url }}" class="header__link primary-brand">
+                    {{ shop.name }}
+                  </a>
+                </h1>
+              {% else %}
+                <a href="{{ shop.url }}" class="header__logo-text header__link primary-brand">
+                  {{ shop.name }}
+                </a>
+              {% endif %}
+            {% endif %}
+          </div>
+          {%- comment -%} Added by westmountsolutions.com WSDEV200904-DV - Put black colors on all items on not active links {%- endcomment -%}
+          {% assign main_menu = linklists[section.settings.main_linklist] %}
+          {% assign wsActive = false %}
+          {% for link in main_menu.links %}
+            {% if link.active or link.child_active %}
+              {% assign wsActive = true %}
+            {% endif %}
+          {% endfor %}
+          <div class="header__menu is-justify-{{ section.settings.menu_alignment }} {% unless wsActive %}ws_all_black{% endunless %}">
+          {%- comment -%} End of added by westmountsolutions.com WSDEV200904-DV - Put black colors on all items on not active links {%- endcomment -%}
+            <nav class="header__menu-items is-flex is-flex-wrap is-justify-{{ section.settings.menu_alignment }} header__dropdown--{{ settings.dropdown_position }}" role="navigation" aria-label="main navigation">
+              {% for link in main_menu.links %}
+                {% if link.links == blank %}
+                  <div class="navbar-item header__item {% if link.active or link.child_active %}is-active{% endif %}" data-navlink-handle="{{ link.title | handleize }}">
+                    <a href="{{ link.url }}" class="navbar-link header__link {% if link.active %}is-active{% endif %} is-arrowless">
+                      {{ link.title }}
+                    </a>
+                  </div>
+                {% else %}
+                  <div class="navbar-item header__item has-dropdown has-dropdown--{{ settings.dropdown_style }} is-hoverable {% if link.active or link.child_active %}is-active{% endif %}" aria-haspopup="true" aria-expanded="false" data-navlink-handle="{{ link.title | handleize }}">
+                    <a class="navbar-link header__link {% if link.active or link.child_active %}is-active{% endif %}"
+                      {% unless link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %} href="{{ link.url }}" {% endunless %}>
+                      {{ link.title }}
+                    </a>
+                    {% include 'header__dropdown-menu' %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </nav>
+          </div>
+
+          {% include 'header__action-icons' %}
+        </div>
+      </div>
+    </section>
+  </header>
+  {% endcomment %}
+  {% include 'tablet-header' %}
+  
+  {% include 'mobile-header' %}
+
+  {% if settings.search_display_style == 'overlay' %}
+    {% include 'search-overlay' %}
+  {% endif %}
+
+</div>
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "enable_overlay": {{ section.settings.enable_overlay | json }},
+    "enable_sticky": {{ section.settings.enable_sticky | json }},
+    "header_layout": {{ settings.header_layout | json }}
+  }
+</script>
+<script src="{{ 'z__jsHeader.js' | asset_url }}"></script>
+
+{% comment %}Schema{% endcomment %}
+{% schema %}
+
+{
+  "name": "Header",
+  "class": "header--classic jsHeader header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "600 x 200px recommended"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Width",
+      "step": 5,
+      "min": 80,
+      "max": 300,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_linklist",
+      "label": "Main menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "link_list",
+      "id": "mob_main_linklist",
+      "label": "Main menu (mobile)"
+    },
+    {
+      "type": "select",
+      "id": "menu_alignment",
+      "label": "Menu alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "icons",
+          "label": "Icons only"
+        },
+        {
+          "value": "text",
+          "label": "Text only"
+        },
+        {
+          "value": "icons_text",
+          "label": "Icons and text"
+        }
+      ],
+      "default": "icons"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "paragraph",
+      "content": "Header is overlaid directly on images. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022225073/#header-overlay)"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Enable overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text_shadow",
+      "label": "Show text shadow",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "overlay_link_color",
+      "label": "Links",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "overlay_link_hover_color",
+      "label": "Links hover",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "overlay_background",
+      "label": "Background",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "range",
+      "id": "overlay_background_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "default": 0,
+      "unit": "%"
+    },
+    {
+      "type": "image_picker",
+      "id": "overlay_logo",
+      "label": "Overlay logo",
+      "info": "600 x 200px recommended"
+    },
+    {
+      "type": "range",
+      "id": "overlay_logo_width",
+      "label": "Overlay logo width",
+      "step": 5,
+      "min": 30,
+      "max": 300,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Sticky header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable sticky on scroll"
+    },
+    {
+      "type": "range",
+      "id": "sticky_background_opacity",
+      "label": "Background opacity",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "default": 50,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "scroll_logo_width",
+      "label": "Logo width",
+      "step": 5,
+      "min": 30,
+      "max": 300,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical alignment",
+      "default": "center",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "block",
+      "name": "Country Selection",
+      "settings": [
+        {
+          "type": "html",
+          "id": "flag_icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "text",
+          "id": "currency",
+          "label": "Currency"
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

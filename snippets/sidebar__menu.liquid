@@ -1,0 +1,59 @@
+{% if menu != blank %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ linklists[menu].title }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+  <ul class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    {% for link in linklists[menu].links %}
+      <li class="sidebar-block__item">
+        <a {% if link.active %}class="active"{% endif %} href="{{ link.url }}" title="{{ link.title | escape }}">{{ link.title }}</a>
+
+        {% if linklists[link.handle] != empty %}
+          {% assign display_sublinks = false %}
+
+          {% for link in linklists[link.handle].links %}
+            {% if link.active %}
+              {% assign display_sublinks = true %}
+            {% endif %}
+          {% endfor %}
+
+          {% if display_sublinks or link.active %}
+            <ul>
+            {% for link in linklists[link.handle].links %}
+              <li>
+                <a {% if link.active %}class="active"{% endif %} href="{{ link.url }}" title="{{ link.title }}">{{ link.title }}</a>
+              </li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ 'homepage.onboarding.menu_title' | t }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+  <ul class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    <li><p>{{ 'homepage.onboarding.no_content' | t }}</p></li>
+  </ul>
+{% endif %}

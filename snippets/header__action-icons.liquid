@@ -1,0 +1,249 @@
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+<div class="header__icons header__icon-style-{{ object.settings.icon_style | replace: '_', '-' }} {{ header_icon_class }}">
+  <a href="#" class="header__link action-area__link flag-icon-item tab-header" data-toggle-target=".data-tab-content-flag">
+    {% comment %}<img src="{{ 'flag-icon-uk.png' | asset_url }}">{% endcomment %}
+    {% render 'icon' with 'flag-uk' %}
+  </a>
+  {% if object.settings.display_search %}
+    {% comment %} Search icon // data-show-search-trigger{% endcomment %}
+    <a href="#" class="header__link action-area__link search-icon-item tab-header" data-toggle-target=".data-tab-content-search">
+      {% include settings.icon, name: 'search', icon_class: 'header__icon' %}
+      <span class="icon-caption">{{ 'general.search.title' | t | escape }}</span>
+    </a>
+  {% endif %}
+
+  {% if settings.show_multiple_currencies %}
+    {% comment %} Currency converter select {% endcomment %}
+    <div class="header__currency-dropdown header__link action-area__link">
+        {% include settings.icon, name: 'globe', icon_class: 'header__icon' %}
+        <span class="icon-caption select is-arrowless">
+          {% include 'header__currencies-switcher' %}
+        </span>
+    </div>
+  {% endif %}
+
+  {% if shop.customer_accounts_enabled %}
+    {% if customer %}
+      <div id="header__account_icon" href="{{ routes.account_url }}" class="header__link action-area__link sign-icon-item tab-header" {% unless customer %}data-toggle-target=".data-tab-content-account"{% endunless %}>
+          {% include settings.icon, name: 'avatar', icon_class: 'header__icon' %}
+          <span class="icon-caption">{{ 'layout.customer.my_account' | t | escape }}</span>
+      </div>
+    {% else %}
+      <a href='#' class="header__link action-area__link sign-icon-item tab-header" {% unless customer %}data-toggle-target=".data-tab-content-account"{% endunless %}>
+        {% include settings.icon, name: 'avatar', icon_class: 'header__icon' %}
+        <span class="icon-caption">{{ 'layout.customer.my_account' | t | escape }}</span>
+      </a>
+    {% endif %}
+  {% endif %}
+  
+  {% comment %}
+  {% if shop.customer_accounts_enabled %}
+    {% comment %} Account icon {% endcomment %}
+    {% if customer %}
+      {% comment %} Logout {% endcomment %}
+      <a href="{{ routes.account_url }}" class="header__link action-area__link sign-icon-item tab-header" data-tab="signin" data-tab-header>
+          {% include settings.icon, name: 'avatar', icon_class: 'header__icon' %}
+          <span class="icon-caption">{{ 'layout.customer.my_account' | t | escape }}</span>
+      </a>
+    {% else %}
+      {% comment %} Login {% endcomment %}
+      <a href="{{ routes.account_login_url }}" class="header__link action-area__link" >
+          {% include settings.icon, name: 'avatar', icon_class: 'header__icon' %}
+          <span class="icon-caption">{{ 'layout.customer.log_in' | t | escape }}</span>
+      </a>
+    {% endif %}
+  {% endif %}
+  {% endcomment %}
+
+  {% comment %} Cart icon {% endcomment %}
+  <div class="header--cart action-area__link tab-header {% if cart.item_count != 0 %}has-cart-count{% endif %}" data-toggle-target=".data-tab-content-cart">
+    <a class="header__link" {% unless settings.cart_action == 'mini_cart' %}href="{{ routes.cart_url }}" >{% endunless %}
+      <span class="header-cart__icon">
+        {% comment %}{% include settings.icon, name: settings.cart_icon, icon_class: 'header__icon' %}{% endcomment %}
+		<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="icon/bag" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <g id="icon-account">
+              <rect id="bounding-box" x="0" y="0" width="24" height="24"></rect>
+              <path d="M12,0.5 C14.6589665,0.5 15.8481716,1.84437068 16.2858415,5.00268581 L16.1727442,5 C18.8207872,5 21.0096242,7.06457439 21.1642164,9.70810104 L21.8762129,21.8832404 C21.9406974,22.985926 21.0990692,23.9321044 19.9963836,23.9965889 L19.879624,24 L4.120376,24 C3.0158065,24 2.120376,23.1045695 2.120376,22 L2.12378711,21.8832404 L2.83578356,9.70810104 C2.98817963,7.1021283 5.11743412,5.05877547 7.71468413,5.0012457 C8.15182839,1.84437068 9.34103352,0.5 12,0.5 Z M15.393415,6.00021699 L8.60666117,5.99934685 C8.53166456,6.85532894 8.5,7.85078846 8.5,9 C8.5,9.27614237 8.27614237,9.5 8,9.5 C7.72385763,9.5 7.5,9.27614237 7.5,9 C7.5,7.88145832 7.53114261,6.88600988 7.60457698,6.00636544 C5.65469954,6.11344547 4.06308238,7.62035808 3.85108446,9.56330647 L3.83407801,9.76648083 L3.12208156,21.9416202 C3.12094476,21.9610594 3.120376,21.9805276 3.120376,22 C3.120376,22.5128358 3.50641619,22.9355072 4.00375488,22.9932723 L4.120376,23 L19.9380038,22.9982944 C20.449965,22.9683552 20.8493784,22.558298 20.8780105,22.0584352 L20.8780105,21.9416202 L20.165922,9.76648083 C20.046595,7.72598881 18.4122575,6.11667339 16.394697,6.00606929 C16.4688574,6.88600988 16.5,7.88145832 16.5,9 C16.5,9.27614237 16.2761424,9.5 16,9.5 C15.7238576,9.5 15.5,9.27614237 15.5,9 L15.4963971,8.35335933 C15.4862086,7.4730973 15.4539266,6.69121884 15.393415,6.00021699 Z M12,1.5 C10.0481722,1.5 9.10835587,2.48030454 8.72405953,4.99940842 L15.2759579,4.99952261 C14.8916725,2.48033417 13.9518573,1.5 12,1.5 Z" id="Combined-Shape" fill="#1A1A1A" fill-rule="nonzero"></path>
+            </g>
+          </g>
+        </svg>
+        <span class="header-cart__count header-cart__count--badge badge" data-bind="itemCount">
+          {{ cart.item_count }}
+        </span>
+      </span>
+      <span class="header-cart__caption icon-caption">
+        {{ 'layout.general.cart' | t | escape }}
+        {%- if object.settings.icon_style == 'text' -%}
+          <span class="header-cart__count cart__count--text" data-bind="itemCount">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </span>
+    </a>
+  </div>
+</div>
+
+<div class="tab-contents">
+  <div class="tab-content data-tab-content-flag">
+    <div class="country-selection">
+      {% for block in section.blocks %}
+        <li class="{% if forloop.first %}is_active{% endif %}">
+          <a href="http://{{ block.settings.link }}">
+            <div class="icon_wrapper">
+              <div class="flag_svg">{{ block.settings.flag_icon }}</div>
+            </div>
+            <div class="info_wrapper">
+              <div class="title">{{ block.settings.title }}</div>
+              <div>
+                <span>{{ block.settings.subtitle }}</span>
+                <span>{{ block.settings.currency }}</span>
+              </div>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tab-content data-tab-content-search">
+    <form class="search-form search-popup__form" action="{{ routes.search_url }}">
+      <div class="search__fields">
+        {% if settings.search_option != 'everything' %}
+          <input class="visuallyhidden" type="text" name="type" value="product" />
+        {% endif %}
+        <label for="q" class="visuallyhidden">{{ settings.search_placeholder }}</label>
+        <div class="field">
+          <div class="control has-icons-left">
+            <label for="q" class="search_label">Search</label>
+            <div class="input_wrap"><input class="input" id="q" type="text" name="q" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+              <input type="submit" name="search" class="" value="Search" /></div>
+            {% if settings.enable_autocomplete == true %}
+              <ul class="predictive-results"></ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="tab-content data-tab-content-account" data-tab-content="account">
+    <div class="form-wrapper form-signup" data-form-content="signup" >
+      <div class="form-title">Sign up</div>
+      {% form 'create_customer' %}
+        {{ form.errors | default_errors }}
+        <div id="first_name" class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.first_name' | t }}</label>
+          <div class="control">
+            <input type="text" value="" name="customer[first_name]" id="first_name" class="input" size="30" placeholder="{{ 'customer.register.first_name' | t }}" />
+          </div>
+        </div>
+        <div id="last_name" class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.last_name' | t }}</label>
+          <div class="control">
+            <input type="text" value="" name="customer[last_name]" id="last_name" class="input" size="30" placeholder="{{ 'customer.register.last_name' | t }}" />
+          </div>
+        </div>
+        <div id="email" class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.email' | t }}*</label>
+          <div class="control">
+            <input type="email" value="" name="customer[email]" id="email" class="input" size="30" placeholder="{{ 'customer.register.email' | t }}*" />
+          </div>
+        </div>
+        <div id="password" class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.password' | t }}*</label>
+          <div class="control">
+            <input type="password" value="" name="customer[password]" id="password" class="input" size="30" placeholder="{{ 'customer.register.password' | t }}" />
+             <div class="pwstrength_viewport_progress"></div>
+          </div>
+        </div>
+        <div class="is-flex is-justify-space-between">
+          <input class="button button--secondary" type="submit" value="Sign up" />
+          {% comment %}<p class="has-margin-left">* {{ 'general.forms.required_field' | t }}</p>{% endcomment %}
+        </div>
+        <p class="has-padding-top form-footer">
+          Already signed up to YourZooki? 
+          <a href="javascript:;" class="hoverButton" data-form="signin">Sign in</a>
+        </p>
+      {% endform %}
+    </div>
+    <div class="form-wrapper form-signin is-hidden" data-form-content="signin">
+      <div class="form-title">Sign in</div>
+      {% form 'customer_login' %}
+        {{ form.errors | default_errors }}
+        <div class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.email' | t }}*</label>
+          <div class="control">
+            <input type="email" value="" name="customer[email]" id="customer_email" class="input" size="30"  autocorrect="off" autocapitalize="off" tabindex="1" placeholder="{{ 'customer.login.email' | t }}"/>
+          </div>
+        </div>
+        {% if form.password_needed %}
+          {% comment %}
+            Customer Account Login
+          {% endcomment %}
+        {% endif %}
+        <div class="field">
+          <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.password' | t }}*</label>
+          <div class="control">
+            <input type="password" value="" name="customer[password]" id="customer_password" class="input" size="16" tabindex="2" placeholder="{{ 'customer.login.password' | t }}"/>
+          </div>
+        </div>
+        <div class="is-flex is-flex-wrap is-justify-space-between  is-align-center">
+          <input class="button button--secondary" type="submit" value="{{ 'customer.login.sign_in' | t }}" style="margin-bottom: 5px !important" tabindex="3" />
+          <small class="right"><a class="js-recover-password" href="javascript:;" data-form="reset">{{ 'customer.login.forgot_password' | t }}</a></small>
+        </div>
+        {% unless shop.checkout.guest_login %}
+          <p class="has-padding-top">
+            {{ 'customer.login.new_customer_label' | t }}
+            <a href="javascript:;" class="hoverButton" data-form="signup">Sign up</a>
+          </p>
+        {% endunless %}
+      {% endform %}
+      {% if shop.checkout.guest_login %}
+        <span class="has-padding-top"> {{ 'customer.login.or' | t }} </span>
+        {% form 'guest_login' %}
+          <input class="button button--secondary" type="submit" value="{{ 'customer.login.guest_title_html' | t }}" />
+        {% endform %}
+      {% endif %}
+    </div>
+    <div class="form-wrapper form-reset-psd is-hidden" data-form-content="reset">
+      <div class="form-title">Reset password</div>
+      {% form 'recover_customer_password' %}
+        {%- if form.errors -%}
+          <div class="form-subtitle">We didn’t find an account with that email address, please try again</div>
+        {% endif %}
+        {% comment %}{{ form.errors | default_errors }}{% endcomment %}
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <div class="control">
+            <input type="email" value="" name="email" id="recover-email" class="input" placeholder="Email"/>
+          </div>
+        </div>
+        <div class="account-form-submit">
+          <input type="submit" value="Email me" />
+        </div>
+        <div>
+          <a href="javascript:;" data-form="signin">Back to sign in</a>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+  <div class="tab-content data-tab-content-cart" data-tab-content="cart">
+    {% if settings.cart_action == 'mini_cart' %}
+      {% include 'ajax-cart' %}
+    {% endif %}
+  </div>
+  <div class="tab-content-overlay"></div>
+</div>
+
+<script>
+  $('#header__account_icon').click(function(e) {
+    console.log("account icon clicked");
+    e.preventDefault();
+    {% if customer %}
+      window.location = '/account';
+    {% endif %}
+  });
+</script>

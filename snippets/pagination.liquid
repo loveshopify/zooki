@@ -1,0 +1,76 @@
+{% comment %}
+
+  This snippet renders a custom widget based on the current 'paginate' context,
+  defined in { % paginate XXXX by 5 % } tags wrapping the content.
+
+  Replace Text Example:
+    <div class="pagination">
+      {{ paginate | default_pagination | replace: 'Previous', 'Newer articles' | replace: 'Next', 'Older articles' }}
+    </div>
+
+  More information:
+  - http://docs.shopify.com/themes/liquid-variables/paginate
+______________
+Optional values
+pagination_type: <string>
+context: <string>
+{% endcomment %}
+
+{% if paginate.pages > 1 %}
+  <div class="paginate" data-current-page="{{ paginate.current_page }}" data-paginate-pages="{{ paginate.pages }}">
+    {%  if pagination_type == 'load_more'
+        or pagination_type == 'infinite_scroll'
+        or pagination_type == 'infinite_load_more' %}
+
+        {% if load_more_text == blank %}
+          {% assign load_more_text = 'general.pagination.pagination_button' | t %}
+        {% endif %}
+
+      {% if paginate.next.url %}
+        {% assign next_url = paginate.next.url %}
+        {% if pagination_type == 'load_more' %}
+          {% comment %} Incremental load more button {% endcomment %}
+          {% include 'button', label: load_more_text, type: "link", href: next_url, attribute: 'data-load-more data-custom-pagination', class: 'pagination-button__load-more', style: 'button--primary'  %}
+        {% elsif pagination_type == 'infinite_scroll' %}
+          {% comment %} Button turned into loading icon {% endcomment %}
+          {% include 'button', label: load_more_text, type: "link", href: next_url, attribute: 'data-load-infinite-scroll data-load-infinite data-custom-pagination', class: 'is-loading is-loading--icon-only', style: 'button--primary'  %}
+        {% elsif pagination_type == 'infinite_load_more' %}
+          {% comment %} Infinite load more button {% endcomment %}
+          {% include 'button', label: load_more_text, type: "link", href: next_url, attribute: 'data-load-more-infinite', class: 'pagination-button__load-more-infinite', style: 'button--primary'  %}
+          {% comment %} Button turned into loading icon {% endcomment %}
+          {% include 'button', label: load_more_text, type: "link", href: next_url, attribute: 'data-load-infinite data-custom-pagination', class: 'is-loading is-loading--icon-only is-hidden', style: 'button--primary'  %}
+        {% endif %}
+
+      {% endif %}
+
+    {% else %}
+      <nav class="pagination {% if paginate.previous and paginate.next %}paginate--both{% endif %}" role="navigation" aria-label="pagination">
+        {%- if paginate.previous-%}
+          <a href="{{ paginate.previous.url }}" class="pagination-previous">{{ 'general.pagination.previous' | t }}</a>
+        {% endif %}
+
+        <ul class="pagination-list">
+          {%- for part in paginate.parts -%}
+            {% if part.is_link %}
+              <li>
+                <a class="pagination-link" href="{{ part.url }}">{{ part.title }}</a>
+              </li>
+            {% elsif part.title == '&hellip;' %}
+              <li>
+                <a class="pagination-ellipsis">&hellip;</a>
+              </li>
+            {% else %}
+              <li>
+                <a class="pagination-link is-current">{{ part.title }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        {%- if paginate.next-%}
+          <a href="{{ paginate.next.url }}" class="pagination-next">{{ 'general.pagination.next' | t }}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </div>
+{% endif %}
+

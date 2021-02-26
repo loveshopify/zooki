@@ -1,0 +1,306 @@
+{% comment %}
+** Featured product - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% include 'include-featured-product', type: 'product' %}
+
+{% schema %}
+{
+  "name": "Featured product",
+  "class": "featured-product-section jsProduct",
+  "settings": [
+    {
+      "type": "product",
+      "id": "featured_product",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Product gallery"
+    },
+    {
+      "type": "checkbox",
+      "id": "gallery_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Magnify on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_product_lightbox",
+      "label": "Enable lightbox",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "slideshow_speed",
+      "label": "Gallery speed",
+      "min": 0,
+      "max": 6,
+      "unit": "sec",
+      "default": 0,
+      "info": "Set to 0 to disable autoplay."
+    },
+    {
+      "type": "select",
+      "id": "slideshow_transition",
+      "label": "Gallery transition",
+      "options": [
+        {
+          "value": "slide",
+          "label": "Slide"
+        },
+        {
+          "value": "fade",
+          "label": "Fade"
+        }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "select",
+      "id": "thumbnail_position",
+      "label": "Thumbnails",
+      "default": "bottom-thumbnails",
+      "options": [
+        {
+          "value": "left-thumbnails",
+          "label": "Left"
+        },
+        {
+          "value": "right-thumbnails",
+          "label": "Right"
+        },
+        {
+          "value": "bottom-thumbnails",
+          "label": "Bottom"
+        },
+        {
+          "value": "no-thumbnails",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_thumbnail_slider",
+      "label": "Enable thumbnail slider",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "product_images_position",
+      "label": "Gallery position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_sku",
+      "label": "Show SKU",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_shopify_product_badges",
+      "label": "Show star rating",
+      "info": "Reviews app must be enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360008549274#section2)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_savings",
+      "label": "Show price savings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_button",
+      "label": "Show dynamic checkout button",
+      "default": true,
+      "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https:\/\/help.shopify.com\/manual\/using-themes\/change-the-layout\/dynamic-checkout)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "custom_description",
+      "label": "Product description",
+      "info": "Used to create a custom product description."
+    },
+    {
+      "type": "radio",
+      "id": "product_description_position",
+      "label": "Description position",
+      "default": "top",
+      "options": [
+        {
+          "value": "top",
+          "label": "Above 'add to cart'"
+        },
+        {
+          "value": "bottom",
+          "label": "Below 'add to cart'"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "display_collections",
+      "label": "Show collections",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_type",
+      "label": "Show type",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_tags",
+      "label": "Show tags",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_social_buttons",
+      "label": "Show social media share icons",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [{
+    "name": "Featured product",
+    "category": "Product",
+    "settings": {
+
+    }
+  }]
+}
+{% endschema %}

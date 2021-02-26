@@ -1,0 +1,29 @@
+{% if context == 'header' %}
+  {% assign search_results = settings.search_option %}
+{% else %}
+  {% assign search_results = block.settings.search_results %}
+{% endif %}
+
+{% if block.settings.title != blank %}
+  <h3 class="sidebar-block__heading">
+    {{ block.settings.title }}
+  </h3>
+{% endif %}
+<form class="sidebar-block__content sidebar-block__search search-form" action="{{ routes.search_url }}">
+  <div class="search__fields">
+    {% if search_results != "search_everything" %}
+      <input class="visuallyhidden" type="text" name="type" value="product" />
+    {% endif %}
+    <label for="q" class="visuallyhidden">{{ 'general.search.placeholder' | t }}</label>
+    <div class="field">
+      <div class="control has-icons-left is-relative">
+        {% if settings.enable_autocomplete == true %}
+          <ul class="predictive-results"></ul>
+        {% endif %}
+        <input class="input" id="q" type="text" name="q" placeholder="{{ 'general.search.placeholder' | t }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+        {% include settings.icon, name: 'search' %}
+      </div>
+    </div>
+    <input type="submit" name="search" class="visuallyhidden" value="" />
+  </div>
+</form>

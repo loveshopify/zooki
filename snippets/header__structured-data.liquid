@@ -1,0 +1,23 @@
+{% comment %} JSON-LD Structured data - https://developers.google.com/search/docs/guides/intro-structured-data {% endcomment %}
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": "{{ shop.name }}",
+    {% if section.settings.logo %}
+      {% assign image_size = section.settings.logo.width | append:'x' %}
+      "logo": "https:{{ section.settings.logo | img_url: image_size }}",
+    {% endif %}
+    "sameAs": [
+      "{{ settings.twitter_link }}",
+      "{{ settings.facebook_link }}",
+      "{{ settings.pinterest_link }}",
+      "{{ settings.instagram_link }}",
+      "{{ settings.tumblr_link }}",
+      "{{ settings.snapchat_link }}",
+      "{{ settings.youtube_link }}",
+      "{{ settings.vimeo_link }}"
+    ],
+    "url": "{{ shop.url }}{{ page.url }}"
+  }
+</script>

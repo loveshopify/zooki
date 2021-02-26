@@ -1,0 +1,80 @@
+{% comment %}
+Product page with moveable sections template
+{% endcomment %}
+
+<div id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section product-page">
+    <section class="section__wrapper
+                    section
+                    is-width-wide
+                    ">
+        <div class="container">
+            <div class="section is-width-standard">
+                <div
+                    class="one-whole column breadcrumb__container is-flex is-justify-space-between is-flex-column-reverse-mobile is-align-center has-padding-bottom">
+
+                    <div class="breadcrumb__wrapper">
+                        {% include 'breadcrumb', type: 'product' %}
+                    </div>
+
+                    {% if collection.previous_product or collection.next_product %}
+                    <div
+                        class="page-navigation-arrows has-padding-top has-padding-bottom is-{{ settings.breadcrumb_capitalization }}">
+
+                        {% if collection.previous_product %}
+                        <a href="{{ collection.previous_product }}"
+                            title="{{ 'products.general.previous_product_html' | t }}" class="page-navigation__next">
+                            {{ 'products.general.previous_product_html' | t }}
+                        </a>
+                        {% endif %}
+                        {% if collection.previous_product and collection.next_product %}
+                        <span class="page-navigation__divider"> | </span>
+                        {% endif %}
+                        {% if collection.next_product %}
+                        <a href="{{collection.next_product}}" title="{{ 'products.general.next_product_html' | t }}"
+                            class="page-navigation__next">
+                            {{ 'products.general.next_product_html' | t }}
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            {% section 'product__sidebar' %}
+            {% section 'product-sections__main-gluta' %}
+            {% section 'TitleAndIconsGluta' %}
+            {% section 'logo-section' %}
+            {% section 'image-and-icons-gluta' %}
+            {% section 'Directions-for-use-gluta' %}
+            {% section 'image-with-text-gluta' %}
+            {% section 'faq-section-gluta' %}
+        </div>
+
+    </section>
+</div>
+
+<div id="yotpo-reviews" class="yotpo yotpo-main-widget" data-product-id="{{ product.id }}" data-name="{{ product.title | escape }}"
+    data-url="{{ shop.url }}{{ product.url }}"
+    data-image-url="{{ product.featured_image | product_img_url: "large" |replace: '?', '%3F' | replace: '&','%26'}}"
+    data-description="{{ product.description | escape }}">
+
+    {%- assign yotpo_offload_content = shop.metafields.yotpo.yotpo_offload_content %}
+    {%- assign time_now = 'now' | date: '%s' %}
+    {%- assign yotpo_live_time = shop.metafields.yotpo.yotpo_live | date: '%s' %}
+    {%- assign diff_seconds_from_live = time_now | minus: yotpo_live_time %}
+    {%- assign yotpo_main_widget_last_updated = product.metafields.yotpo.main_widget_update_time | date: '%s' %}
+    {%- assign diff_seconds_from_last_main_widget_update = time_now | minus: yotpo_main_widget_last_updated %}
+    {%- if yotpo_live_time and diff_seconds_from_live < 86400 or yotpo_main_widget_last_updated and diff_seconds_from_last_main_widget_update < 86400 -%}
+    {%- assign yotpo_main_widget_obsolete = false %}
+    {%- else %}
+    {%- assign yotpo_main_widget_obsolete = true %}
+    {%- endif %}
+    {%- if yotpo_offload_content == 'yes' and yotpo_main_widget_obsolete != true -%}
+    {%- for field in product.metafields.yotpo_reviews -%}
+    {{ field | last }}
+    {%- endfor -%}
+    {%- endif %}</div>

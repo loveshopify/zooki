@@ -1,0 +1,377 @@
+{% comment %}
+** Collection sidebar **
+- Complimentary section to be used with collection templates
+- Uses blocks
+{% endcomment %}
+
+{% if section.blocks.size > 0 and section.settings.show_sidebar %}
+
+{% assign id = section.id %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  {% if section.settings.show_sidebar %}
+    #shopify-section-{{ id }} {
+      width: 25%;
+    }
+
+    #shopify-section-{{ id }} + .has-sidebar-option {
+      width: 75%;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<aside class="{{ css_class }}
+              one-whole
+              column">
+  {% for block in section.blocks %}
+    <div id="shopify-section-{{ block.id }}"
+          class="sidebar__block block__{{ block.type | downcase | replace: '_', '-' }}
+                has-padding-top has-padding-bottom
+                {% if settings.toggle_sidebar %}sidebar-toggle-active{% endif %}"
+          {{ block.shopify_attributes }}>
+
+      {% if block.type == 'collection_list' %}
+        {% comment %} Tag list {% endcomment %}
+        {% include 'sidebar__collection-list' %}
+
+      {% elsif block.type == 'featured_promo' %}
+        {% comment %} Featured promo {% endcomment %}
+        {% include 'sidebar__featured-promo' %}
+
+      {% elsif block.type == 'html' %}
+        {% comment %} Custom HTML {% endcomment %}
+        {% include 'sidebar__html' %}
+
+      {% elsif block.type == 'menu' %}
+        {% comment %} Menu {% endcomment %}
+        {% include 'sidebar__menu', menu: block.settings.menu %}
+
+      {% elsif block.type == 'newsletter' %}
+        {% comment %} Newsletter {% endcomment %}
+        {% include 'sidebar__newsletter' %}
+
+      {% elsif block.type == 'page' %}
+        {% comment %} Page {% endcomment %}
+        {% include 'sidebar__page', page: block.settings.page %}
+
+      {% elsif block.type == 'search' %}
+        {% comment %} Search {% endcomment %}
+        {% include 'sidebar__search' %}
+
+      {% elsif block.type == 'tag_filter' %}
+        {% comment %} Tag filter {% endcomment %}
+        {% include 'sidebar__tag-filter' %}
+
+      {% elsif block.type == 'tag_list' %}
+        {% comment %} Tag list {% endcomment %}
+        {% include 'sidebar__tag-list' %}
+
+      {% elsif block.type == 'text' %}
+        {% comment %} Text {% endcomment %}
+        {% include 'sidebar__text' %}
+
+      {% elsif block.type == 'type_list' %}
+        {% comment %} Type list {% endcomment %}
+        {% include 'sidebar__type-list' %}
+
+      {% elsif block.type == 'vendor_list' %}
+        {% comment %} Vendor list {% endcomment %}
+        {% include 'sidebar__vendor-list' %}
+
+      {% endif %}
+    </div>
+  {% endfor %}
+</aside>
+
+{% endif %}
+
+<script data-theme-editor-load-script src="{{ 'z__jsSidebar.js' | asset_url }}"></script>
+
+{% schema %}
+
+{
+  "name": "Collection sidebar",
+  "class": "sidebar-section collection-sidebar jsSidebar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_sidebar",
+      "label": "Show sidebar",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_list",
+      "name": "Collection list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Collections"
+        }
+      ]
+    },
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "html_content",
+          "label": "HTML",
+          "default": "<div class='container is-flex is-justify-center'><h2 class='title'>Your own custom HTML</h2></div>"
+        }
+      ]
+    },
+    {
+      "type": "featured_promo",
+      "name": "Featured promotion",
+      "settings": [
+        {
+          "type": "color",
+          "id": "promo_background",
+          "label": "Background",
+          "default": "#EEEEEE"
+        },
+        {
+          "type": "color",
+          "id": "promo_text",
+          "label": "Text",
+          "default": "#000000"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image",
+          "label": "Image"
+        },
+        {
+          "type": "richtext",
+          "id": "richtext",
+          "label": "Text",
+          "default": "<p>Use this area for promotional information.</p>"
+        },
+        {
+          "type": "url",
+          "id": "promo_link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop now"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "This menu won't show drop-down items."
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "newsletter_title",
+          "label": "Heading",
+          "default": "Subscribe"
+        },
+        {
+          "type": "richtext",
+          "id": "newsletter_richtext",
+          "label": "Text",
+          "default": "<p>Sign up to get the latest on sales, new releases and more …</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_first_name",
+          "label": "Show first name"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_last_name",
+          "label": "Show last name"
+        }
+      ]
+    },
+    {
+      "type": "page",
+      "name": "Page",
+      "settings": [
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        }
+      ]
+    },
+    {
+      "type": "search",
+      "name": "Search form",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Search"
+        }
+      ]
+    },
+    {
+      "type": "tag_filter",
+      "name": "Tag filter",
+      "limit": 5,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Filter by"
+        },
+        {
+          "type": "textarea",
+          "id": "filter_tags",
+          "label": "Filter tags",
+          "info": "Add a comma-separated list of product tags. Only the tags found in the collection will be displayed as filters. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/115008642047)"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_filter_swatches",
+          "label": "Display color swatches",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "tag_list",
+      "name": "Tag list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Category"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Text area can be used for details about blog authors or general information.</p>"
+        }
+      ]
+    },
+    {
+      "type": "type_list",
+      "name": "Type list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Types"
+        }
+      ]
+    },
+    {
+      "type": "vendor_list",
+      "name": "Vendor list",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Vendors"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "featured_promo"
+      },
+      {
+        "type": "menu"
+      },
+      {
+        "type": "text"
+      }
+    ]
+  }
+}
+
+{% endschema %}

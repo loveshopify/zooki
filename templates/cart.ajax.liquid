@@ -1,0 +1,233 @@
+{% layout none %}
+
+<template data-options>
+  {
+    "item_count": {{ cart.item_count | json }}
+  }
+</template>
+
+<template data-html="content">
+  {% comment %} No items in the cart message {% endcomment %}
+  <div class="ajax-cart__empty-cart-message text-align-center {% if cart.item_count > 0 %}is-hidden {% endif %}">
+    <p class="ajax-cart__cart-title has-margin-bottom">{{ 'cart.general.title' | t }}
+      <span class="cart__count--text" data-bind="itemCount" >{{ cart.item_count }}</span>
+    </p>
+    {% include settings.icon, name: settings.cart_icon %}
+    <p class="ajax-cart__empty-text">{{ 'layout.general.empty_cart' | t }}</p>
+    <a href="{{ routes.all_products_collection_url }}">{{ 'cart.general.continue_shopping_link_html' | t }}</a>
+  </div>
+  <form action="/checkout" method="post"
+          class="ajax-cart__form {% if cart.item_count == 0 %}is-hidden{% endif %}">
+    <div class="ajax-cart__cart-count text-align-center">
+      <p class="ajax-cart__cart-title">{{ 'cart.general.title' | t }} <span class="cart__count--text" data-bind="itemCount" >{{ cart.item_count }}</span></p>
+    </div>
+    <div class="ajax-cart__list">
+      {% assign total_saving = 0 %}
+
+      {% comment %} Loop through cart products {% endcomment %}
+        {% for item in cart.items %}
+        {%- comment -%} Added by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+        {% assign wsProduct = '' %}
+        {% for property in item.properties %}
+          {% if property.first == '_ws_original_product' %}
+            {% assign wsProduct = property.last %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {%- comment -%} End of added by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+        {% if item.variant.compare_at_price > item.variant.price %}
+          {% assign saving = item.variant.compare_at_price | minus: item.variant.price | times: item.quantity %}
+          {% assign total_saving = saving | plus: total_saving %}
+        {% endif %}
+
+        <div class="ajax-cart__product media" data-cart-item="{{ item.key }}" data-line-item="{{ forloop.index }}">
+          {% comment %} Image {% endcomment %}
+          <figure class="ajax-cart__product-image media-left">
+            {% if item.image %}
+              {%- comment -%} Modified by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+              <a href="{% render 'ws-link_product' with wsProduct: wsProduct, itemUrl: item.product.url %}">
+              {%- comment -%} End of modified by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+                {% include 'image-element', image: item.image, alt: item.title  %}
+              </a>
+            {% endif %}
+          </figure>
+          <div class="ajax-cart__product-content media-content">
+            <div class="ajax-cart__product-title">
+              {%- comment -%} Modified by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+              <a href="{% render 'ws-link_product' with wsProduct: wsProduct, itemUrl: item.product.url %}">
+              {%- comment -%} End of modified by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+                {{ item.product.title }}
+              </a>
+              <div class="subscription_title">
+                {% assign item_price = item.price | money %}
+                {% if item.properties.discounted_price == blank %}                
+                  one off purchase
+                {% else %}
+                  {% if item_price != item.properties.discounted_price %}
+                    subscription
+                  {% else %}
+                    {% unless item.product.has_only_default_variant or item.variant.title contains "Title" %}
+                      {% for option in item.product.options %}
+                        {{ item.variant.options[forloop.index0] }} {% unless forloop.last %}/{% endunless %}
+                      {% endfor %}
+                    {% endunless %}
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+            <script>console.log({{ item | json }});</script>
+            <div class="ajax-cart__line-items">
+              {% if item.properties %}
+                {% comment %}
+                {% for p in item.properties %}
+              
+                  {% if p.last != blank %}
+                    <div class="ajax-cart__line-item">
+                      {{ p.first }}: {{ p.last }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endcomment %}
+              {% endif %}
+              <span class="bold_ro_desc" data-product-id="{{item.id}}-{{ forloop.index0 }}"></span>
+<span class="bold_load_cart_item_properties"></span>
+            </div>
+            <div class="ajax-cart__line-items-discount">
+            {% if item.line_level_discount_allocations.size > 0 %}
+              <div class="ajax-cart__price-comparison">
+                <p class="sale">{{ item.final_price | money }}</p>
+                {% if item.original_line_price > item.final_line_price %}
+                  <s class="original-price">
+                    <span class="Bold-theme-hook-DO-NOT-DELETE bold_cart_item_price" style="display:none !important;"></span>
+                    {{ item.original_price | money }}</s>
+                {% endif %}
+              </div>
+              {% for discount_allocation in item.line_level_discount_allocations %}
+                <div class="line-item-discount__container">
+                  <p>{{ discount_allocation.discount_application.title }}</p>
+                </div>
+              {% endfor %}
+            {% endif %}
+            </div>
+
+            {% if settings.display_ajax_quantity_box %}
+              <div class="ajax-cart__quantity-box product-quantity-box" data-line-item-key={{ forloop.index }} sdf>
+                {% include 'quantity-box', size: 'is-medium', variant: item.variant %}
+              </div>
+              <p class="ajax-cart__quantity-warning quantity-warning">
+            {% endif %}
+
+            
+
+            {% if item.line_level_discount_allocations.size < 1 %}
+            <div class="ajax-cart__price price">
+                <span class="Bold-theme-hook-DO-NOT-DELETE bold_cart_item_price" style="display:none !important;"></span>
+              {% assign item_price = item.price | money %}
+              <span class="money {% if item.original_price < item.variant.compare_at_price %}sale{% endif %}">
+                {% if item.properties.discounted_price == blank %}                
+                  {{ item.price | money }}
+                {% else if item_price != item.properties.discounted_price %}
+                  {{ item.properties.discounted_price }}
+                {% else if item.properties.discounted_price == item_price %}
+                  {{ item.price | money }}
+                {% endif %}
+              </span>
+              {% if item.original_price < item.variant.compare_at_price %}
+                {% assign total_line_saving = 0 %}
+                {% assign line_saving = item.variant.compare_at_price | times: item.quantity %}
+                {% assign total_line_saving = line_saving | plus: total_line_saving %}
+                <span class="money was-price">
+                  {{ total_line_saving | money }}
+                </span>
+              {% endif %}
+            </div>
+            {% endif %}
+                
+          </div>
+          <div class="ajax-cart__right-content media-right">
+            <a class="ajax-cart__delete" data-ajax-cart-delete data-cart-item-key="{{ item.key }}" href="{{ routes.cart_change_url }}?line={{ forloop.index }}&amp;quantity=0" title="{{ 'cart.general.remove' | t }}" >
+              <button class="close" aria-label="close">
+                {% include settings.icon, name: 'x' %}
+              </button>
+            </a>
+          </div>
+        </div>
+
+      {% endfor %}
+    </div>
+
+    <div class="ajax-cart__details-wrapper">
+      {%- if cart.cart_level_discount_applications != blank -%}
+        <div class="cart__discounts ajax-cart__details-row is-flex is-justify-space-between sale">
+        {%- for discount_application in cart.cart_level_discount_applications -%}
+          <div class="ajax-cart__row-description">
+            <p>{{- discount_application.title -}}</p>
+          </div>
+          <p class="ajax-cart__discount">
+            <span class="money">- {{ discount_application.total_allocated_amount | money }}</span>
+          </p>
+        {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {% comment %} Subtotal {% endcomment %}
+      <div class="ajax-cart__subtotal ajax-cart__details-row is-flex is-justify-space-between">
+        <div class="ajax-cart__row-description">
+          <span>{{ 'layout.general.subtotal' | t }}</span>
+        </div>
+        <span class="Bold-theme-hook-DO-NOT-DELETE bold_cart_total" style="display:none !important;"></span>
+        <span class="money">{{ cart.total_price | money }}</span>
+      </div>
+
+      {% comment %} Total savings {% endcomment %}
+      {% if settings.display_savings and total_saving > 0 %}
+        <div class="ajax-cart__savings ajax-cart__details-row is-flex is-justify-space-between sale">
+          <div class="ajax-cart__row-description">
+            <span>{{ 'layout.general.savings' | t }}:</span>
+          </div>
+          
+          <span class="money">{{ total_saving | plus: cart.total_discount | money }}</span>
+        </div>
+      {% endif %}
+
+      {% comment %} Special instructions {% endcomment %}
+      {% if settings.display_special_instructions and settings.go_to_checkout %}
+        <textarea id="note" name="note" rows="2" placeholder="{{ 'layout.general.cart_note' | t }}" class="ajax-cart__note">{{ cart.note }}</textarea>
+      {% endif %}
+
+      {% comment %} Terms of service checkbox {% endcomment %}
+      {% if settings.display_tos_checkbox and settings.go_to_checkout %}
+        <div class="ajax-cart__tos-checkbox text-align-center">
+          <p class="tos">
+          <input type="checkbox" class="tos_agree" id="sliding_agree" required />
+            <label for="sliding_agree" class="tos_label">
+              {{ 'cart.general.agree_to_terms_html' | t }}
+            </label>
+            {% if settings.tos_page != blank %}
+              <a href="{{ pages[settings.tos_page].url }}" target="_blank" class="tos_icon">{{ 'cart.general.view_terms' | t }}</a>
+            {% endif %}
+        </p>
+        </div>
+
+      {% endif %}
+
+      {% comment %} Cart message {% endcomment %}
+      {% if settings.cart_message != blank %}
+        <div class="ajax-cart__cart-message text-align-center">
+          {{ settings.cart_message }}
+        </div>
+      {% endif %}
+
+      {% comment %} Checkout {% endcomment %}
+      <div class="ajax-cart__button-wrapper text-align-center">
+        {% if settings.go_to_checkout %}
+          <button type="submit" name="checkout" class="ajax-cart__button button--add-to-cart button">{% if settings.show_lock_icon %}{% include settings.icon, name: 'lock' %}{% endif %}{{ 'layout.general.checkout' | t }}</button>
+          <a class="ajax-cart__cart-link" href="{{ routes.cart_url }}" >{{ 'layout.general.go_to_cart' | t }}</a>
+        {% else %}
+          <a href="{{ routes.cart_url }}" class="ajax-cart__button button--add-to-cart button" >{% if settings.show_lock_icon %}{% include settings.icon, name: 'lock' %}{% endif %}{{ 'layout.general.go_to_cart' | t }} </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </form>
+</template>

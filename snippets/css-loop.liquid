@@ -1,0 +1,19 @@
+{% comment %}
+CSS loop - creates CSS declarations that are specific to the section or block
+
+Required values
+id: <number>
+css: <string>
+
+Example use:
+{% include 'css-loop' %}
+{% endcomment %}
+
+{%- if css != blank -%}
+  {%- assign declarations = css | split: '}' -%}
+  {%- for declaration in declarations -%}
+    {%- if declaration != '' -%}
+      #shopify-section-{{ id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}

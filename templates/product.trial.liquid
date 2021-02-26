@@ -1,0 +1,12 @@
+{% comment %}
+  To edit the contents of this file, look inside the `sections` folder for the file name that comes directly after `section`. Eg. {% section 'product__main' %} or {% section 'page__banner' %}
+
+  - This 404 template can be targeted with CSS using `.error-404` as a selector.
+  - Renders a page where visitors are taken to if they enter an invalid URL for the shop.
+  - https://help.shopify.com/en/themes/development/templates/404-liquid
+{% endcomment %}
+
+<div id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section page-not-found-page" data-check-for-order="true">
+  {% section '404__banner' %}
+  {% section '404__main' %}
+</div>

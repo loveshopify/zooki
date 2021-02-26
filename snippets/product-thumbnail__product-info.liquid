@@ -1,0 +1,40 @@
+<div class="product-thumbnail">
+  {% if settings.display_vendor %}
+    <span class="product-thumbnail__vendor">{{ product.vendor }}</span>
+  {% endif %}
+
+  <a href="{{ product.url | within: collection }}" class="product-thumbnail__title">{{ product.title }}</a><span class="bold_ro_desc" data-product-id="{{ product.id }}-{{ forloop.index0 }}"></span>
+
+
+  {% if collection_handles contains 'coming-soon' %}
+    {% if settings.stickers_enabled == false %}
+      {{ 'collections.general.coming_soon' | t }}
+    {% endif %}
+  {% else %}
+<!-- price   <span class="product-thumbnail__price price {% if product.compare_at_price_max > product.price %}sale{% endif %}">
+      {% if product.available %}
+        {% if product.price_varies and product.price_min > 0 %}
+          <small><em>{{ 'products.general.from' | t }}</em></small>
+        {% endif %}
+        {% if product.price_min > 0 %}
+          <span class="money">{{ product.price_min | money }}</span>
+        {% else %}
+          {{ settings.free_price_text }}
+        {% endif %}
+        {% if product.compare_at_price_max > product.price %}
+          <span class="product-thumbnail__was-price was-price">
+            <span class="money">{{ product.compare_at_price_max | money }}</span>
+          </span>
+        {% endif %}
+-->
+  <div class="yotpozooki" style="text-align: center">
+<div class="yotpo bottomLine" style="display:inline-block; margin-top: 12px;"
+data-product-id="{{ product.id }}">
+</div>
+</div>
+      {% else %}
+        <span class="product-thumbnail__sold-out sold-out">{{ 'products.product.sold_out' | t }}</span>
+      {% endif %}
+    </span>
+  {% endif %}
+</div>

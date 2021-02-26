@@ -1,0 +1,601 @@
+{% comment %}
+** Article (blog post) - main content area **
+- Template section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} JSON-LD Structured data - https://developers.google.com/search/docs/guides/intro-structured-data {% endcomment %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Article",
+  "articleBody": "{{ article.content | strip_html | escape }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ shop.url }}{{ page.url }}"
+  },
+  "headline": "{{ article.title | escape }}",
+  {% if article.excerpt != blank %}
+    "description": "{{ article.excerpt | strip_html | escape }}",
+  {% endif %}
+  {% if article.image %}
+    {% assign image_size = article.image.width | append: 'x' %}
+    "image": [
+      "https:{{ article | img_url: image_size }}"
+    ],
+  {% endif %}
+  "datePublished": "{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}",
+  "dateCreated": "{{ article.created_at | date: '%Y-%m-%dT%H:%M:%SZ' }}",
+  "dateModified": "{{ article.updated_at | date: '%Y-%m-%dT%H:%M:%SZ' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ article.author }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    {% assign image_size = settings.og_image_fallback.width | append: 'x' %}
+    "logo": {
+      "@type": "ImageObject",
+      "height": "{{ settings.og_image_fallback.height }}",
+      "url": "https:{{ settings.og_image_fallback | img_url: image_size }}",
+      "width": "{{ settings.og_image_fallback.width }}"
+    },
+    "name": "{{ shop.name }}"
+  }
+}
+</script>
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section
+        {{ css_class }}
+        is-width-wide
+        ">
+{% paginate article.comments by 100 %}
+
+{% if section.settings.show_breadcrumb %}
+  <div class="container breadcrumb__container">
+    <div class="one-whole column is-flex is-justify-space-between is-flex-column-reverse-mobile breadcrumb is-{{ settings.breadcrumb_size }} is-{{ settings.breadcrumb_capitalization }}">
+      <div class="breadcrumb__wrapper">
+        {% include 'breadcrumb', type: 'article' %}
+      </div>
+
+      <div class="page-navigation-arrows has-padding-bottom">
+        {% if blog.previous_article %}
+          <a href="{{ blog.previous_article }}" title="{{ 'blogs.article.previous_article_html' | t }}" class="page-navigation__previous">
+            {{ 'blogs.article.previous_article_html' | t }}
+          </a>
+        {% endif %}
+        {% if blog.next_article and blog.previous_article %}
+          <span class="page-navigation__divider"> | </span>
+        {% endif %}
+        {% if blog.next_article %}
+          <a href="{{ blog.next_article }}" title="{{ 'blogs.article.next_article_html' | t }}" class="page-navigation__next">
+            {{ 'blogs.article.next_article_html' | t }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+  <div class="container hide-when-banner-enabled">
+    {% include 'heading', title: article.title, heading_tag: 'h1', context: 'article', text_alignment: 'left' %}
+  </div>
+
+  <div class="container blog-meta">
+    <div class="one-whole column meta-info is-small">
+      {% include 'meta-info-list' %}
+
+      {% if section.settings.show_tags and article.tags.size > 0 %}
+        <ul class="meta-tag-list tags has-padding-top">
+        {% for tag in article.tags %}
+          <li class="tag tag--{{ settings.tag_style}}">
+            <a href="{{ shop.url}}/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" title="{{ blog.title }} {{ 'blogs.general.tagged' | t }} {{ tag | escape }}">
+              {{ tag }}
+            </a>
+          </li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container article-content has-padding-top has-padding-bottom">
+    <div class="one-whole column content">
+      {% if article.image and section.settings.show_featured_image %}
+        <p>
+          {% include 'image-element', image: article.image, alt: article.image.alt, stretch_width: true %}
+        </p>
+      {% endif %}
+
+      {{ article.content }}
+    </div>
+  </div>
+
+  {% for block in section.blocks %}
+    {% if block.type == 'author_share' %}
+      {% comment %} Author and social share {% endcomment %}
+      <div class="container author-share-wrap is-flex is-justify-space-between has-padding-top has-padding-bottom" {{ block.shopify_attributes }}>
+        <div class="blog-author one-half column medium-down--one-whole">
+          {% if block.settings.blog_author %}
+            <div class="media">
+              <div class="media-left">
+                <figure class="image">
+                  <img src="//1.gravatar.com/avatar/{{ article.user.email | md5 }}?s=160&r=G" alt="{{ article.author }}" />
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="comment__author title is-5">{{ article.author }}</p>
+                <p class="subtitle">{{ article.user.bio }}</p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if block.settings.display_social_buttons %}
+          <div class="blog-share one-half column medium-down--one-whole">
+            {% include 'social-share-buttons' with "article" %}
+          </div>
+        {% endif %}
+      </div>
+    {% elsif block.type == 'comments' %}
+      {% comment %} Comments {% endcomment %}
+      <div class="clear" id="comments" {{ block.shopify_attributes }}></div>
+
+      <div class="container comment-section">
+
+        {% if settings.disqus_enabled %}
+          <div id="disqus_thread"></div>
+          <script>
+              var disqus_config = function () {
+                  this.page.url = "{{ canonical_url }}";
+                  this.page.identifier = "{{ article.id }}";
+              };
+              (function() {
+                  var d = document, s = d.createElement('script');
+                  s.src = '//{{ settings.disqus_shortname }}.disqus.com/embed.js';
+                  s.setAttribute('data-timestamp', +new Date());
+                  (d.head || d.body).appendChild(s);
+              })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        {% elsif blog.comments_enabled? %}
+          {% if article.comments_count > 0 %}
+            <div class="one-whole column comment-section--title has-margin-bottom has-margin-top">
+              <h4 class="title">{{ 'blogs.comments.response_count' | t: count: article.comments.size }}</h4>
+            </div>
+
+            <div class="one-whole column comment-section--cards">
+              {% for comment in article.comments %}
+                <div id="comment-{{ comment.id }}" class="card has-margin-bottom">
+                  <div class="card-content" data-email="{{ comment.email }}">
+                    <div class="media">
+                      <div class="media-left">
+                        <figure class="image">
+                          <img src="//1.gravatar.com/avatar/{{ comment.email | md5 }}?s=160&r=G" alt="{{ comment.author }}" />
+                        </figure>
+                      </div>
+                      <div class="media-content">
+                        <p class="title">{{ comment.author }}</p>
+                        <p class="subtitle has-text-grey-lighter"><small>{{ comment.created_at | date: format: "month_day_year" }}</small></p>
+                        <div class="content">
+                          {{ comment.content }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if comment and comment.created_at %}
+            {% if article.comments_count == 0 %}
+            <div class="one-whole column comment-section--title has-margin-bottom has-margin-top">
+              <h4 class="title">{{ 'blogs.comments.response_count' | t: count: article.comments.size }}</h4>
+            </div>
+            {% endif %}
+            <div class="one-whole column comment-section--cards">
+              <div id="comment-{{ comment.id }}" class="card has-margin-bottom">
+                <div class="card-content" data-email="{{ comment.email }}">
+                  <div class="media">
+                    <div class="media-left">
+                      <figure class="image">
+                        <img src="//1.gravatar.com/avatar/{{ comment.email | md5 }}?s=160&r=G" alt="{{ comment.author }}" />
+                      </figure>
+                    </div>
+                    <div class="media-content">
+                      <p class="title">{{ comment.author }}</p>
+                      <p class="subtitle has-text-grey-lighter"><small>{{ comment.created_at | date: format: "month_day_year" }}</small></p>
+                      <div class="content">
+                        {{ comment.content }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="one-whole column text-align-center">
+            {% include 'pagination' %}
+          </div>
+
+          <div class="clear" id="new-comment"></div>
+
+          <div class="one-whole column new-comment-title has-margin-bottom has-margin-top">
+            <h4 class="title">{{ 'blogs.comments.title' | t }}</h4>
+          </div>
+          {% if blog.moderated? %}
+          <div class="one-whole column"><em>{{ 'blogs.comments.moderated' | t }}</em></div>
+          {% endif %}
+          <div class="one-whole column new-comment-form">
+            {% form article %}
+              {% if form.posted_successfully? %}
+                {% if blog.moderated? %}
+                  <p class="help">{{ 'blogs.comments.success_moderated' | t }}</p>
+                {% else %}
+                  <p class="help is-success">{{ 'blogs.comments.success' | t }}</p>
+                {% endif %}
+              {% endif %}
+
+              {% if form.errors %}
+                <p class="help is-danger">{{ 'general.forms.post_error' | t }}</p>
+              {% endif %}
+
+              <div class="field is-horizontal">
+                <div class="field-body">
+
+                  <div class="field">
+                    <label class="label">{{ 'blogs.comments.name' | t }} <span class="required-field-indicator">*</span></label>
+                    <div class="control">
+                      <input class="input" id="comment_author" name="comment[author]" required="required" type="text" placeholder="e.g Alex Smith">
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label class="label">{{ 'blogs.comments.email' | t }} <span class="required-field-indicator">*</span></label>
+                    <div class="control">
+                      <input class="input" id="comment_email" name="comment[email]" required="required" type="email" placeholder="e.g. alexsmith@gmail.com">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            <div class="field is-horizontal">
+                <div class="field-body">
+                  <div class="field">
+                    <label class="label" for="comment_body">{{ 'blogs.comments.comment' | t }} <span class="required-field-indicator">*</span></label>
+                    <div class="control">
+                      <textarea class="textarea" id="comment_body" name="comment[body]" rows="5" required="required">{{ form.body }}</textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field is-horizontal">
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input type="submit" value="{{ 'blogs.comments.post' | t }}" id="comment-submit" class="button" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            {% endform %}
+
+          </div>
+        {% endif %}
+      </div>
+    {% elsif block.type == 'related_posts' %}
+      {% comment %} Related blog posts {% endcomment %}
+      {% if blog.articles_count > 1 %}
+        <div class="container related-blogs has-padding-bottom" {{ block.shopify_attributes }}>
+          <div class="one-whole column related-blogs--title has-margin-bottom has-margin-top">
+            <h4 class="title">{{ 'blogs.article.additional_articles' | t: title: blog.title }}</h4>
+          </div>
+
+          <div class="one-whole column related-blogs--content equal-columns--outside-trim field is-grouped is-flex-wrap">
+            {% assign article_found = false %}
+            {% for a in blog.articles limit: 4 %}
+              {% assign skip_article = false %}
+              {% if article_found == false and forloop.last %}
+                {% assign skip_article = true %}
+              {% endif %}
+              {% if article.id == a.id %}
+                {% assign article_found = true %}
+                {% assign skip_article = true %}
+              {% endif %}
+              {% unless skip_article %}
+                <div class="one-third columns article blog-card card show-border-{{ block.settings.show_border }} medium-down--one-whole">
+                  {% if a.image %}
+                    <div class="card-image blog-card__image">
+                      <figure class="image">
+                        <a href="{{ a.url }}" title="{{ a.title | escape }}">
+                          {% include 'image-element', image: a.image, alt: a.image.alt, stretch_width: true %}
+                        </a>
+                      </figure>
+                    </div>
+                  {% endif %}
+
+                  <div class="card-content blog-card__content">
+                    <div class="media">
+                      <div class="media-content">
+                        <h4 class="title">
+                          <a href="{{ a.url }}" title="{{ a.title | escape }}">{{ a.title }}</a>
+                        </h4>
+                      </div>
+                    </div>
+
+                    {% if a.excerpt != blank and block.settings.blog_show_excerpt %}
+                      {% assign postexcerpt = a.excerpt | size %}
+                      {% if postexcerpt > 150 %}
+                           {% assign excerptlength = 'lg' %}
+                      {% elsif postexcerpt <= 150 %}
+                           {% assign excerptlength = 'sm' %}
+                      {% endif %}
+
+                      <div class="excerpt excerpt-length-{{ excerptlength }} has-margin-bottom">
+                        {{ a.excerpt }}
+                        <span class="truncation-fade"></span>
+                      </div>
+                    {% endif %}
+
+                    <div class="meta-info is-small">
+                      {% if block.settings.blog_show_tags %}
+                        {% if a.tags.size > 0 %}
+                        <ul class="meta-tag-list tags">
+                        {% for tag in a.tags %}
+                          <li class="tag tag--{{ settings.tag_style}}">
+                            <a href="{{ shop.url}}/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" title="{{ blog.title | escape }} {{ 'blogs.general.tagged' | t }} {{ tag | escape }}">{{ tag }}
+                            </a>
+                          </li>
+                        {% endfor %}
+                        </ul>
+                        {% endif %}
+                      {% endif %}
+
+                      {% include 'meta-info-list' %}
+
+                    </div>
+
+                  </div>
+                {% if block.settings.button_type != 'none' %}
+                  <div class="blog-card__read-more buttons">
+                    {% include 'button', label: block.settings.button_label, href: a.url, type: "link", style: block.settings.button_type %}
+                  </div>
+                {% endif %}
+                </div>
+              {% endunless %}
+            {% endfor %}
+
+          </div>
+
+        </div>
+      {% endif %}
+
+    {% endif %}
+  {% endfor %}
+
+{% endpaginate %}
+</section>
+
+{% schema %}
+
+{
+  "name": "Blog post",
+  "class": "article-main has-sidebar-option",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_author",
+      "label": "Show author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_read_time",
+      "label": "Show estimated read time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_comment_count",
+      "label": "Show comment count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show tags",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_image",
+      "label": "Show featured image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "author_share",
+      "name": "Author and social share",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "blog_author",
+          "label": "Show author bio"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_social_buttons",
+          "label": "Show social media share icons",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "comments",
+      "name": "Comments",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Comments must be enabled from admin."
+        }
+      ]
+    },
+    {
+      "type": "related_posts",
+      "name": "Additional blog posts",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_border",
+          "label": "Show border",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_excerpt",
+          "label": "Show excerpts",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_tags",
+          "label": "Show tags",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Read more"
+        },
+        {
+          "type": "select",
+          "id": "button_type",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

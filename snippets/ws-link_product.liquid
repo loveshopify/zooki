@@ -1,0 +1,7 @@
+{%- comment -%} Added by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}
+{% if wsProduct == '' %}
+  {{ itemUrl }}
+{% else %}
+  {{ '/products/' | append: wsProduct }}
+{% endif %}
+{%- comment -%} End of added by westmountsolutions.com WSDEV20201015-DV {%- endcomment -%}

@@ -1,0 +1,44 @@
+{% comment %}
+Required values
+title: <string>
+heading_tag: <string>
+context: <string>
+______________
+Optional values
+url: <string>
+text_alignment: <string>
+enable_divider: <boolean>
+{% endcomment %}
+
+{% if text_alignment == blank %}
+  {% assign text_alignment = center %}
+{% endif %}
+
+<div class="heading-wrapper--{{ context }}
+            heading-wrapper
+            heading-wrapper--{{ settings.heading_divider_style }}
+            one-whole column
+            is-flex
+            is-flex-column
+            is-align-{{ text_alignment }}
+            text-align-{{ text_alignment }}">
+  <{{- heading_tag }} class="{{ context }}__title title">
+    {% if url != blank %}
+      <a href="{{ url }}">
+    {% endif %}
+
+      {{ title }}
+
+    {% if url != blank %}
+      </a>
+    {% endif %}
+  </{{- heading_tag -}}>
+  {% if settings.display_heading_divider == true %}
+    <div class="heading-divider
+                heading-divider--{{ settings.heading_divider_style }}"
+          {% if settings.heading_divider_animation != "none" %}
+            data-scroll-class="{{ settings.heading_divider_animation }}"
+          {% endif %}>
+    </div>
+  {% endif %}
+</div>

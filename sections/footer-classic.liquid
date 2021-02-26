@@ -1,0 +1,335 @@
+{% comment %}
+** Footer - classic - static **
+- Static section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<footer class="footer__container {{ css_class }}">
+  <section class="footer__content
+                  section
+                  is-width-wide
+                  has-background
+                  has-padding-top
+                  has-padding-bottom">
+    <div class="container has-limit is-justify-space-between">
+      {% for block in section.blocks %}
+        <div id="shopify-section-{{ block.id }}" class="footer__block block__{{ block.id }} block__{{ block.type | downcase | replace: '_', '-' }}
+                    {% include 'column-width', value: section.blocks.size %}
+                    medium-down--one-whole column"
+                    {{ block.shopify_attributes }}>
+          {% if block.type == 'logo' %}
+            {% comment %} Logo and text {% endcomment %}
+            <div>
+              <a href="{{ shop.url }}" title="{{ shop.name }}" class="footer__logo-wrapper has-padding-bottom is-{{ block.settings.size }}">
+                {% if block.settings.logo %}
+                  {% include 'image-element', image: block.settings.logo, alt: block.settings.logo.alt, additional_classes: 'footer__logo' %}
+                {% else %}
+                  <h2 class="footer__heading">{{ shop.name }}</h2>
+                {% endif %}
+              </a>
+              {% if block.settings.text != blank %}
+                {{ block.settings.text }}
+              {% endif %}
+              {% if block.settings.social_icons_footer %}
+                <div class="has-padding-bottom has-padding-top">
+                  {% include 'social-icons' %}
+                </div>
+              {% endif %}
+            </div>
+
+          {% elsif block.type == 'html' %}
+
+            {{ block.settings.html_content }}
+
+          {% elsif block.type == 'link_list' %}
+            {% comment %} Menu {% endcomment %}
+            {% include 'footer__menu', menu_link: block.settings.menu %}
+
+            {% if block.settings.social_icons_footer %}
+              <div class="has-padding-bottom has-padding-top">
+                {% include 'social-icons' %}
+              </div>
+            {% endif %}
+
+          {% elsif block.type == 'text' %}
+            {% comment %} Text {% endcomment %}
+            {% if block.settings.title != blank %}
+              <p class="footer__heading">{{ block.settings.title }}</p>
+            {% endif %}
+            {% if block.settings.content != blank %}
+              {{ block.settings.content }}
+            {% endif %}
+
+            {% if block.settings.social_icons_footer %}
+              <div class="has-padding-bottom has-padding-top">
+                {% include 'social-icons' %}
+              </div>
+            {% endif %}
+
+            {% elsif block.type == 'newsletter' %}
+              {% comment %} Newsletter {% endcomment %}
+              {% if block.settings.newsletter_title != blank %}
+                <p class="footer__heading">{{ block.settings.newsletter_title }}</p>
+              {% endif %}
+
+              {% if block.settings.newsletter_richtext != blank %}
+                <div class="content">
+                  {{ block.settings.newsletter_richtext }}
+                </div>
+              {% endif %}
+
+              {% include 'newsletter-form', type: 'block' %}
+
+              {% if block.settings.social_icons_footer %}
+                <div class="has-padding-bottom has-padding-top">
+                  {% include 'social-icons' %}
+                </div>
+              {% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="footer__extra-content section">
+    <div class="container has-padding-top has-padding-bottom">
+      <div class="footer__credits {% if section.settings.display_payment_methods %}two-thirds {% else %} one-whole {% endif %} column small-down--one-whole">
+        <p>&copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.</p>
+        {{ section.settings.copyright_text }}
+        {% if section.settings.display_designed_by %}
+          <p>{{ 'layout.general.designer_credits_html' | t }}</p>
+        {% endif %}
+        {% if section.settings.display_shopify %}
+          <p>{{ powered_by_link | split: '" ' | join: '&ref=out-of-the-sandbox" ' | split: '">' | join: '&ref=out-of-the-sandbox">' }}</p>
+        {% endif %}
+      </div>
+      {% if section.settings.display_payment_methods %}
+        <div class="footer__payment-methods one-third column small-down--one-whole is-flex is-justify-end is-flex-wrap">
+          <div class="payment-methods">
+            {% for type in shop.enabled_payment_types %}
+              {{ type | payment_type_svg_tag: class:'payment-icon' }}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</footer>
+
+{% schema %}
+
+{
+  "name": "Footer",
+  "class": "footer footer--classic",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "copyright_text",
+      "label": "Copyright text"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_designed_by",
+      "label": "Show theme designer credits",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_shopify",
+      "label": "Show Powered by Shopify",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_payment_methods",
+      "label": "Show payment method icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "html_content",
+          "label": "HTML",
+          "default": "<h2 class='footer__heading'>Your own custom HTML</h2>"
+        }
+      ]
+    },
+    {
+      "type": "logo",
+      "name": "Logo and text",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Logo"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo",
+          "info": "500 x 200px recommended"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Logo size",
+          "default": "small",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "checkbox",
+          "id": "social_icons_footer",
+          "label": "Show social media icons",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "link_list",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "This menu won't show drop-down items.",
+          "default": "footer"
+        },
+        {
+          "type": "checkbox",
+          "id": "social_icons_footer",
+          "label": "Show social media icons",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "newsletter_title",
+          "label": "Heading",
+          "default": "Subscribe"
+        },
+        {
+          "type": "richtext",
+          "id": "newsletter_richtext",
+          "label": "Text",
+          "default": "<p>Sign up to get the latest on sales, new releases and more …</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_first_name",
+          "label": "Show first name"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_last_name",
+          "label": "Show last name"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Text",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "social_icons_footer",
+          "label": "Show social media icons",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "empty",
+      "name": "Empty column",
+      "settings": [
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "logo"
+      },
+      {
+        "type": "link_list",
+        "settings": {
+          "menu": "main-menu"
+        }
+      },
+      {
+        "type": "text"
+      }
+    ]
+  }
+}
+
+{% endschema %}

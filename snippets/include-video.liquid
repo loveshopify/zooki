@@ -1,0 +1,230 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-video' %}
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% assign aspect_ratio = object.settings.aspect_ratio %}
+{% assign autoplay = object.settings.autoplay %}
+{% assign autoloop = object.settings.autoloop %}
+{% assign controls = object.settings.controls %}
+{% assign image = object.settings.image %}
+{% assign overlay_style = object.settings.overlay_style %}
+{% assign overlay_color = object.settings.video_overlay_color %}
+{% assign background_opacity = object.settings.background_opacity %}
+{% assign overlay_background_alpha = background_opacity | divided_by: 100.00 %}
+{% assign gradient = object.settings.gradient %}
+{% assign gradient_rotation = object.settings.gradient_rotation %}
+{% assign horizontal_text_position = object.settings.horizontal_text_position %}
+{% assign vertical_text_position = object.settings.vertical_text_position %}
+{% assign text_align = object.settings.text_align %}
+{% assign pretext = object.settings.pretext %}
+{% assign pretext_color = object.settings.pretext_color %}
+{% assign title = object.settings.title %}
+{% assign title_color = object.settings.heading_color %}
+{% assign subtitle = object.settings.subtitle %}
+{% assign subtitle_color = object.settings.subheading_color %}
+{% assign button_label = object.settings.button_label %}
+{% assign button_style = object.settings.button_style %}
+{% assign banner_overlay_color = object.settings.banner_overlay_color %}
+{% assign text_width =  object.settings.text_width %}
+{% assign color = object.settings.color %}
+{% assign link_color = object.settings.link_color %}
+{% comment %} Mobile {% endcomment %}
+{% assign mobile_text_below_media = object.settings.mobile_text_below_video %}
+{% assign mobile_headline_color = object.settings.heading_color_mobile %}
+{% assign mobile_preheading_color = object.settings.pretext_color_mobile %}
+{% assign mobile_subtitle_color = object.settings.subheading_color_mobile %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% assign iframe_video = object.settings.iframe_video %}
+{% assign html5_video = object.settings.html5_video %}
+{% if iframe_video != blank or html5_video != blank %}
+  {% assign video_exists = true %}
+{% else %}
+  {% assign video_exists = false %}
+{% endif %}
+
+{% comment %}Is the color set to transparent?{% endcomment %}
+{% assign heading_alpha = title_color | color_extract: 'alpha' %}
+{% assign preheading_alpha = pretext_color | color_extract: 'alpha' %}
+{% assign subheading_alpha = subtitle_color | color_extract: 'alpha' %}
+{% assign mobile_headline_alpha = mobile_headline_color | color_extract: 'alpha' %}
+{% assign mobile_preheading_alpha = mobile_preheading_color | color_extract: 'alpha' %}
+{% assign mobile_subtitle_alpha = mobile_subtitle_color | color_extract: 'alpha' %}
+{% assign caption_border_alpha = object.settings.border_color | color_extract: 'alpha' %}
+
+
+{% comment %} Section specific CSS {% endcomment %}
+{%- capture section_css -%}
+
+{% if overlay_style != 'none' %}
+.overlay {
+    background-image: linear-gradient({{ gradient_rotation }}deg, rgba(255,255,255,0), {{ gradient }});
+    background-color: {{ overlay_color }};
+    opacity: {{ overlay_background_alpha }};
+  }
+{% endif %}
+
+.video__title {
+  color: {% if heading_alpha != 0 %}{{ title_color }}{% else %}{{ settings.heading_color }}{% endif %};
+}
+
+.video__subtitle {
+  color: {% if subheading_alpha != 0 %}{{ subtitle_color }}{% else %}{{ settings.heading_color }}{% endif %};
+}
+
+.pretext {
+  color: {% if preheading_alpha != 0 %}{{ pretext_color }}{% else %}{{ settings.heading_color }}{% endif %};
+}
+
+.video__text-container .hidden {
+  display: none;
+}
+{%- endcapture -%}
+
+{% style %}
+  {% include 'css-loop', css: section_css, id: id %}
+
+  @media only screen and (min-width: 480px) {
+    #shopify-section-{{ id }} .video__text-wrapper {
+      width: {{ text_width }}%;
+    }
+  }
+
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% elsif width == 'half' %}
+      width: 50%;
+    {% endif %}
+  }
+
+  @media only screen and (max-width: 480px) {
+    #shopify-section-{{ id }} .video__title {
+      color: {% if mobile_headline_alpha != 0 %}{{ mobile_headline_color}}{% endif %};
+    }
+    #shopify-section-{{ id }} .video__subtitle {
+      color: {% if mobile_subtitle_alpha != 0 %}{{ mobile_subtitle_color}}{% endif %};
+    }
+    #shopify-section-{{ id }} .pretext {
+      color: {% if mobile_preheading_alpha != 0 %}{{ mobile_preheading_color}}{% endif %};
+    }
+  }
+
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="featured-video
+                section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if mobile_text_below_media == true %}
+                  mobile-text--below-media
+                  {% else %}
+                  mobile-text--over-media
+                {% endif %}
+                {% if video_exists %} has-video-added {% endif %}"
+        {% if animation != "none" %}
+          data-scroll-class="{{ animation }}"
+        {% endif %}>
+  <div class="container
+              video__container
+              {% if width == 'wide' or width == 'half' %}
+                equal-columns--outside-trim
+              {% endif %}">
+    <div class="one-whole column">
+      <div class="video-wrapper overlay--{{ overlay_style }}">
+
+        {% comment %} Including the image element when there is no video added {% endcomment %}
+        {% unless video_exists %}
+          {% if image %}
+            {% include 'image-element', image: image, alt: image.alt %}
+          {% else %}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg placeholder-svg--video' }}
+          {% endif %}
+        {% endunless %}
+
+      {% comment %} Checks there is an iframe video (YouTube or Vimeo) {% endcomment %}
+      {% if iframe_video != blank %}
+        <div class="lazyframe lazyvideo video-{{ id }} video-element" data-video-element>
+        </div>
+        {% comment %} Checks there is an HTML5 video {% endcomment %}
+      {% elsif html5_video != blank %}
+        <video class="video-{{ id }} video-element" onclick="this.paused?this.play():this.pause()" data-video-element data-html5-video {% if controls %} controls {% endif %}>
+          <source src="{{ html5_video }}">
+        </video>
+      {% endif %}
+
+        <div class="video__text-container" data-video-text-container>
+          <div class="video__text is-justify-{{ vertical_text_position }} {% if pretext == blank and title == blank and subtitle == blank and button_label == blank %} hidden{% endif %}">
+            <div class="text-outer-wrapper is-flex is-justify-{{ horizontal_text_position }}">
+              <div class="video__text-wrapper text-align-{{ text_align }}">
+                <div class="overlay"></div>
+                {% if pretext != blank %}
+                  <p class="pretext subtitle banner__subheading video__subtitle">{{ pretext }}</p>
+                {% endif %}
+                {% if title != blank %}
+                  <h2 class="title video__title banner__heading has-small-padding-top mobile-shrink-text">
+                    <span>{{ title }}</span>
+                  </h2>
+                {% endif %}
+                {% if subtitle != blank %}
+                  <p class="subtitle video__subtitle banner__subheading has-small-padding-top">{{ subtitle }}</p>
+                {% endif %}
+                {% if button_label != blank %}
+                  <button class="button {{ button_style }}" data-play-button>{{ button_label }}</button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  {% comment %} JavaScript {% endcomment %}
+  <script
+    type="application/json"
+    data-section-id="{{ object.id }}"
+    data-section-data
+  >
+    {
+      "autoplay": {{ object.settings.autoplay | json }},
+      "autoloop": {{ object.settings.autoloop | json }},
+      "video_id": {{ object.settings.iframe_video.id | json }},
+      "video_type": {{ object.settings.iframe_video.type | json }},
+      "iframe_video": {{ object.settings.iframe_video | json }},
+      "html5_video": {{ object.settings.html5_video | json }},
+      "aspect_ratio": {{ object.settings.aspect_ratio | json }},
+      "poster": {{ object.settings.image | json }},
+      "button": {{ object.settings.button_label | json }},
+      "id": {{ object.id | json }}
+    }
+  </script>
+  <script data-theme-editor-load-script src="{{ 'z__jsVideo.js' | asset_url }}"></script>
+</section>

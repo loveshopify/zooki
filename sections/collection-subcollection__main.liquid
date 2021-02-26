@@ -1,0 +1,383 @@
+{% comment %}
+** Collections - subcollection view **
+- Features a subset of collections and products on a page
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign overlay_background_opacity = section.settings.overlay_background_opacity %}
+{% assign overlay_background = section.settings.overlay_background %}
+{% assign overlay_text = section.settings.overlay_text %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Buttons {% endcomment %}
+{% assign button_style = section.settings.button_style %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign overlay_alpha = overlay_background | color_extract: 'alpha' %}
+{% assign overlay_text_alpha = overlay_text | color_extract: 'alpha' %}
+{% comment %} Opacity level {% endcomment %}
+{% if overlay_alpha != 0 %}
+  {% assign overlay_background_alpha = overlay_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% if section.settings.align_height %}
+  {% assign collection_height = section.settings.collection_height %}
+{% endif %}
+
+{% assign menu = linklists[collection.handle] %}
+
+{%- capture section_css -%}
+  .collection-thumbnail-overlay {
+    background-color: {%- if overlay_alpha != 0 -%}{{ overlay_background | color_modify: 'alpha', overlay_background_alpha }}{% endif %}
+  }
+
+  .collection-info__caption span {
+    color: {%- if overlay_text_alpha != 0 -%}{{ overlay_text }}{% endif %}
+  }
+
+  {%- if section.settings.align_height -%}
+    .placeholder-svg {
+      height: {{ collection_height }}px;
+      max-height: {{ collection_height }}px;
+    }
+  {%- endif -%}
+{%- endcapture -%}
+
+{% comment %} CSS {% endcomment %}
+{%- style -%}
+  .subcollection.section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {%- if width == 'wide' -%}
+      width: 100%;
+      max-width: none;
+    {%- endif -%}
+  }
+
+  {% if section.settings.collection_breadcrumb == false %}
+    .breadcrumb__container {
+      display: none;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{%- endstyle -%}
+
+<main class="{{ css_class }} {% if section.settings.show_promo_banner or menu.links.size > 0 %}has-padding-top has-padding-bottom{% endif %}">
+
+  {% if section.settings.show_promo_banner %}
+    <div class="collection-promo-banner container">
+      <div class="banner__wrapper
+                  one-whole
+                  column
+                  dark-overlay-{{ section.settings.image_darken }}
+                  is-{{ section.settings.banner_height }}
+                  has-margin-bottom">
+        {% if section.settings.image != blank %}
+          {% include 'image-element', image: section.settings.image, alt: section.settings.image.alt, stretch_width: true %}
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+        <div class="banner__content card-content">
+          <div class="banner__text text-align-center">
+            <h1 class="banner__heading title">{{ section.settings.promo_title }}</h1>
+            {% if section.settings.promo_text != blank %}
+              <div class="banner__subheading subtitle">{{ section.settings.promo_text }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="list-collection-wrapper container">
+    {% assign menu = linklists[collection.handle] %}
+    {% for link in menu.links %}
+      {% assign collection = link.object %}
+      {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+      <div class="
+        {% include 'column-width', value: section.settings.collections_per_row  %}
+        column thumbnail
+        {% if section.settings.align_height %}list-collection--align-height{% endif %}
+        list-collection__thumbnail medium-down--one-half
+        {% if section.settings.mobile_collections_per_row == '1' %}small-down--one-whole{% else %}small-down--one-half{% endif %}">
+        <div class="product-wrap">
+          <div class="collection-thumbnail-overlay"></div>
+
+          {% if collection.image != blank %}
+            {% assign collection_image = collection.image %}
+            {% assign collection_image_alt = collection.image.alt | escape %}
+          {% else collection.empty? == false %}
+            {% assign collection_image = collection.products.first.featured_image %}
+            {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
+          {% endif %}
+
+          {% if collection_image != nil %}
+            <div class="thumbnail image__container has-image-crop">
+              {% include 'image-element', image: collection_image.src, alt: collection_image_alt, image_crop: true, max_height: collection_height %}
+            </div>
+          {% else %}
+            {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+            {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endif %}
+          <a class="collection-info__caption" href="{{ collection.url }}">
+            {% if section.settings.collection_title_below_image == blank %}
+              <div class="collection-info__caption-wrapper">
+                <span class="title">
+                  {{ collection.title }}
+                </span>
+                {% assign view_products = 'collections.general.view_all' | t %}
+                {% include 'button', label: view_products, href: collection.url, style: section.settings.button_style %}
+              </div>
+            {% endif %}
+          </a>
+        </div>
+        {% if section.settings.collection_title_below_image != blank %}
+          <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+            <span class="title">
+              {{ collection.title }}
+            </span>
+            {% assign view_products = 'collections.general.view_all' | t %}
+            {% include 'button', label: view_products, href: collection.url, style: section.settings.button_style %}
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</main>
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {}
+</script>
+<script src="{{ 'z__jsCollection.js' | asset_url }}"></script>
+
+{% schema %}
+
+{
+  "name": "Sub Collection",
+  "class": "sub-collection-main has-sidebar-option jsCollection",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collection_breadcrumb",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Promotional banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_banner",
+      "label": "Show promotional banner",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1800 x 800px recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_darken",
+      "label": "Darken banner image",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promo_title",
+      "label": "Heading",
+      "default": "Special sale on now!"
+    },
+    {
+      "type": "richtext",
+      "id": "promo_text",
+      "label": "Text",
+      "default": "<p>Description of promotion with lots of details.</p>"
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Subcollections"
+    },
+    {
+      "type": "range",
+      "id": "collections_per_row",
+      "label": "Collections per row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_collections_per_row",
+      "label": "Collections per row on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "align_height",
+      "label": "Align to height",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "collection_height",
+      "label": "Collection image height",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "default": 400,
+      "unit": "px",
+      "info": "Applied when 'Align to height' is also enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360024344614)"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "default": "button--secondary",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "overlay_background",
+      "label": "Overlay",
+      "default": "#939393"
+    },
+    {
+      "type": "range",
+      "id": "overlay_background_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "color",
+      "id": "overlay_text",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_title_below_image",
+      "label": "Show collection title below image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

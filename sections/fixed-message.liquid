@@ -1,0 +1,166 @@
+{% comment %}
+** Fixed message - static **
+- Static section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign width = section.settings.width %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = section.settings.background | color_extract: 'alpha' %}
+
+{% comment %} Opacity level {% endcomment %}
+{% if background_alpha != 0 %}
+  {% assign background_alpha = section.settings.background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .fixed-message__container {
+    background-color: {% if background_alpha != 0 %}{{ section.settings.background | color_modify: 'alpha', background_alpha }};{% endif %};
+    color: {{ section.settings.text_color }};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="fixed-message__container
+                {{ css_class }}">
+  <div class="section
+              is-width-{{ width }}">
+    <div class="container is-align-center">
+      <div class="fixed-message__text seven-tenths column has-padding-top has-padding-bottom">
+        {{ section.settings.text }}
+      </div>
+      <div class="fixed-message__button three-tenths column is-flex is-justify-center is-align-center">
+        {% if section.settings.button_label != blank %}
+          {% include 'button', label: section.settings.button_label, href: section.settings.link, type: "link", style: section.settings.button_style, class: "js-close-fixed-message" %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script defer src="{{ 'z__jsFixedMessage.js' | asset_url }}"></script>
+
+{% comment %} Schema {% endcomment %}
+{% schema %}
+{
+  "name": "Fixed message",
+  "class": "fixed-message-section is-fixed-bottom is-hidden jsFixedMessage",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We use cookies on our website to give you the best shopping experience. By using this site, you agree to its use of cookies. </p>"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "I agree"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ],
+      "default": "button--primary"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "background_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 100,
+      "default": 77,
+      "unit": "%"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

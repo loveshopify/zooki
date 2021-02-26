@@ -1,0 +1,417 @@
+{% comment %}
+** Video - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% include 'include-video' %}
+
+{% schema %}
+{
+  "name": "Video",
+  "class": "video-section jsVideo",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "options": [
+        {
+          "value": "16:9",
+          "label": "16:9"
+        },
+        {
+          "value": "4:3",
+          "label": "4:3"
+        }
+      ],
+      "default": "16:9"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay on compatible devices",
+      "info": "[Learn more](https:\/\/help.outofthesandbox.com\/hc\/en-us\/articles\/360000661568)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "autoloop",
+      "label": "Autoloop video",
+      "default": true
+    },
+    {
+      "type": "video_url",
+      "id": "iframe_video",
+      "label": "YouTube or Vimeo video URL",
+      "accept": ["youtube", "vimeo"],
+      "default": "https://www.youtube.com/watch?v=8NxS0vrPcsA"
+    },
+    {
+      "type": "text",
+      "id": "html5_video",
+      "label": "HTML5 MP4/OGV File URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "Enable HTML5 video controls",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1600 x 900px recommended"
+    },
+    {
+      "type": "text",
+      "id": "pretext",
+      "label": "Preheading"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Featured video"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Embed a Youtube or Vimeo video."
+    },
+    {
+      "type": "color",
+      "id": "pretext_color",
+      "label": "Preheading",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_text_position",
+      "label": "Horizontal position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "vertical_text_position",
+      "label": "Vertical position",
+      "options": [
+        {
+          "value": "start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Play video"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "default": "button--secondary",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Overlay style",
+      "default": "text_only",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full"
+        },
+        {
+          "value": "text_only",
+          "label": "Text only"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "video_overlay_color",
+      "label": "Overlay",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gradient",
+      "label": "Gradient",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "range",
+      "id": "gradient_rotation",
+      "label": "Gradient rotation",
+      "min": 0,
+      "max": 180,
+      "default": 180,
+      "unit": "deg",
+      "step": 10
+    },
+    {
+      "type": "range",
+      "id": "background_opacity",
+      "label": "Background opacity",
+      "default": 77,
+      "min": 0,
+      "max": 100,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "text_width",
+      "label": "Text width",
+      "min": 40,
+      "max": 100,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_text_below_video",
+      "label": "Show text below image",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "pretext_color_mobile",
+      "label": "Preheading",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "heading_color_mobile",
+      "label": "Heading",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color_mobile",
+      "label": "Subheading",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "half",
+          "label": "Half"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [{
+    "name": "Video",
+    "category": "Video",
+    "settings": {
+      "autoplay": false,
+      "iframe_video": "https://www.youtube.com/watch?v=8NxS0vrPcsA",
+      "button_label": "Play Video"
+    }
+  }]
+}
+
+{% endschema %}

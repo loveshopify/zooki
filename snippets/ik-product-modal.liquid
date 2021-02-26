@@ -1,0 +1,19 @@
+<div class="ik-product-modal-wrap">
+    <div class="bottom-bar">
+        {% if product.available %}
+            <button class="ik-btn-buy-modal">Buy now</button>
+        {% else %}
+            <button class="ik-btn-buy-modal">Email me when available</button>
+        {% endif %}
+    </div>
+    <div class="ik-product-modal">
+        <div class="ik-product-modal-content">
+            <span class="ik-close-button">×</span>
+            <div class="ik-content">
+                {% unless product.available %}
+                    {% include 'product__notify-me-form' %}
+                {% endunless %}
+            </div>
+        </div>
+    </div>
+</div>

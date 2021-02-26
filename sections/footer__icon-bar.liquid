@@ -1,0 +1,283 @@
+{% comment %}
+** Icon bar for footer - static **
+- Static section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Colors{% endcomment %}
+{% assign background = section.settings.background %}
+{% assign link = section.settings.link_color %}
+{% assign link_hover = section.settings.link_hover_color %}
+{% assign text = section.settings.text_color %}
+{% comment %} Advanced {% endcomment %}
+{% assign width = section.settings.width %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = background | color_extract: 'alpha' %}
+{% assign link_alpha = link | color_extract: 'alpha' %}
+{% assign link_hover_alpha = link_hover | color_extract: 'alpha' %}
+{% assign text_alpha = text | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+
+  a.icon-bar__block {
+    color: {%- if link_alpha != 0 -%}{{ link }}{%- endif -%};
+  }
+
+  a.icon-bar__block:hover {
+    color: {%- if link_hover_alpha != 0 -%}{{ link_hover }}{%- endif -%};
+  }
+
+  .icon-bar__block {
+    color: {%- if text_alpha != 0 -%}{{ text }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+{% if section.settings.show_icon_bar and section.blocks.size > 0 %}
+  <section class="section
+                  has-padding-top
+                  has-padding-bottom
+                  is-width-{{ width }}
+                  {{ css_class }}">
+    <div class="container is-justify-{{ section.settings.alignment }}">
+      {% for block in section.blocks %}
+
+        {% assign icon = block.settings.icon | downcase %}
+
+        {% if block.settings.link %}
+          <a href="{{ block.settings.link }}" class="icon-bar__block is-{{ section.settings.size }} is-flex is-align-center is-flex-{{ section.settings.icon_position }}" {{ block.shopify_attributes }}>
+        {% else %}
+          <div class="icon-bar__block is-{{ section.settings.size }} is-flex is-align-center is-flex-{{ section.settings.icon_position }}" {{ block.shopify_attributes }}>
+        {% endif %}
+            {% if icon != blank %}
+              {% include settings.icon, name: icon %}
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <p class="icon-bar__text {% if section.settings.icon_position == 'column' %} text-align-center {% endif %}">{{ block.settings.text }}</p>
+            {% endif %}
+          {% if block.settings.link %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+
+{
+  "name": "Icon bar",
+  "class": "icon-bar",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_icon_bar",
+      "label": "Show icon bar",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Icon position",
+      "options": [
+        {
+          "value": "row",
+          "label": "Left"
+        },
+        {
+          "value": "column",
+          "label": "Center"
+        }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Base size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Regular"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#8B8B8B"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Links",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Links hover",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Icon and text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon",
+          "default": "chat",
+          "info": "[Icon list](https://help.outofthesandbox.com/hc/en-us/articles/360021570294)"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Descriptive text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "text",
+        "settings": {
+          "icon": "leaf",
+          "text": "100% Organic"
+        }
+      },
+      {
+        "type": "text",
+        "settings": {
+          "icon": "bunny",
+          "text": "Cruelty free"
+        }
+      },
+      {
+        "type": "text",
+        "settings": {
+          "icon": "chat",
+          "text": "24/7 support"
+        }
+      },
+      {
+        "type": "text",
+        "settings": {
+          "icon": "truck",
+          "text": "Free shipping"
+        }
+      }
+    ]
+  }
+}
+
+
+{% endschema %}

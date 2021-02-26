@@ -1,0 +1,22 @@
+{% if block.settings.title != blank %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ block.settings.title }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus', icon_class: 'icon--inactive' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+{% endif %}
+<div class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+  <ul class="sidebar-block__vendor-list">
+    {% for product_vendor in shop.vendors %}
+      <li {% if product_vendor == collection.title %}class="is-active"{% endif %}>{{ product_vendor | link_to_vendor }}</li>
+    {% endfor %}
+  </ul>
+</div>

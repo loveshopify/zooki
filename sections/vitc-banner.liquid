@@ -1,0 +1,61 @@
+{% assign id = section.id %}
+{% assign custom_css = section.settings.custom_css %}
+
+
+
+{%style%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%endstyle%}
+
+<div class="container banner-container" style="background-color: #ffffff;">
+    <div class="h-b-txt" style="background-color: #ffffff;">
+        <h2> {{ section.settings.h-title }} </h2>
+        <p> {{ section.settings.h-txt }} </p>
+        <button><a href="{{ section.settings.h-btn-url }}">{{ section.settings.h-btn-txt }}</a></button>
+    </div>
+    <div class="h-b-img" style="background-image: url({{ section.settings.h-img | img_url: '1280x' }})"></div>
+</div>
+
+{% schema %}
+{
+"name": "Homepage Banner",
+"settings": [
+{
+"type": "text",
+"id": "h-title",
+"label": "Heading"
+},
+{
+"type": "textarea",
+"id": "h-txt",
+"label": "Banner text"
+},
+{
+"type": "url",
+"id": "h-btn-url",
+"label": "Button URL"
+},
+{
+"type": "text",
+"id": "h-btn-txt",
+"label": "Button text"
+},
+{
+"type": "image_picker",
+"id": "h-img",
+"label": "Banner Image"
+},
+{
+"type": "textarea",
+"id": "custom_css",
+"label": "Custom CSS"
+}
+],
+"presets": [
+{
+"category": "Little Vitamin",
+"name":"Homepage Banner"
+}
+]
+}
+{% endschema %}

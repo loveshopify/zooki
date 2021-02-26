@@ -1,0 +1,409 @@
+{% comment %}
+** Main blog page - main content area **
+- Template section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% assign animation = section.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} JSON-LD Structured data - https://developers.google.com/search/docs/guides/intro-structured-data {% endcomment %}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {% for article in blog.articles %}
+        {
+          "@type": "ListItem",
+          "position": "{{ forloop.index | json }}",
+          "url": "{{ shop.url }}{{ article.url }}",
+          "name": "{{ article.title }}"
+        } {%- unless forloop.last -%},{%- endunless -%}
+      {% endfor %}
+    ]
+  }
+</script>
+
+{% comment %} HTML markup {% endcomment %}
+{% paginate blog.articles by section.settings.blog_posts_per_page %}
+<section class="section
+                is-width-wide
+                {{ css_class }}
+                "
+                {% if animation != "none" %}
+                  data-scroll-class="{{ animation }}"
+                {% endif %}>
+  <div class="container {% if settings.heading_divider_style == 'long' %}has-heading-divider-below {% endif %}">
+    <div class="one-half medium-down--one-whole column has-no-side-gutter">
+      <div class="hide-when-banner-enabled">
+        {% comment %} Blog title {% endcomment %}
+        {% include 'heading', title: blog.title, heading_tag: 'h1', context: 'blog', text_alignment: 'left' %}
+      </div>
+    </div>
+    {% if section.settings.blog_tags %}
+      <div class="blog__filter one-half medium-down--one-whole column">
+        {% comment %} Blog filter {% endcomment %}
+        <div class="field is-grouped is-flex-wrap">
+          <div class="select">
+            <select name="tag_filter" id="blog_filter" class="select">
+              <option {% unless current_tags %}selected="selected"{% endunless %} value="{{ blog.url }}">{{ 'blogs.general.view_all' | t }}</option>
+              {% for tag in blog.all_tags %}
+                <option {% if current_tags contains tag %}selected="selected"{% endif %} value="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}">{{ tag }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% if settings.heading_divider_width != 0 and settings.heading_divider_style == 'long' %}
+      <div class="heading-divider-below heading-wrapper one-whole column hide-when-banner-enabled">
+        <div class="heading-divider
+                    heading-divider--{{ settings.heading_divider_style }}"
+              {% if settings.heading_divider_animation != "none" %}
+                data-scroll-class="{{ settings.heading_divider_animation }}"
+              {% endif %}>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="container" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid {% endif %}>
+    {% if blog.articles.size == 0 %}
+      <div class="blog-page__no-content one-whole column">
+        <div class="excerpt">{{ 'homepage.onboarding.blog_excerpt' | t }}</div>
+      </div>
+    {% endif %}
+    {% for article in blog.articles %}
+      <div class="featured-article blog-card {% include 'column-width', value: section.settings.blog_posts_per_row %} columns article card show-border-{{ section.settings.show_border }} medium-down--one-half small-down--one-whole has-margin-bottom {% if section.settings.blog_posts_per_row == 1 %}is-horizontal{% endif %}" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid-item{% endif %}>
+        {% if article.image %}
+          <div class="card-image blog-card__image">
+            <figure class="image">
+              <a href="{{ article.url }}" title="{{ article.title | escape }}">
+                {% include 'image-element', image: article.image, alt: article.image.alt, stretch_width: true %}
+              </a>
+            </figure>
+          </div>
+        {% endif %}
+
+        <div class="card-content blog-card__content">
+          <div class="media">
+            <div class="media-content">
+              <h4 class="title">
+                <a class="featured-article--link" href="{{ article.url }}">{{ article.title }}</a>
+              </h4>
+            </div>
+          </div>
+
+          {% if article.excerpt != blank and section.settings.blog_show_excerpt %}
+            {% assign postexcerpt = article.excerpt | size %}
+            {% if postexcerpt > 150 %}
+                {% assign excerptlength = 'lg' %}
+            {% elsif postexcerpt <= 150 %}
+                {% assign excerptlength = 'sm' %}
+            {% endif %}
+            <div class="excerpt excerpt-length-{{ excerptlength }} has-margin-bottom">
+              {{ article.excerpt }}
+              <span class="truncation-fade"></span>
+            </div>
+          {% endif %}
+
+          <div class="meta-info is-small">
+            {% if section.settings.blog_show_tags %}
+              {% if article.tags.size > 0 %}
+                <ul class="meta-tag-list tags">
+                {% for tag in article.tags %}
+                  <li class="tag tag--{{ settings.tag_style }}">
+                    <a href="{{ shop.url}}/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" title="{{ blog.title | escape }} {{ 'blogs.general.tagged' | t }} {{ tag | escape }}">{{ tag }}</a>
+                  </li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endif %}
+
+            {% include 'meta-info-list' %}
+          </div>
+
+          {% if section.settings.button_type != 'none' and section.settings.blog_posts_per_row == 1 %}
+            <div class="blog-card__read-more buttons">
+              {% include 'button', label: section.settings.button_label, href: article.url, type: "link", style: section.settings.button_type %}
+            </div>
+          {% endif %}
+        </div>
+
+      {% if section.settings.button_type != 'none' and section.settings.blog_posts_per_row != 1 %}
+        <div class="blog-card__read-more buttons">
+          {% include 'button', label: section.settings.button_label, href: article.url, type: "link", style: section.settings.button_type %}
+        </div>
+      {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="container">
+    <div class="one-whole column text-align-center">
+      {% assign load_more_text = 'blogs.general.pagination_button' | t %}
+      {% include 'pagination', pagination_type: section.settings.pagination_type, load_more_text: load_more_text %}
+    </div>
+  </div>
+
+</section>
+
+{% endpaginate %}
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "enable_filter": {{ section.settings.blog_tags | json }}
+  }
+</script>
+<script src="{{ 'z__jsBlog.js' | asset_url }}"></script>
+
+{% schema %}
+
+{
+  "name": "Blog",
+  "class": "blog-main has-sidebar-option jsBlog",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "blog_tags",
+      "label": "Show tag filter"
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_per_row",
+      "label": "Posts per row",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_per_page",
+      "label": "Posts per page",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "Pagination type",
+      "options": [
+        {
+          "value": "infinite_scroll",
+          "label": "Infinite scroll"
+        },
+        {
+          "value": "infinite_load_more",
+          "label": "Infinite load more button"
+        },
+        {
+          "value": "load_more",
+          "label": "Load more button"
+        },
+        {
+          "value": "basic_pagination",
+          "label": "Page links"
+        }
+      ],
+      "default": "basic_pagination"
+    },
+    {
+      "type": "header",
+      "content": "Blog posts"
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_author",
+      "label": "Show author"
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_read_time",
+      "label": "Show estimated read time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_comment_count",
+      "label": "Show comment count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_tags",
+      "label": "Show tags",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_show_excerpt",
+      "label": "Show excerpts",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show border",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Read more"
+    },
+    {
+      "type": "select",
+      "id": "button_type",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ],
+      "default": "button--primary"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

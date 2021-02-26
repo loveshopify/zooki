@@ -1,0 +1,87 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-content-page' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+
+{% assign title = object.settings.title %}
+{% assign content_page = object.settings.content_page %}
+{% comment %}Background{% endcomment %}
+{% assign background = object.settings.background %}
+{% assign gradient = object.settings.gradient %}
+{% assign gradient_rotation = object.settings.gradient_rotation %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %}Is the color set to transparent?{% endcomment %}
+{% assign background_alpha = background | color_extract: 'alpha' %}
+{% assign gradient_alpha = gradient | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .section {
+    background-image: linear-gradient({{ gradient_rotation }}deg, rgba(255,255,255,0), {{ gradient }});
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- elsif width == 'half' -%}
+      width: 50%;
+    {%- endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+  <section class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if background_alpha != 0 or gradient_alpha != 0  %}
+                  has-background
+                {% endif %}
+                has-padding-top
+                has-padding-bottom
+                "
+          {% if animation != "none" %}
+            data-scroll-class="{{ animation }}"
+          {% endif %}>
+    <div class="container
+                has-limit
+                content
+                ">
+      {% if content_page != blank %}
+        {% include 'page-multi-column', content: pages[content_page].content %}
+      {% else %}
+        <div class="one-whole column">
+          <p class="text-align-center">
+            {{ 'homepage.onboarding.no_content' | t }}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </section>

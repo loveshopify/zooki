@@ -1,0 +1,134 @@
+{% assign radio = section.settings.radio-btn %}
+{% assign id = section.id %}
+{% assign custom_css = section.settings.custom_css %}
+
+
+
+{%style%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%endstyle%}
+
+
+<div
+    class="section-{{id}} container slant-container {% if radio == 'right' %}imageOnRight{% else %}imageOnLeft{%endif%}">
+
+    <!-- Only for max-width 768 -->
+    {% if section.settings.img != blank %}
+    <div class="{% if radio == 'right' %}slant-r-img{% else %}slant-l-img{% endif%} visible" style="display: none;">
+        {% render 'rimage', image: section.settings.img, size: '1280x' %}
+    </div>
+    {% endif %}
+    <!-- END -->
+
+    <div class="slant-txt">
+        <div class="inner-slant-txt">
+            <h2>{{ section.settings.title }}</h2>
+
+            {% assign text = section.settings.text | split: ' | ' %}
+
+            <ul>
+                {% for t in text %}
+                <li>{{t | strip }}</li>
+                {% endfor %}
+            </ul>
+
+            <button> <a href="{{ section.settings.button-url }}"> {{ section.settings.button-txt }}</a></button>
+        </div>
+    </div>
+
+    {% if section.settings.img != blank %}
+    <div class="{% if radio == 'right' %}slant-r-img{%else%}slant-l-img{%endif%} hidden">
+        {% render 'rimage', image: section.settings.img, size: '1280x' %}
+    </div>
+    {% endif %}
+
+</div>
+
+
+
+<style>
+    .section-{{id}}.imageOnRight .slant-txt .inner-slant-txt ul li::before {
+        background-image: url('{{ section.settings.line-bullet-icon | img_url: '1280x' }}') !important;
+    }
+
+    .section-{{id}}.imageOnLeft .slant-txt .inner-slant-txt ul li::before {
+        background-image: url('{{ section.settings.line-bullet-icon | img_url: '1280x' }}') !important;
+    }
+
+    .section-{{id}} .slant-txt .inner-slant-txt ul li::after {
+        background-image: url('{{ section.settings.line-bullet-icon | img_url: '1280x' }}') !important;
+    }
+
+    .section-{{id}}.ImageOnLeft .slant-txt .inner-slant-txt ul li::after {
+        background-image: url('{{ section.settings.line-bullet-icon | img_url: '1280x'}}') !important;
+    }
+</style>
+
+
+{% schema %}
+{
+"name": "Image with text slant",
+"settings": [
+{
+"type": "radio",
+"id": "radio-btn",
+"options": [
+{ "value": "right", "label": "Image on right" },
+{ "value": "left", "label": "Image on left" }
+],
+"label": "Image on the right or left side"
+},
+{
+"type": "checkbox",
+"id": "hui",
+"label": "Right text align",
+"default": false,
+"info": "Check if you want the text container to be right aligned"
+},
+{
+"type": "text",
+"id": "title",
+"label": "Heading",
+"default": "Title"
+},
+{
+"type": "textarea",
+"id": "text",
+"label": "Text area",
+"info": "Split text by ' | '"
+},
+{
+"type": "url",
+"id": "button-url",
+"label": "Button URL"
+},
+{
+"type": "text",
+"id": "button-txt",
+"label": "Button text"
+},
+{
+"type": "image_picker",
+"id": "img",
+"label": "Choose image"
+},
+{
+"type": "textarea",
+"id": "custom_css",
+"label": "Custom CSS"
+},
+{
+"type": "image_picker",
+"id": "line-bullet-icon",
+"label": "Pick icon that will appear in front of the line"
+}
+],
+
+"presets": [
+{
+"category": "Little Vitamin",
+"name":"Image with text slant"
+}
+]
+}
+{% endschema %}

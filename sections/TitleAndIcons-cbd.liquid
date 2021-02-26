@@ -1,0 +1,135 @@
+<div class="tai-container">
+    <div class="tai-txt-area">
+        <h2>{{ section.settings.tai_heading }}</h2>
+        <p>{{ section.settings.tai_txt }}</p>
+    </div>
+    <div class="tai-icons-area">
+        <div class="tai-f-3-icons">
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/hemp_icon_Cannabis_leaf.svg?v=1600170791" alt="">
+                <p>{{ section.settings.tai_1_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/american_grown_icon_Sleep_copy_c366ae19-cf31-4618-9e94-577265607865.svg?v=1600193087" alt="">
+                <p>{{ section.settings.tai_2_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/co2_extracted_icon_Lightbulb_stroke.svg?v=1600170851" alt="">
+                <p>{{ section.settings.tai_3_txt }}</p>
+            </div>
+        </div>
+        <div class="tai-s-3-icons">
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/3rd_party_tested_icon_Tick.svg?v=1600170877" alt="">
+                <p>{{ section.settings.tai_4_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/great_tasting_icon_Taste.svg?v=1600170895" alt="">
+                <p>{{ section.settings.tai_5_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/All_strengths_icon_Body.svg?v=1600170911" alt="">
+                <p>{{ section.settings.tai_6_txt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% schema %}
+{
+"name": "Title and Icons",
+"settings": [
+{
+"type": "text",
+"id": "tai_heading",
+"label": "Heading",
+"default": "Title"
+},
+{
+"type": "textarea",
+"id": "tai_txt",
+"label": "Text"
+},
+{
+"type": "image_picker",
+"id": "tai_1_img",
+"label": "First icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_1_txt",
+"label": "First icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_2_img",
+"label": "Second icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_2_txt",
+"label": "Second icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_3_img",
+"label": "Third icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_3_txt",
+"label": "Third icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_4_img",
+"label": "Fourth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_4_txt",
+"label": "Fourth icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_5_img",
+"label": "Fifth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_5_txt",
+"label": "Fifth icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_6_img",
+"label": "Sixth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_6_txt",
+"label": "Sixth icon text"
+}
+
+]
+}
+{% endschema %}

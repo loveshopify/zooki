@@ -1,0 +1,143 @@
+{% if related_products == true %}
+  {% assign hover_enabled = block.settings.show_related_products_title_on_hover %}
+{% else %}
+  {% assign hover_enabled = settings.thumbnail_hover_enabled %}
+{% endif %}
+
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+<div class="
+  {% include 'column-width', value: products_per_row %}
+  medium-down--one-half
+  {% if object.settings.mobile_products_per_row == '1' %}
+    small-down--one-whole
+  {% else %}
+    small-down--one-half
+  {% endif %}
+  column
+  {% if settings.enable_quickshop %}
+    quick-shop--true
+    quick-shop--closed
+    product-{{ product.id }} js-product_section
+  {% endif %}
+  {% if settings.stickers_enabled %}
+    has-thumbnail-sticker
+  {% endif %}
+  {% if product.images[1] != blank and settings.show_secondary_image == true %}
+    has-secondary-image-swap
+  {% endif %}
+  thumbnail
+  product__thumbnail
+  product__grid-item
+  thumbnail__hover-overlay--{{ hover_enabled }}
+  has-padding-bottom"
+  {% if section.settings.pagination_type != 'basic_pagination' %}
+    data-load-more--grid-item
+  {% endif %}>
+  <div class="product-wrap">
+
+    {% assign collection_handles = product.collections | map: 'handle' %}
+    {% if product.featured_image.alt contains 'youtube' or image.alt contains 'vimeo' %}
+      {% assign alt_text = product.title %}
+    {% else %}
+      {% assign alt_text = product.featured_image.alt %}
+    {% endif %}
+
+      {% if type == 'block' %}
+        {% assign image_crop = block.settings.image_crop %}
+      {% else %}
+        {% assign image_crop = section.settings.image_crop %}
+      {% endif %}
+
+      <div class="product-image__wrapper">
+        <div class="image__container product__imageContainer">
+          <a href="{{ product.url | within: collection }}">
+            {% if settings.stickers_enabled %}
+              {% include 'product-thumbnail__sticker' %}
+            {% endif %}
+
+            {% comment %} Primary image {% endcomment %}
+            {% include 'image-element', image: product.featured_image, alt: alt_text, object_fit: align_height, max_height: height %}
+            
+            {% comment %} Secondary image {% endcomment %}
+            {% if product.images[1] != blank and settings.show_secondary_image == true %}
+              {% include 'image-element', image: product.images[1], alt: alt_text, object_fit: align_height, max_height: height, additional_classes: 'lazypreload secondary swap--visible' %}
+            {% endif %}
+          </a>
+        </div>
+        {% if hover_enabled or settings.enable_quickshop %}
+          <div class="thumbnail-overlay__container">
+            <a class="hidden-product-link" href="{{ product.url | within: collection }}">{{ product.title }}</a><span class="bold_ro_desc" data-product-id="{{ product.id }}-{{ forloop.index0 }}"></span>
+
+
+            {% if hover_enabled %}
+              <div class="quick-shop__info animated fadeInDown">
+                <div class="thumbnail-overlay">
+                  <div class="info text-align-center">
+                    {% if settings.display_vendor %}
+                      <span class="product-thumbnail__vendor">{{ product.vendor }}</span>
+                    {% endif %}
+                    {% if collection_handles contains 'coming-soon' %}
+                      <span>{{ 'collections.general.coming_soon' | t }}</span>
+                    {% else %}
+                      <span class="product-thumbnail__price price {% if product.compare_at_price_max > product.price %}sale{% endif %}">
+                        {% if product.available %}
+                          {% if product.price_varies and product.price_min > 0 %}
+                            <small><em>{{ 'products.general.from' | t }}</em></small>
+                          {% endif %}
+                          {% if product.price_min > 0 %}
+                            <span class="money">{{ product.price_min | money }}</span>
+                          {% else %}
+                            {{ settings.free_price_text }}
+                          {% endif %}
+                          {% if product.compare_at_price_max > product.price %}
+                            <span class="product-thumbnail__was-price was-price">
+                              <span class="money">{{ product.compare_at_price_max | money }}</span>
+                            </span>
+                          {% endif %}
+                        {% else %}
+                          <span class="product-thumbnail__sold-out sold-out">{{ 'products.product.sold_out' | t }}</span>
+                        {% endif %}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endif %} 
+
+            {% if settings.enable_quickshop %}
+              {% include 'product-thumbnail__quick-shop-button' %}
+            {% endif %}
+
+            {% if hover_enabled %}
+              {% if settings.enable_shopify_collection_badges and settings.enable_shopify_review_comments %}
+                <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+              {% endif %}
+            {% endif %}
+
+          </div>
+        {% endif %}
+
+      </div>
+
+      <div class="thumbnail__caption text-align-{{ settings.thumbnail_text_alignment }}">
+        {% include 'product-thumbnail__product-info' %}
+      </div>
+
+  </div>
+
+  {% include 'product-thumbnail__swatch' %}
+
+  {% if hover_enabled == false %}
+    {% if settings.enable_shopify_collection_badges and settings.enable_shopify_review_comments %}
+    <div class="product-thumbnail__review-stars is-flex is-justify-{{ settings.thumbnail_text_alignment }}">
+      <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+    </div>
+    {% endif %}
+  {% endif %}
+
+</div>

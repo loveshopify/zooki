@@ -1,0 +1,215 @@
+<div class="mobile-menu">
+  <div class="mobile-menu__content">
+      <div class="mobile-menu-tabs">
+        <div class="tab-headers d-flex" data-tab-header-wrapper>
+          <div class="tab-header" data-tab="currency" data-tab-header>
+            {% render 'icon' with 'flag-uk' %}
+          </div>
+          <div class="tab-header" data-tab="search" data-tab-header>{% render 'icon' with 'search' %}</div>
+          {% if customer %}
+            <a class="tab-header" href="/account">{% render 'icon' with 'user' %}</a>  
+          {% else %}
+            <div class="tab-header" data-tab="account" data-tab-header>{% render 'icon' with 'user' %}</div>  
+          {% endif %}
+        </div>
+        <div class="tab-contents">
+          <div class="tab-content data-tab-content-currency" data-tab-content="currency">
+            <div class="country-selection">
+              {% for block in section.blocks %}
+                <li class="{% if forloop.first %}active{% endif %}">
+                  <a href="{{ block.settings.link }}">
+                    <div class="icon_wrapper">
+                      <div class="flag_svg">{{ block.settings.flag_icon }}</div>
+                    </div>
+                    <div class="info_wrapper">
+                      <div class="title">{{ block.settings.title }}</div>
+                      <div>
+                        <span>{{ block.settings.subtitle }}</span>
+                        <span>{{ block.settings.currency }}</span>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="tab-content data-tab-content-search" data-tab-content="search">
+            <form class="search-form search-popup__form" action="{{ routes.search_url }}">
+              <div class="search__fields">
+                {% if settings.search_option != 'everything' %}
+                  <input class="visuallyhidden" type="text" name="type" value="product" />
+                {% endif %}
+                <label for="q" class="visuallyhidden">{{ settings.search_placeholder }}</label>
+                <div class="field">
+                  <div class="control has-icons-left">
+                    <input class="input" id="q" type="text" name="q" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+                    {% if settings.enable_autocomplete == true %}
+                      <ul class="predictive-results"></ul>
+                    {% endif %}
+                  </div>
+                </div>
+                <input type="submit" name="search" class="" value="Search" />
+              </div>
+            </form>
+          </div>
+          <div class="tab-content data-tab-content-account" data-tab-content="account">
+            <div class="form-wrapper form-signup" data-form-content="signup" >
+              <div class="form-title">Sign up</div>
+              {% form 'create_customer' %}
+                {{ form.errors | default_errors }}
+                <div id="first_name" class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.first_name' | t }}</label>
+                  <div class="control">
+                    <input type="text" value="" name="customer[first_name]" id="first_name" class="input" size="30" placeholder="{{ 'customer.register.first_name' | t }}" />
+                  </div>
+                </div>
+                <div id="last_name" class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.last_name' | t }}</label>
+                  <div class="control">
+                    <input type="text" value="" name="customer[last_name]" id="last_name" class="input" size="30" placeholder="{{ 'customer.register.last_name' | t }}" />
+                  </div>
+                </div>
+                <div id="email" class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.email' | t }}*</label>
+                  <div class="control">
+                    <input type="email" value="" name="customer[email]" id="email" class="input" size="30" placeholder="{{ 'customer.register.email' | t }}*" />
+                  </div>
+                </div>
+                <div id="password" class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.password' | t }}*</label>
+                  <div class="control">
+                    <input type="password" value="" name="customer[password]" id="password" class="input" size="30" placeholder="{{ 'customer.register.password' | t }}" />
+                     <div class="pwstrength_viewport_progress"></div>
+                  </div>
+                </div>
+                <div class="is-flex is-justify-space-between">
+                  <input class="button button--secondary" type="submit" value="Sign up" />
+                  {% comment %}<p class="has-margin-left">* {{ 'general.forms.required_field' | t }}</p>{% endcomment %}
+                </div>
+                <p class="has-padding-top form-footer">
+                  Already signed up to YourZooki? 
+                  <a href="javascript:;" class="hoverButton" data-form="signin">Sign in</a>
+                </p>
+              {% endform %}
+            </div>
+            <div class="form-wrapper form-signin is-hidden" data-form-content="signin">
+              <div class="form-title">Sign in</div>
+              {% form 'customer_login' %}
+                {{ form.errors | default_errors }}
+                <div class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.email' | t }}*</label>
+                  <div class="control">
+                    <input type="email" value="" name="customer[email]" id="customer_email" class="input" size="30"  autocorrect="off" autocapitalize="off" tabindex="1" placeholder="{{ 'customer.login.email' | t }}"/>
+                  </div>
+                </div>
+                {% if form.password_needed %}
+                  {% comment %}
+                    Customer Account Login
+                  {% endcomment %}
+                {% endif %}
+                <div class="field">
+                  <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.password' | t }}*</label>
+                  <div class="control">
+                    <input type="password" value="" name="customer[password]" id="customer_password" class="input" size="16" tabindex="2" placeholder="{{ 'customer.login.password' | t }}"/>
+                  </div>
+                </div>
+                <div class="is-flex is-flex-wrap is-justify-space-between  is-align-center">
+                  <input class="button button--secondary" type="submit" value="{{ 'customer.login.sign_in' | t }}" style="margin-bottom: 5px !important" tabindex="3" />
+                  <small class="right"><a class="js-recover-password" href="javascript:;" data-form="reset">{{ 'customer.login.forgot_password' | t }}</a></small>
+                </div>
+                {% unless shop.checkout.guest_login %}
+                  <p class="has-padding-top">
+                    {{ 'customer.login.new_customer_label' | t }}
+                    <a href="javascript:;" class="hoverButton" data-form="signup">Sign up</a>
+                  </p>
+                {% endunless %}
+              {% endform %}
+              {% if shop.checkout.guest_login %}
+                <span class="has-padding-top"> {{ 'customer.login.or' | t }} </span>
+                {% form 'guest_login' %}
+                  <input class="button button--secondary" type="submit" value="{{ 'customer.login.guest_title_html' | t }}" />
+                {% endform %}
+              {% endif %}
+            </div>
+            <div class="form-wrapper form-reset-psd is-hidden" data-form-content="reset">
+              <div class="form-title">Reset password</div>
+              <div class="form-subtitle">We didn’t find an account with that email address, please try again</div>
+              {% form 'recover_customer_password' %}
+                {{ form.errors | default_errors }}
+
+                <div class="field">
+                  <label class="label" for="email">Email</label>
+                  <div class="control">
+                    <input type="email" value="" name="email" id="recover-email" class="input" placeholder="Email"/>
+                  </div>
+                </div>
+                <div class="account-form-submit">
+                  <input type="submit" value="Email me" />
+                </div>
+                <div>
+                  <a href="javascript:;" data-form="signin">Back to sign in</a>
+                </div>
+              {% endform %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="has-margin-bottom">
+        {% if settings.header_layout == 'vertical' %}
+          {% for block in nav_blocks %}
+            {% if block.type == 'navigation' %}
+              {% assign main_menu = linklists[block.settings.main_linklist] %}
+              {% include 'mobile-menu-loop' %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% comment %}{% assign main_menu = linklists[section.settings.main_linklist] %}{% endcomment %}
+          {% assign main_menu = linklists[section.settings.mob_main_linklist] %}
+          {% include 'mobile-menu-loop' %}
+        {% endif %}
+
+        {% if settings.show_multiple_currencies %}
+          {% comment %} Currency converter select {% endcomment %}
+          <li>
+            <div class="mobile-menu__item mobile__currency-dropdown">
+                {% if settings.icon_style != 'text' %}
+                  {% include settings.icon, name: 'globe' %}
+                {% endif %}
+                <span class="icon-caption select is-arrowless">
+                  {% include 'header__currencies-switcher' %}
+                </span>
+            </div>
+          </li>
+        {% endif %}
+
+        {% comment %}
+        {% if shop.customer_accounts_enabled %}
+          {% comment %} Accounts {% endcomment %}
+          <li>
+            {% if customer %}
+              {% comment %} Logout {% endcomment %}
+              <a class="mobile-menu__item item-with-icon" href="{{ routes.account_url }}" >
+                {% if settings.icon_style != 'text' %}
+                  {% include settings.icon, name: 'avatar' %}
+                {% endif %}
+                <span class="icon-caption">
+                  {{ 'layout.customer.my_account' | t | escape }}
+                </span>
+            {% else %}
+              {% comment %} Login {% endcomment %}
+              <a class="mobile-menu__item item-with-icon" href="{{ routes.account_login_url }}" >
+                {% if settings.icon_style != 'text' %}
+                  {% include settings.icon, name: 'avatar' %}
+                {% endif %}
+                <span class="icon-caption">
+                  {{ 'layout.customer.log_in' | t | escape }}
+                </span>
+              </a>
+            {% endif %}
+          </li>
+        {% endif %}
+        {% endcomment %}
+      </ul>
+  </div>
+  {% comment %}<div class="mobile-menu-overlay"></div>{% endcomment %}
+</div>

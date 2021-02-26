@@ -1,0 +1,105 @@
+{% comment %}
+Optional values
+newsletter_class: <string>
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+
+{% if settings.form_button_style contains 'primary' %}
+  {% assign field_input_size = settings.button_primary_padding %}
+  {% assign field_input_style = 'primary-btn-style' %}
+{% elsif settings.form_button_style contains 'secondary' %}
+  {% assign field_input_size = settings.button_secondary_padding %}
+  {% assign field_input_style = 'secondary-btn-style' %}
+{% else %}
+  {% assign field_input_size = settings.button_link_padding %}
+{% endif %}
+
+{% style %}
+
+  #shopify-section-{{ id }} .newsletter-form__wrapper {
+    {% if width == 'half' %}
+      max-width: 100%;
+    {% endif %}
+  }
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<div class="newsletter-form__wrapper {{ newsletter_class }}">
+  <div class="form__success-message text-align-{{ text_alignment }}"></div>
+  
+  {% form 'customer', class: 'contact-form newsletter-form--newsletter-section', id: 'newsletter_form' %}
+    {% if form.posted_successfully? %}
+      <p class="quote">{{ 'general.newsletter_form.success_text' | t }}</p>
+    {% elsif form.errors %}
+      <div class="one-whole column contact-form__form-errors">
+        {% for field in form.errors %}
+          <p class="form__error">{{ field | capitalize }} - {{ form.errors.messages[field] }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% comment %} Hidden fields {% endcomment %}
+    <input type="hidden" name="contact[tags]" value="prospect,newsletter"/>
+    <input type="hidden" name="challenge" value="false" />
+
+    <div class="newsletter-form form is-responsive">
+
+      {% if object.settings.display_first_name %}
+        {% comment %} First name {% endcomment %}
+        <div class="field is-stretched-width {% if object.settings.display_last_name != true %} is-full-width {% endif %}">
+          <label class="label newsletter__text {% if settings.use_placeholders %}is-sr-only{% endif %}">
+            {{ 'general.newsletter_form.subscriber_first_name' | t }}
+          </label>
+          <div class="control">
+            <input class="input is-{{ field_input_style }} is-{{ field_input_size }}" type="text" name="contact[first_name]" placeholder="{% if settings.use_placeholders %}{{ 'general.newsletter_form.subscriber_first_name' | t }}{% endif %}">
+          </div>
+        </div>
+      {% endif %}
+
+      {% if object.settings.display_last_name %}
+        {% comment %} Last name {% endcomment %}
+        <div class="field is-stretched-width {% if object.settings.display_first_name != true %} is-full-width {% endif %}">
+          <label class="label newsletter__text {% if settings.use_placeholders %}is-sr-only{% endif %}">
+            {{ 'general.newsletter_form.subscriber_last_name' | t }}
+          </label>
+          <div class="control">
+            <input class="input is-{{ field_input_style }} is-{{ field_input_size }}" type="text" name="contact[last_name]" placeholder="{% if settings.use_placeholders %}{{ 'general.newsletter_form.subscriber_last_name' | t }}{% endif%}">
+          </div>
+        </div>
+      {% endif %}
+
+      {% comment %} Email {% endcomment %}
+      <div class="field is-stretched-width">
+        <label class="label newsletter__text {% if settings.use_placeholders %}is-sr-only{% endif %}">
+          {{ 'general.newsletter_form.email' | t }}<span class="required">*</span>
+        </label>
+        <div class="control {% if settings.show_form_icons %} has-icons-left has-icons-left--responsive-form{% endif %}">
+          <input class="input is-{{ field_input_style }} is-{{ field_input_size }}" type="email" name="contact[email]" placeholder="{% if settings.use_placeholders %}{{ 'general.newsletter_form.email' | t }}*{% endif %}" required>
+          {% if settings.show_form_icons %}
+            {% include settings.icon, name: 'email' %}
+          {% endif %}
+        </div>
+      </div>
+
+      {% comment %} Submit button {% endcomment %}
+      <div class="field is-default-width is-align-self-end">
+        <div class="control">
+          {% assign button_label = 'general.newsletter_form.submit' | t %}
+          {% include 'button', label: button_label, type: "submit", style: settings.form_button_style, class: 'is-within-form' %}
+        </div>
+      </div>
+
+    </div>
+  {% endform %}
+</div>
+

@@ -1,0 +1,74 @@
+{% comment %}
+  Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
+{% endcomment %}
+
+{% assign file_extension = 'png' %}
+
+{% assign swatch = option %}
+{% assign found_option = false %}
+{% assign is_color = false %}
+{% assign option_index = 0 %}
+
+{% for option in product.options %}
+  {% if option == swatch %}
+    {% assign found_option = true %}
+    {% assign option_index = forloop.index0 %}
+    {% assign downcased_option = swatch | downcase %}
+    {% if downcased_option contains 'color' or downcased_option contains 'colour' %}
+      {% assign is_color = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+<div class="swatch is-flex is-flex-wrap" data-option-index="{{ option_index }}">
+  <div class="option-title label" aria-label="{{ value | escape }}" tabindex="0">{{ swatch }}</div>
+  {% assign values = '' %}
+  {% for variant in product.variants %}
+    {% assign value = variant.options[option_index] %}
+    {% unless values contains value %}
+      {% assign values = values | join: ',' %}
+      {% assign values = values | append: ',' | append: value %}
+      {% assign values = values | split: ',' %}
+
+      {%- comment -%} Modified by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+      <input data-variant-id="{{ variant.id }}"
+               {% if section.settings.products_per_row == '2' and variant.featured_image %}
+                data-image="{{ variant.featured_image | img_url: '600x' }}"
+              {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
+                data-image="{{ variant.featured_image | img_url: '500x' }}"
+              {% elsif variant.featured_image %}
+                data-image="{{ variant.featured_image | img_url: '400x' }}"
+              {% endif %}
+              class="swatch--{{ value | handle }}"id="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" type="radio" aria-label="{{ value | escape }}" tabindex="0" name="option-{{ option_index }}" value="{{ value | escape }}"{% if forloop.first %} checked{% endif %}/>
+      {%- comment -%} End of modified by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+      <div aria-label="{{ value | escape }}" tabindex="0" data-value="{{ value | escape }}" data-value-handle="{{ value | handle }}" class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }}-swatch {% if variant.available %}available{% else %}soldout{% endif %}">
+        {% if is_color %}
+          <div class="tooltip">{{ value }}</div>
+        {% endif %}
+        {% if is_color %}
+          <label  {% if section.settings.products_per_row == '2' and variant.featured_image%}
+                    data-image="{{ variant.featured_image | img_url: '600x' }}"
+                  {% elsif section.settings.products_per_row == '3' and variant.featured_image %}
+                    data-image="{{ variant.featured_image | img_url: '500x' }}"
+                  {% elsif variant.featured_image %}
+                    data-image="{{ variant.featured_image | img_url: '400x' }}"
+                  {% endif %}
+            for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}" style="background-color: {{ value | split: ' ' | last | handle }};">
+
+            {% assign image_name = value | handle | append: '.' | append: file_extension %}
+            {% assign swatch = images[image_name] %}
+
+            <img class="swatch__image {% if swatch == empty %}swatch__image--empty{% endif %}" src="{{ swatch | img_url: '50x' }}" alt="">
+
+            <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
+          </label>
+        {% else %}
+          <label for="swatch-{{ option_index }}-{{ value | handle }}-{{ product.id }}">
+            {{ value }}
+            <span class="crossed-out" aria-label="{{ 'products.product.sold_out' | t }}" alt="{{ 'products.product.sold_out' | t }}"></span>
+          </label>
+        {% endif %}
+      </div>
+    {% endunless %}
+  {% endfor %}
+</div>

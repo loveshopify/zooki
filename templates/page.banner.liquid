@@ -1,0 +1,14 @@
+{% comment %}
+  The contents of the page.liquid template can be found in /sections/page-template.liquid
+{% endcomment %}
+
+<section class="banner__page" data-check-for-order="true">
+  {% section 'page__banner' %}
+  <section class="section__wrapper
+                section
+                ">
+    <div class="container">
+      {% section 'page__main' %}
+    </div>
+  </section>
+</section>

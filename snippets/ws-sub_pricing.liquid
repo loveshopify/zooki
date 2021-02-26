@@ -1,0 +1,24 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+<div class="ws_pricing">
+  <div class="ws_price-lbmessage">
+    <div class="ws_prices">
+      <div class="ws-div-lbprice-subsave">
+        <label class="ws_total"><b>{{ product.price | money }}</b></label>
+      </div>
+      <div class="ws-div-price">
+        <span class="text">Then&nbsp;</span>
+        <label class="ws_dicounted_price">{{ product.price | money }}</label>
+      </div>
+    </div>
+    <div class="ws_reorder">
+      <span>Auto re-order,</span><span>&nbsp;cancel any time</span>
+    </div>
+  </div>
+  <button type="button" class="sticky-btn button button--add-to-cart disabled ws-bt">
+    <span class="text">Add to basket</span>
+    <svg x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" class="checkmark">
+      <path fill="none" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11"></path>
+    </svg>
+  </button>
+</div>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}

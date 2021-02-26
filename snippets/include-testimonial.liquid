@@ -1,0 +1,139 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-testimonial' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% assign card_text = object.settings.card_text %}
+{% assign card_background = object.settings.card_background %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign card_text_alpha = card_text | color_extract: 'alpha' %}
+{% assign card_background_alpha = card_background | color_extract: 'alpha' %}
+
+
+{% capture section_css -%}
+
+  .testimonial-block {
+    background-color: {%- if card_background_alpha != 0 -%}{{ card_background }}{%- endif -%};
+  }
+
+  .testimonial__description {
+    color: {%- if card_text_alpha != 0 -%}{{ card_text }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if section.blocks.size == 3 %}mobile-slider{% endif %}
+                {% if section.blocks.size <= 3 %}desktop-slider--disabled{% endif %}
+                "
+          {% if animation != "none" %}
+            data-scroll-class="{{ animation }}"
+          {% endif %}>
+
+  {% if section.blocks.size > 2 %}
+    <div class="container">
+      <div class="testimonial__nav-wrapper one-whole column is-flex">
+        <div class="testimonial__nav testimonial__nav--prev">
+          {% include settings.icon, name: 'left-arrow' %}
+        </div>
+        <div class="testimonial__nav testimonial__nav--next ">
+          {% include settings.icon, name: 'right-arrow' %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="testimonials container" {% if section.blocks.size > 2 %}data-testimonial-slider{% endif %}>
+    {% for block in section.blocks %}
+
+    {% comment %} Is the color set to transparent? {% endcomment %}
+    {% assign info_text_alpha = block.settings.info_text | color_extract: 'alpha' %}
+    {% assign info_background_alpha = block.settings.info_background | color_extract: 'alpha' %}
+
+    {% if section.blocks.size >= 3 %}
+      {% assign column-value = 'one-third' %}
+    {% else %}
+      {% assign column-value = section.blocks.size %}
+    {% endif %}
+
+    <div id="shopify-section-{{ block.id }}"
+         class="testimonial-block
+                block--{{ block.id }}
+                column
+                has-images-enabled-{{ section.settings.enable_images }}
+                testimonial-border--{{ section.settings.show_border }}
+                testimonial-align--{{ section.settings.card_alignment }}
+                {% include 'column-width', value: column-value %}
+                medium-down--one-whole" data-testimonial-index={{ forloop.index0 }} {{ block.shopify_attributes }}>
+
+      <style>
+          .block--{{ block.id }} .testimonial__name {
+            color: {%- if info_text_alpha != 0 -%}{{ block.settings.info_text }}{%- endif -%};
+            background-color: {%- if info_background_alpha != 0 -%}{{ block.settings.info_background }}{% else %}{{ settings.shop_bg_color }}{%- endif -%};
+          }
+      </style>
+
+      <div class="testimonial__description">
+          {{ block.settings.quote }}
+
+      </div>
+      <div class="testimonial__name">
+
+        {{ block.settings.text }}
+
+        <div class="testimonial__image has-image-crop image-style--{{ section.settings.crop_shape }}">
+            {% if section.settings.enable_images == true %}
+              {% if block.settings.image != blank %}
+                {% include 'image-element', image: block.settings.image, alt: block.settings.image.alt %}
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            {% endif %}
+          </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ object.id }}"
+  data-section-data
+>
+  {
+  }
+</script>
+<script data-theme-editor-load-script src="{{ 'z__jsTestimonials.js' | asset_url }}"></script>

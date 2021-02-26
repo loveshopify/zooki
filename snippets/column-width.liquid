@@ -1,0 +1,26 @@
+{% comment %}
+Required values
+value: <number>
+{% endcomment %}
+
+{% assign value = value | plus: 0 %}
+
+{% if value == 1 %}
+  one-whole
+{% elsif value == 2 %}
+  one-half
+{% elsif value == 3 %}
+  one-third
+{% elsif value == 4 %}
+  one-fourth
+{% elsif value == 5 %}
+  one-fifth
+{% elsif value == 6 %}
+  one-sixth
+{% elsif value == 7 %}
+  one-seventh
+{% elsif value == 8 %}
+  one-eighth
+{% else %}
+  {{ value }}
+{% endif %}

@@ -1,0 +1,308 @@
+{% comment %}
+** Collection list - main content area **
+- Template
+- This template can be viewed by going to /collections of the shop.
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign overlay_background_opacity = section.settings.overlay_background_opacity %}
+{% assign overlay_background = section.settings.overlay_background %}
+{% assign overlay_text = section.settings.overlay_text %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Buttons {% endcomment %}
+{% assign button_style = section.settings.button_style %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign overlay_alpha = overlay_background | color_extract: 'alpha' %}
+{% assign overlay_text_alpha = overlay_text | color_extract: 'alpha' %}
+{% comment %} Opacity level {% endcomment %}
+{% if overlay_alpha != 0 %}
+  {% assign overlay_background_alpha = overlay_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% if section.settings.align_height %}
+  {% assign collection_height = section.settings.collection_height %}
+{% endif %}
+
+{%- capture section_css -%}
+
+  {% if section.settings.align_height != blank %}
+    .placeholder-svg {
+      height: {{ collection_height }}px;
+      max-height: {{ collection_height }}px;
+    }
+  {% endif %}
+
+  .collection-thumbnail-overlay {
+    background-color: {%- if overlay_alpha != 0 -%}{{ overlay_background | color_modify: 'alpha', overlay_background_alpha }}{% endif %};
+  }
+
+  .collection-info__caption span {
+    color: {%- if overlay_text_alpha != 0 -%}{{ overlay_text }}{% endif %}
+  }
+{%- endcapture -%}
+
+{% comment %} CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<main class="section
+            {{ css_class }}
+            is-width-{{ width }}
+            has-padding-bottom
+            has-padding-top
+            ">
+
+  {% paginate collections by section.settings.pagination_limit %}
+
+    <div class="list-collection-wrapper container" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid {% endif %}>
+
+      {%- capture title -%}{{ 'collections.general.title' | t }}{%- endcapture -%}
+      {% include 'heading', title: title, heading_tag: 'h1', context: 'list-collection', text_alignment: 'left' %}
+
+      {% for collection in collections %}
+        {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+        <div class="{% include 'column-width', value: section.settings.collections_per_row  %} column thumbnail {% if section.settings.align_height %}list-collection--align-height{% endif %} list-collection__thumbnail medium-down--one-half small-down--one-whole" {% if section.settings.pagination_type != 'basic_pagination' %}data-load-more--grid-item{% endif %}>
+          <div class="product-wrap">
+            <div class="collection-thumbnail-overlay"></div>
+            {% if collection.image != blank %}
+              {% assign collection_image = collection.image %}
+              {% assign collection_image_alt = collection.image.alt | escape %}
+            {% else collection.empty? == false %}
+              {% assign collection_image = collection.products.first.featured_image %}
+              {% assign collection_image_alt = collection.products.first.featured_image.alt | escape %}
+            {% endif %}
+
+            {% if collection_image != nil %}
+              <div class="thumbnail image__container has-image-crop">
+                {% include 'image-element', image: collection_image.src, alt: collection_image_alt, image_crop: true, max_height: collection_height %}
+              </div>
+            {% else %}
+              {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+              {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+            <a class="collection-info__caption" href="{{ collection.url }}">
+              {% if section.settings.collection_title_below_image == blank %}
+                <div class="collection-info__caption-wrapper">
+                  <span class="title">
+                    {{ collection.title }}
+                  </span>
+                  {% assign view_products = 'collections.general.view_all' | t %}
+                  {% include 'button', label: view_products, href: collection.url, style: section.settings.button_style %}
+                </div>
+              {% endif %}
+            </a>
+          </div>
+          {% if section.settings.collection_title_below_image != blank %}
+            <a class="collection-info__caption-wrapper collection-info__caption--below-image" href="{{ collection.url }}">
+              <span class="title">
+                {{ collection.title }}
+              </span>
+              {% assign view_products = 'collections.general.view_all' | t %}
+              {% include 'button', label: view_products, href: collection.url, style: section.settings.button_style %}
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="container">
+      <div class="one-whole column text-align-center">
+        {% include 'pagination', pagination_type: section.settings.pagination_type %}
+      </div>
+    </div>
+  {% endpaginate %}
+</main>
+
+{% schema %}
+
+{
+  "name": "Collections",
+  "class": "collection-list-main",
+  "settings": [
+    {
+      "type": "range",
+      "id": "collections_per_row",
+      "label": "Collections per row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "pagination_limit",
+      "label": "Collections per page",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "Pagination type",
+      "options": [
+        {
+          "value": "infinite_scroll",
+          "label": "Infinite scroll"
+        },
+        {
+          "value": "infinite_load_more",
+          "label": "Infinite load more button"
+        },
+        {
+          "value": "load_more",
+          "label": "Load more button"
+        },
+        {
+          "value": "basic_pagination",
+          "label": "Page links"
+        }
+      ],
+      "default": "basic_pagination"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_height",
+      "label": "Align to height",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "collection_height",
+      "label": "Collection image height",
+      "min": 200,
+      "max": 400,
+      "step": 10,
+      "default": 400,
+      "unit": "px",
+      "info": "Applied when 'Align to height' is also enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360024344614)"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "default": "button--secondary",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_background",
+      "label": "Background",
+      "default": "#939393"
+    },
+    {
+      "type": "range",
+      "id": "overlay_background_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "color",
+      "id": "overlay_text",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_title_below_image",
+      "label": "Show collection title below image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

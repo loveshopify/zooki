@@ -1,0 +1,61 @@
+{% comment %} Check if product is on sale {% endcomment %}
+{% if product.available and product.compare_at_price_max > product.price %}
+  {% assign product_on_sale = true %}
+{% endif %}
+
+{% comment %} Check if sticker holder should be displayed {% endcomment %}
+{% if collection_handles contains 'best-seller' or
+      collection_handles contains 'coming-soon' or
+      collection_handles contains 'new' or
+      collection_handles contains 'pre-order' or
+      collection_handles contains 'staff-pick' or
+      product_on_sale %}
+  <div class="
+              sticker-holder
+              sticker-shape-{{ settings.sticker_shape }}
+              sticker-position-{{ settings.sticker_position }}">
+    <div class="sticker-holder__content sticker-holder__content--{{ context }}">
+
+      {% if collection_handles contains 'best-seller' %}
+        <div class="best-seller-sticker thumbnail-sticker sticker-{{i}}">
+          <span class="sticker-text">{{ 'collections.general.best_seller' | t }}</span>
+        </div>
+      {% endif %}
+
+
+      {% if collection_handles contains 'coming-soon' %}
+        <div class="coming-soon-sticker thumbnail-sticker sticker-{{i}}">
+          <span class="sticker-text">{{ 'collections.general.coming_soon' | t }}</span>
+        </div>
+      {% endif %}
+
+
+      {% if collection_handles contains 'new' %}
+        <div class="new-sticker thumbnail-sticker sticker-{{i}}">
+          <span class="sticker-text">{{ 'collections.general.new' | t }}</span>
+        </div>
+      {% endif %}
+
+      {% if collection_handles contains 'pre-order' %}
+        <div class="pre-order-sticker thumbnail-sticker sticker-{{i}}">
+          <span class="sticker-text">{{ 'collections.general.pre_order' | t }}</span>
+        </div>
+      {% endif %}
+
+      {% if product.available %}
+        {% if product.compare_at_price_max > product.price %}
+          <div class="sale-sticker thumbnail-sticker sticker-{{i}}">
+            <span class="sticker-text">{{ 'collections.general.sale' | t }}</span>
+          </div>
+        {% endif %}
+      {% endif %}
+
+      {% if collection_handles contains 'staff-pick' %}
+        <div class="staff-pick-sticker thumbnail-sticker sticker-{{i}}">
+          <span class="sticker-text">{{ 'collections.general.staff_pick' | t }}</span>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+{% endif %}

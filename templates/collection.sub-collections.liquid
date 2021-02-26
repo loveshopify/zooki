@@ -1,0 +1,58 @@
+{% comment %}
+  The contents of the collection.sub-collections.liquid template can be found in /sections/collection-subcollection__main.liquid
+{% endcomment %}
+
+<div id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section collection-page" data-check-for-order="true">
+  {% comment %} Collection banner {% endcomment %}
+  {% section 'collection__banner' %}
+  <section class="subcollection
+                  section__wrapper
+                  section
+                  ">
+    <div class="collection__breadcrumb-title-filter container is-justify-space-between is-flex-wrap has-padding-bottom is-align-center">
+      <div class="one-third column medium-down--one-whole">
+        {% comment %} Collection breadcrumb {% endcomment %}
+        <div class="breadcrumb__container">
+          {% include 'breadcrumb', type: 'collection' %}
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Collection title {% endcomment %}
+    <div class="container">
+      <div class="one-whole column">
+        <div class="collection__title hide-when-banner-enabled has-no-side-gutter">
+          {% include 'heading', title: collection.title, heading_tag: 'h1', context: 'collection', text_alignment: 'left' %}
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Collection description {% endcomment %}
+    {% if collection.description != blank %}
+      <div class="container">
+        <div class="one-whole column">
+          <div class="collection__description content has-padding-bottom">
+            {{ collection.description }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% comment %} Collection sidebar and main content area {% endcomment %}
+    <div class="container collection__content">
+      {% section 'collection__sidebar' %}
+      {% section 'collection-subcollection__main' %}
+      <div class="collection__filtering one-whole column">
+        {% comment %} Collection filters {% endcomment %}
+        <div class="collection__filters text-align-right">
+          {% include 'collection__filters' %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="on-subcollection-page section__wrapper section">
+    {% section 'subcollection__featured-collection' %}
+  </section>
+</div>
+

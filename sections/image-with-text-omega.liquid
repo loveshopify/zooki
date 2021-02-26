@@ -1,0 +1,79 @@
+{% for block in section.blocks %}
+
+
+
+
+<div
+    class="section-{{id}} iwt-container {% if block.settings.radio-btn == 'right' %}imgRight{% else %}imgLeft{%endif%}">
+
+
+    <div class="iwt-txt">
+        <div class="inner-iwt-txt">
+            <h2>{{ block.settings.title }}</h2>
+
+            {% assign text = block.settings.text | split: ' | ' %}
+
+            <ul>
+                {% for t in text %}
+                <li>{{t | strip }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+
+
+    {% if block.settings.img != blank %}
+    <div class="{% if block.settings.radio-btn == 'right' %}iwt-r-img{%else%}iwt-l-img{%endif%}"
+        style="background-image: url({{ block.settings.img | img_url: '1280x' }});">
+        {% render 'rimage', image: block.settings.img, size: '1280x' %}    
+    </div>
+    {% endif %}
+
+</div>
+{% endfor %}
+
+
+
+
+{% schema %}
+{
+"name": "Image with Text",
+"settings": [
+
+],
+"blocks": [
+{
+"type": "text",
+"name": "Image with Text",
+"settings": [
+{
+"type": "radio",
+"id": "radio-btn",
+"options": [
+{ "value": "right", "label": "Image on right" },
+{ "value": "left", "label": "Image on left" }
+],
+"label": "Image on the right or left side"
+},
+{
+"type": "text",
+"id": "title",
+"label": "Heading of the section"
+},
+{
+"type": "textarea",
+"id": "text",
+"label": "Text area",
+"info": "Split text by ' | '"
+},
+{
+"type": "image_picker",
+"id": "img",
+"label": "Choose image"
+}
+]
+}
+]
+}
+{% endschema %}

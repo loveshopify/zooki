@@ -1,0 +1,64 @@
+{% if type == 'product' %}
+  {% assign tag_count = product.tags | size %}
+  {% if tag_count > 0 %}
+    {% if block.settings.title != blank %}
+      <h3 class="sidebar-block__heading" data-has-toggle-option>
+        {{ block.settings.title }}
+        {% if settings.toggle_sidebar %}
+          <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+            {% if settings.toggle_icon_style == 'plus_and_minus' %}
+              {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+              {% include settings.icon, name: 'minus' %}
+            {% else %}
+              {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+            {% endif %}
+          </button>
+        {% endif %}
+      </h3>
+    {% endif %}
+    <div class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+      <ul class="sidebar-block__tag-list tags">
+        {% for tag in product.tags %}
+          {% unless tag contains 'meta-' %}
+            <li class="tag tag--{{ settings.tag_style }}">
+              <a {% if current_tags contains tag %}class="is-active"{% endif %} href="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}/{{ tag | handleize }}">{{ tag }}</a>
+            </li>
+          {% endunless %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% else %}
+  {% assign tag_count = collection.all_tags | size %}
+  {% if tag_count > 0 %}
+    {% if block.settings.title != blank %}
+      <h3 class="sidebar-block__heading" data-has-toggle-option>
+        {{ block.settings.title }}
+        {% if settings.toggle_sidebar %}
+          <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+            {% if settings.toggle_icon_style == 'plus_and_minus' %}
+              {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+              {% include settings.icon, name: 'minus' %}
+            {% else %}
+              {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+            {% endif %}
+          </button>
+        {% endif %}
+      </h3>
+    {% endif %}
+    <div class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+      <ul class="sidebar-block__tag-list tags">
+        <li class="tag tag--{{ settings.tag_style }}">
+          <a {% unless current_tags %}class="active--default"{% endunless %} href="{% if collection.handle == "all" %}{{ routes.all_products_collection_url }}{% else %}{{ collection.url }}{% endif %}">All {{ collection.title }}</a>
+        </li>
+        {% for tag in collection.all_tags %}
+          {% unless tag contains 'meta-' %}
+            <li class="tag tag--{{ settings.tag_style }}">
+              <a {% if current_tags contains tag %}class="active"{% endif %} href="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}/{{ tag | handleize }}">{{ tag }}</a>
+            </li>
+          {% endunless %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endif %}

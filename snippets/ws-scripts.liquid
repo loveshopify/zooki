@@ -1,0 +1,58 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+{% case template.name %}
+    {% when "product" %}
+        {% for tag in product.tags %}
+            {% if tag contains 'WS:' %}
+                <script>
+                    var _qtyTags = "{{ tag }}";
+                </script>
+            {% endif %}
+            {% if tag contains 'WS_newDate:' %}
+                <script>
+                    var _newDate = "{{ tag }}";
+                </script>
+            {% endif %}
+            {% if tag contains 'WS_default:' %}
+                <script>
+                    var _wsDefault = "{{ tag | replace: 'WS_default:', '' }}";
+                </script>
+            {% endif %}
+        {% endfor %}
+        {% render 'ws-functions' %}
+        {% render 'ws-events' %}
+        <script>
+            const productData = {{ product | json }};
+            var widgetInitialized = false;
+            (function () {
+                WSFunctions.cleanAttributes();
+                $(document).ready(() => {
+                    WSEvents.productTemplate();
+                });
+
+                $(window).on('load', () => {
+                    WSFunctions.enableArrows();
+                    $(window).trigger('resize');
+                });
+
+                // Fill select with frequency when the product data has been loaded
+                BOLD.recurring_orders.app.ee.on('template_initialized', WSFunctions.fillSelect);
+
+                // Update frequency when the interval has been changed
+                BOLD.recurring_orders.app.ee.on('order_interval_changed', function (data) {
+                    if (data.data.recurring_orders_product.subscription_checked) {
+                        let frequency = $('.subscription select').find(':selected').val().split('-')[1];
+                        $('.shopify-product-form [name="properties[frequency_num]"]').val(frequency);
+                    }
+                });
+            })();
+        </script>
+    {% else %}
+        {% render 'ws-functions' %}
+        <script>
+            (function () {
+                WSFunctions.cleanAttributes();
+            })();
+        </script>
+{% endcase %}
+
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}

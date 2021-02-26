@@ -1,0 +1,98 @@
+{% comment %}
+Optional values
+prefix: <string>
+{% endcomment %}
+
+<div class="navbar-dropdown navbar-dropdown--{{ settings.dropdown_position }} is-{{ settings.dropdown_style }} has-{{ settings.dropdown_link_spacing }}-vertical-spacing">
+  {% if settings.dropdown_style == 'horizontal' and settings.header_layout != 'vertical' %}
+    <div class="section is-flex">
+      {% for sub_link in link.links %}
+        {% if sub_link.links == blank %}
+          <div class="horizontal-dropdown__column">
+            <a class="navbar-item {% if sub_link.active %}is-active{% endif %}" href="{{ sub_link.url }}">
+              {{ sub_link.title }}
+            </a>
+          </div>
+        {% else %}
+          <div class="horizontal-dropdown__column has-submenu">
+            <a href="{{ sub_link.url }}" class="navbar-item menu__heading {% if sub_link.active %}is-active{% endif %}">
+              {{ sub_link.title }}
+            </a>
+            <ul class="navbar-submenu is-visible">
+              {% for sub_sub_link in sub_link.links %}
+                <li>
+                  <a class="navbar-item is-arrowless" href="{{ sub_sub_link.url }}">
+                    {{ sub_sub_link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+    {% elsif settings.dropdown_style == 'vertical' or settings.header_layout == 'vertical' %}
+      {% assign currentIndex = forloop.index %}
+      <div class="dropdown-menu-wrapper">
+      {% comment %}{% for block in section.blocks %}
+        <a class="navbar-item submenu_image_item {% if sub_link.active %}is-active{% endif %}" href="{{ block.settings.link }}" data-pro-title="{{sub_link.object.title}}">
+        {% if block.settings.show_badge %}
+        <span class="product_item_badge {% if block.settings.badge == "COMING SOON..." %}type--comming{% else %}type--new{% endif %}">{{ block.settings.badge }}</span>
+        {% endif %}
+        <span class="item-content">
+          {% if block.settings.image != blank %}
+            <img src="{{ block.settings.image | img_url: '200x' }}">
+          {% endif %}
+          <div class="image_item_title">{{ block.settings.title }}</div>
+        </span>
+        </a>
+      {% endfor %}
+      {% endcomment %}
+        {% for sub_link in link.links %}
+          {% if sub_link.links == blank %}
+            <a class="navbar-item submenu_image_item {% if sub_link.object.metafields.global.nav_img %}custom__image{% endif %} {% unless sub_link.object.featured_image and sub_link.object.metafields.global.nav_img %}no--image{% endunless %} {% unless sub_link.object.image %}no-image{% endunless %} {% if sub_link.active %}is-active{% endif %} {% if sub_link.object.metafields.global.product_badge %}has--badge{% endif %}" href="{{ sub_link.url }}" data-pro-title="{{sub_link.object.title}}">
+            {% if sub_link.object.metafields.global.product_badge %}
+              <span class="product_item_badge {% if sub_link.object.metafields.global.product_badge == "COMING SOON..." %}type--comming{% else %}type--new{% endif %}">{{ sub_link.object.metafields.global.product_badge }}</span>
+            {% endif %}
+            <span class="item-content">
+              {% if sub_link.object.featured_image != blank %}
+                <img src="{{ sub_link.object.featured_image | img_url: '200x' }}" data-img-1="{{ sub_link.object.featured_image }}">
+              {% elsif sub_link.object.metafields.global.nav_img != blank %}
+                <img src="{{ sub_link.object.metafields.global.nav_img }}">
+              {% elsif sub_link.object.image %}
+                <img src="{{ sub_link.object.image | img_url: '200x' }}">
+              {% endif %}
+              <div class="image_item_title">{{ sub_link.title }}</div>
+            </span>
+            </a>
+          {% else %}
+            <div class="has-submenu">
+              <input class="visuallyhidden" type="checkbox" id="{{ prefix }}submenu-{{ block.id }}-{{ forloop.index }}-{{ currentIndex }}">
+              <label for="{{ prefix }}submenu-{{ block.id }}-{{ forloop.index }}-{{ currentIndex }}">
+                {% if sub_link.url == 'http://' or sub_link.url == '' or sub_link.url == '/' or sub_link.url == 'https://' or sub_link.url == '#' %}
+                  <a class="navbar-link {% if sub_link.active %}is-active{% endif %}">
+                    <span>{{ sub_link.title }}</span>
+                  </a>
+                <span class="close-dropdown"></span>
+                {% else %}
+                  <a href="{{ sub_link.url }}" class="navbar-link {% if sub_link.active %}is-active{% endif %}">
+                    <span>{{ sub_link.title }}</span>
+                  </a>
+                  <span class="close-dropdown"></span>
+                {% endif %}
+              </label>
+              <ul class="navbar-submenu">
+                {% for sub_sub_link in sub_link.links %}
+                  <li>
+                    <a class="navbar-item" href="{{ sub_sub_link.url }}">{{ sub_sub_link.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endfor %}
+      
+      </div>
+    {% endif %}
+</div>
+{% comment %}<div class="drop-down-overlay"></div>{% endcomment %}

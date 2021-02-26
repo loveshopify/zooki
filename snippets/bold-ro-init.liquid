@@ -1,0 +1,45 @@
+<script>
+  var BOLD = BOLD || {};
+  BOLD.recurring_orders = BOLD.recurring_orders || {};
+  if(typeof BOLD.recurring_orders.setSettings !== 'undefined') {
+      BOLD.recurring_orders.setSettings({
+        loadingEnabled: true,
+        loadAdditionalCheckoutSelector: '.additional-checkout-buttons',
+        loadAdditionalBuyButtonSelector: '.shopify-payment-button'
+      },true);
+   } else {
+     BOLD.recurring_orders.settings = {
+       loadingEnabled: true,
+       loadAdditionalCheckoutSelector: '.additional-checkout-buttons',
+       loadAdditionalBuyButtonSelector: '.shopify-payment-button'
+     };
+   }
+  BOLD.recurring_orders.modes = {
+    current_mode:{{ shop.metafields.bold_rp.recurring_type | json }},
+    recurring_cart:0,
+    single_product:1,
+    mixed_cart:2
+  };
+
+  BOLD.customer = BOLD.customer || {};
+  BOLD.customer.id = {{ customer.id | json }} || '';
+  BOLD.customer.email = {{ customer.email | json }} || '';
+  BOLD.customer.address1 = {{ customer.default_address.address1 | json }} || '';
+  BOLD.customer.address2 = {{ customer.default_address.address2 | json }} || '';
+  BOLD.customer.city = {{ customer.default_address.city | json }} || '';
+  BOLD.customer.company = {{ customer.default_address.company | json }} || '';
+  BOLD.customer.country = {{ customer.default_address.country | json }} || '';
+  BOLD.customer.first_name = {{ customer.default_address.first_name | default: customer.first_name | json }} || '';
+  BOLD.customer.last_name = {{ customer.default_address.last_name | default: customer.last_name | json }} || '';
+  BOLD.customer.phone = {{ customer.default_address.phone | json }} || '';
+  BOLD.customer.province = {{ customer.default_address.province | json }} || '';
+  BOLD.customer.zip = {{ customer.default_address.zip | json }} || '';
+  BOLD.customer.tags = {{ customer.tags | json }} || '';
+
+
+  {% assign recurring_list = cart.items | map: 'properties' | map: 'frequency_num' | uniq %}
+  {% if recurring_list.length > 1 or recurring_list[0] != blank %}
+    {% assign is_mixed_cart = true %}
+  {% endif %}
+  window.mixed_cart = {{ is_mixed_cart | json }};
+</script>

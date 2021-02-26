@@ -1,0 +1,424 @@
+{% comment %}
+** Pop-up - enabled through general settings **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign width = section.settings.width %}
+{% assign animation = section.settings.animation %}
+{% assign show_close_icon = section.settings.show_close_icon %}
+{% assign display_border = section.settings.display_border %}
+{% assign border_color = section.settings.border_color %}
+{% assign border_width = section.settings.border_width %}
+{% assign image = section.settings.image %}
+{% assign image_position = section.settings.image_position %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = section.settings.background_color | color_extract: 'alpha' %}
+{% assign overlay_alpha = section.settings.overlay_color | color_extract: 'alpha' %}
+{% assign text_alpha = section.settings.text_color | color_extract: 'alpha' %}
+
+{% if overlay_alpha != 0 %}
+  {% assign overlay_background_opacity = section.settings.overlay_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{ id }} {
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+
+  .popup-modal .fancybox-bg {
+    background: {% if overlay_alpha != 0 %}{{ section.settings.overlay_color | color_modify: 'alpha', overlay_background_opacity }}{% else %}transparent{% endif %};
+  }
+
+  .popup-modal .popup__wrapper {
+    background: {% if background_alpha != 0 %}{{ section.settings.background_color }}{% else %}transparent{% endif %};
+    border: {% if display_border %}{{ border_width }}px solid {{ border_color }}{% endif %};
+  }
+
+  .popup-modal .title,
+  .popup-modal p,
+  .popup-modal .newsletter__text {
+    color: {% if text_alpha != 0 %}{{ section.settings.text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+    fill: {% if text_alpha != 0 %}{{ section.settings.text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+  }
+
+  @media (max-width: 480px) {
+    .popup-modal {
+      {% if section.settings.show_popup_on_mobile == false %}
+        display: none !important;
+      {% else %}
+        display: block;
+      {% endif %}
+    }
+
+    .popup-modal .fancybox-bg {
+      background: transparent;
+    }
+  }
+
+  {%- if custom_css != blank -%}
+  {%- assign declarations = custom_css | split: '}' -%}
+  {%- for declaration in declarations -%}
+    {% if declaration != '' %}
+      .popup-modal {{ declaration }} }
+    {% endif %}
+  {%- endfor -%}
+{%- endif -%}
+{% endstyle %}
+
+<div data-popup
+    class="popup__wrapper
+          {{ css_class }}
+          {% if animation != 'none' %}
+            animated
+            {{ animation }}
+          {% endif %}
+          {% if image != blank %} has-image {% endif %}
+          image-position-{{ image_position }}">
+
+  {% if show_close_icon %}
+    <button class="close popup__close" aria-label="close">
+      {% include settings.icon, name: 'x', icon_class: 'icon--vertical-align' %}
+    </button>
+  {% endif %}
+
+  <div class="popup__inner is-flex {% if section.settings.image == blank %} is-align-center {% endif %} text-align-{{ section.settings.newsletter_section_text_align }} image-position-{{ image_position }}">
+
+    {% if section.settings.image != blank %}
+      <div class="popup__image {% if section.settings.image_cropping != 'none' %}has-image-crop image-crop--{{ section.settings.image_cropping }}{% endif %}">
+        {% include 'image-element', image: section.settings.image, alt: section.settings.image.alt, stretch_width: true %}
+      </div>
+    {% endif %}
+
+    <div class="popup__content">
+      <div class="popup__header">
+        {% if section.settings.newsletter_title %}
+          <h3 class="popup__title title">{{ section.settings.newsletter_title }}</h3>
+        {% endif %}
+
+        {% if section.settings.newsletter_text %}
+          <div class="popup__text subtitle">
+            {{ section.settings.newsletter_text }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_signup_form %}
+        <div class="popup__newsletter newsletter-section--popup">
+          {% include 'newsletter-form' %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "show_popup_mobile": {{ section.settings.show_popup_mobile | json }},
+    "popup_delay": {{ section.settings.popup_delay | json}},
+    "popup_days_to_hide": {{ section.settings.popup_days_to_hide | json}}
+  }
+</script>
+<script src="{{ 'z__jsPopup.js' | asset_url }}"></script>
+
+{% schema %}
+  {
+    "name": "Popup",
+    "class": "popup-section jsPopup",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_close_icon",
+        "label": "Show close icon",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_popup_on_mobile",
+        "label": "Show popup on mobile",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "display_border",
+        "label": "Show border",
+        "default": false
+      },
+      {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border",
+        "default": "#CCCCCC"
+      },
+      {
+        "type": "range",
+        "id": "border_width",
+        "label": "Border width",
+        "min": 0,
+        "max": 20,
+        "default": 10,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Text"
+      },
+      {
+        "type": "text",
+        "id": "newsletter_title",
+        "label": "Heading",
+        "default": "Subscribe"
+      },
+      {
+        "type": "richtext",
+        "id": "newsletter_text",
+        "label": "Subheading",
+        "default": "<p>Sign up to get the latest on sales, new releases and more …</p>"
+      },
+      {
+        "type": "select",
+        "id": "newsletter_section_text_align",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "header",
+        "content": "Form"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_signup_form",
+        "label": "Show signup form",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "display_first_name",
+        "label": "Show first name",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "display_last_name",
+        "label": "Show last name",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Feature image"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image",
+        "info": "600 x 875px recommended. Hidden on mobile."
+      },
+      {
+        "type": "select",
+        "id": "image_cropping",
+        "label": "Image cropping",
+        "info": "Crops image to same height as text content.",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "header",
+        "content": "Overlay"
+      },
+      {
+        "type": "color",
+        "id": "overlay_color",
+        "label": "Overlay",
+        "default": "#000000"
+      },
+      {
+        "type": "range",
+        "id": "overlay_background_opacity",
+        "label": "Overlay opacity",
+        "min": 0,
+        "max": 100,
+        "default": 80,
+        "unit": "%"
+      },
+      {
+        "type": "header",
+        "content": "Popup display"
+      },
+      {
+        "type": "range",
+        "id": "popup_delay",
+        "label": "Popup delay",
+        "min": 0,
+        "max": 120,
+        "step": 2,
+        "default": 2,
+        "unit": "sec"
+      },
+      {
+        "type": "select",
+        "id": "popup_days_to_hide",
+        "label": "Days until popup is displayed again",
+        "options": [
+          {
+            "value": "2",
+            "label": "2 days"
+          },
+          {
+            "value": "7",
+            "label": "7 days"
+          },
+          {
+            "value": "14",
+            "label": "14 days"
+          },
+          {
+            "value": "30",
+            "label": "30 days"
+          },
+          {
+            "value": "90",
+            "label": "90 days"
+          },
+          {
+            "value": "365",
+            "label": "365 days"
+          }
+        ],
+        "default": "30"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "animation",
+        "label": "Animation",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "fadeIn",
+            "label": "Fade in"
+          },
+          {
+            "value": "fadeInDown",
+            "label": "Fade in down"
+          },
+          {
+            "value": "fadeInLeft",
+            "label": "Fade in left"
+          },
+          {
+            "value": "fadeInRight",
+            "label": "Fade in right"
+          },
+          {
+            "value": "slideInLeft",
+            "label": "Slide in left"
+          },
+          {
+            "value": "slideInRight",
+            "label": "Slide in right"
+          },
+          {
+            "value": "zoomIn",
+            "label": "Zoom in"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

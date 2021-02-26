@@ -1,0 +1,92 @@
+{% assign initial_filter_tags = block.settings.filter_tags | split: ',' %}
+{% assign filter_name = block.settings.title | replace: ' ', '_' | downcase | append: '__' %}
+
+{% assign collection_all_tags = collection | map: 'all_tags' | join: " " | downcase | handleize | strip %}
+
+{% assign collection_tags = collection | map: 'tags' | join: " " %}
+
+{% for tag in initial_filter_tags %}
+  {% assign tagHandle = tag | handleize %}
+  {% if collection_all_tags contains tagHandle %}
+    {% comment %} Block title {% endcomment %}
+    {% if block.settings.title != blank %}
+      <h3 class="sidebar-block__heading" data-has-toggle-option>
+        {{ block.settings.title }}
+        {% if settings.toggle_sidebar %}
+          <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+            {% if settings.toggle_icon_style == 'plus_and_minus' %}
+              {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+              {% include settings.icon, name: 'minus' %}
+            {% else %}
+              {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+            {% endif %}
+          </button>
+        {% endif %}
+      </h3>
+    {% endif %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} Block content {% endcomment %}
+<div class="sidebar-block__content" {% if settings.toggle_sidebar and block.settings.title != blank %}data-sidebar-block__content--collapsible{% endif %}>
+  <ul class="sidebar-block__tag-filter sidebar-block__tag-filter--{{ block.id }}">
+    <div class="filter-all-tags color-filter--{{ block.settings.enable_filter_swatches }}">
+      {% comment %} Loop through tag names in theme editor settings {% endcomment %}
+      {% for tag in initial_filter_tags %}
+        {% assign handle_tag = tag | downcase | handleize | strip %}
+        {% if collection_all_tags contains handle_tag %}
+          {% assign tag_in_collection = true %}
+          {% if block.settings.enable_filter_swatches %}
+            {% comment %} Display color swatch {% endcomment %}
+            <li class="tag-filter__item tag-filter__item--swatch">
+              <label class="tag-filter__label" data-option-filter="{{ handle_tag }}" title="{{ tag | replace: '_', ' ' }}">
+
+                {% assign image_name = handle_tag | downcase | append: '.png' %}
+                {% assign swatch = images[image_name] %}
+                <span class="tag-filter__swatch" style="background-color: {{- handle_tag -}};">
+                  <input data-tag-filter-checkbox type="checkbox" value="{{ handle_tag }}" name="{{ handle_tag }}" class="tag-filter__checkbox--swatch {% if swatch == empty %}swatch__image--empty{% endif %}" style="background-image: url({{ swatch | img_url: '50x' }});"
+                  {% for url_tag in current_tags %}
+                    {% capture formatted_url_tag %}{{ url_tag | downcase | handleize }}{% endcapture %}
+                      {% if formatted_url_tag == handle_tag %}
+                      checked
+                    {% endif %}
+                  {% endfor %}>
+                </span>
+                {{- tag | strip | replace: '_', ' ' -}}
+              </label>
+              <button class="close tag-filter__clear is-hidden" aria-label="clear" data-clear-filter title="{{ 'collections.sidebar.clear' | t }}">
+                {% include settings.icon, name: 'x' %}
+              </button>
+            </li>
+          {% else %}
+            {% comment %} Display regular item {% endcomment %}
+            <li class="tag-filter__item tag-filter__item--regular">
+              <label class="tag-filter__label" data-option-filter="{{ handle_tag }}" title="{{ tag | replace: '_', ' ' }}">
+                <input data-tag-filter-checkbox class="tag-filter__checkbox--regular" type="checkbox" value="{{ handle_tag }}" name="{{ handle_tag }}"
+                  {% for url_tag in current_tags %}
+                    {% capture formatted_url_tag %}{{ url_tag | downcase | handleize }}{% endcapture %}
+                    {% if formatted_url_tag == handle_tag %}
+                      checked
+                    {% endif %}
+                  {% endfor %}>
+                {{- tag | strip | replace: '_', ' ' -}}
+              </label>
+              <button class="close tag-filter__clear is-hidden" aria-label="clear" data-clear-filter title="{{ 'collections.sidebar.clear' | t }}">
+                {% include settings.icon, name: 'x' %}
+              </button>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if tag_in_collection == blank %}
+        {% comment %} If there are no tags, hide block {% endcomment %}
+        {% style %}
+          #shopify-section-{{ block.id }} {
+            display: none;
+          }
+        {% endstyle %}
+      {% endif %}
+    </div>
+  </ul>
+</div>

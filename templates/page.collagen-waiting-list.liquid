@@ -1,0 +1,17 @@
+{% comment %}
+  To edit the contents of this file, look inside the `sections` folder for the file name that comes directly after `section`. Eg. {% section 'product__main' %} or {% section 'page__banner' %}
+{% endcomment %}
+<body>
+<main id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section default-page">
+  <section>
+    <div>      
+      {% section 'page-collagenaccess__main' %}
+      {% section 'collagen-banner' %}
+	  {% section 'logo-section' %}
+      {% section 'TitleAndIconsCollagen' %}
+      {% section 'Directions-for-use-collagen' %}
+      {% section 'image-with-text-collagen' %}
+    </div>
+  </section>
+</main>
+</body>

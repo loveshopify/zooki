@@ -1,0 +1,28 @@
+{% if block.settings.title != blank %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ block.settings.title }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+{% endif %}
+<div class="sidebar-block__content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+  <ul class="sidebar-block__collection-list">
+    {% for col in collections %}
+      {% unless col.handle == 'frontpage' %}
+        <li {% if col.handle == collection.handle %}class="is-active"{% endif %}>
+          <a href="{{ col.url }}" title="{{ col.title | escape }}">
+            {{ col.title }}
+          </a>
+        </li>
+      {% endunless %}
+    {% endfor %}
+  </ul>
+</div>

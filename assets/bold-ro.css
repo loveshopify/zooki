@@ -1,0 +1,29 @@
+.ro_widget{
+   width: 100%;
+}
+
+input.bold-product__quantity-val{
+  padding: 10px 15px;
+}
+.bold-ro__choice-header {
+margin-right: 2em;
+text-align: center !important;
+}
+
+
+.bold-ro__products-list{
+  width:100% !important;
+   margin:0 auto% !important;
+   text-align:center !important;
+}
+
+@media only screen and (min-width: 499px){
+.bold-grid__column.bold-grid__column--quarter{
+ display:inline-block !important;
+ float:none;
+}
+}
+
+.product_rp_cart_div {
+ text-align: left;
+}

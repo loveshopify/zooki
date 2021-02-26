@@ -1,0 +1,69 @@
+{% for link in main_menu.links %}
+  <li>
+    {% if link.links == blank %}
+      <input class="visuallyhidden submenu__input has-no-menu" type="checkbox" id="mobile-submenu-{{ link.title | handleize }}">
+      <label class="submenu__label has-no-menu {% if link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %}has-no-link{% endif %}" for="mobile-submenu-{{ link.title | handleize }}" data-navlink-handle="{{ link.title | handleize }}">
+        <a class="mobile-menu__item {% if link.active %}is-active{% endif %} menu-level-1" href="{{ link.url }}" >
+          <span class="menu-title">{{ link.title }}</span>
+          <span class="icon">{% render 'icon' with 'arrow-right' %}</span>
+        </a>
+      </label>
+    {% else %}
+      <div class="has-submenu">
+        <input class="visuallyhidden submenu__input" type="checkbox" id="mobile-submenu-{{ forloop.index }}">
+        <label class="submenu__label" for="mobile-submenu-{{ forloop.index }}" data-navlink-handle="{{ link.title | handleize }}">
+          <a {% unless link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %}href="{{ link.url }}"{% endunless %} class="mobile-menu-link parent_link {% if link.active %}is-active{% endif %}">
+            {{ link.title }}
+            {% if forloop.index == 2 %}
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="margin-left: 10px;"> <g fill="none" fill-rule="evenodd"> <g> <g> <g> <g> <g> <path d="M0 0H24V24H0z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> <path fill="#E9550D" d="M18.078 5.043c0 1.062-1.083 1.933-2.44 2.457H22c.276 0 .5.224.5.5v5c0 .276-.224.5-.5.5h-.5V22c0 .245-.177.45-.41.492L21 22.5H3c-.276 0-.5-.224-.5-.5v-8.5H2c-.245 0-.45-.177-.492-.41L1.5 13V8c0-.276.224-.5.5-.5h5.94C6.581 6.976 5.5 6.105 5.5 5.043c0-2.252 1.81-3.27 4.24-1.938.955.523 1.673 1.316 2.05 2.172.375-.856 1.093-1.65 2.047-2.172 2.43-1.331 4.24-.314 4.24 1.938zM11 13.5H3.5v8H11v-8zm9.5 0H13v8h7.5v-8zm-9.5-5H2.5v4H11v-4zm10.5 0H13v4h8.5v-4zM9.26 3.982C7.486 3.01 6.5 3.564 6.5 5.043c0 .97 2.488 2 4.259 2 .271 0 .411-.303.268-.91-.19-.805-.83-1.637-1.767-2.151zm5.058 0c-.938.514-1.578 1.346-1.768 2.15-.143.608-.003.911.269.911 1.771 0 4.259-1.03 4.259-2 0-1.48-.986-2.033-2.76-1.061z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> </g> </g> </g> </g> </svg>
+            {% endif %}
+          </a>
+          <span class="close-dropdown" data-submenu-open="false"></span>
+        </label>
+        <ul class="mobile-menu__submenu has-dropdown">
+          {% assign currentIndex = forloop.index %}
+          {% for sub_link in link.links %}
+            <li class="sub_menu menu-level-2">
+              {% if sub_link.links == blank %}
+                <a class="mobile-menu__item {% if sub_link.object.metafields.global.nav_img %}custom--image{% endif %}" href="{{ sub_link.url }}" {{ sub_link.object.featured_image }}>
+                  <script>console.log({{ sub_link.object | json }});</script>
+                  {% if sub_link.object.featured_image != blank %}
+                    <img src="{{ sub_link.object.featured_image | img_url: '200x' }}" data-img-1="{{ sub_link.object.featured_image }}">
+                  {% elsif sub_link.object.metafields.global.nav_img != blank %}
+                    <img src="{{ sub_link.object.metafields.global.nav_img }}">
+                  {% elsif sub_link.object.image %}
+                    <img src="{{ sub_link.object.image | img_url: '200x' }}">
+                  {% endif %}
+                  <span class="menu-title mobile__prod_title {% unless sub_link.object.metafields.global.product_badge %}flex-center{% endunless %}">
+                    {% if sub_link.object.metafields.global.product_badge %}
+                      <span class="product_item_badge {% if sub_link.object.metafields.global.product_badge == "COMING SOON..." %}type--comming{% else %}type--new{% endif %}">{{ sub_link.object.metafields.global.product_badge }}</span>
+                    {% endif %}
+                    <span class="item-title">{{ sub_link.title }}</span>
+                  </span>
+                  <span class="icon">{% render 'icon' with 'arrow-right' %}</span>
+                </a>
+              {% else %}
+                <div class="has-submenu">
+                  <input class="visuallyhidden submenu__input" type="checkbox" id="mobile-sub-submenu-{{ forloop.index }}-{{ currentIndex }}">
+                  <label class="submenu__label" for="mobile-sub-submenu-{{ forloop.index }}-{{ currentIndex }}">
+                    <a {% unless sub_link.url == 'http://' or sub_link.url == '' or sub_link.url == '/' or sub_link.url == 'https://' or sub_link.url == '#' %}href="{{ sub_link.url }}"{% endunless %} class="mobile-menu-link {% if sub_link.active %}is-active{% endif %}">
+                      {{ sub_link.title }}
+                    </a>
+                  <span class="close-sub-dropdown"></span>
+                  </label>
+                  <ul class="mobile-menu__submenu">
+                    {% for sub-sub_link in sub_link.links %}
+                      <li>
+                        <a class="mobile-menu__item" href="{{ sub-sub_link.url }}">{{ sub-sub_link.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </li>
+{% endfor %}

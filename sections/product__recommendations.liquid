@@ -1,0 +1,183 @@
+{% assign limit = section.settings.recommended_products_limit %}
+{% assign products_per_row = section.settings.products_per %}
+{% assign skip_product = product %}
+
+{% assign align_height = section.settings.align_height %}
+{% assign height = section.settings.collection_height %}
+
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% assign animation = section.settings.animation | default: 'none' %}
+
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+   {% comment %} Check whether product has any tags for custom related products {% endcomment %}
+  {% for tag in product.tags %}
+    {% if tag contains 'meta-related-collection-' %}
+      {% assign related_collection_handle = tag | remove: 'meta-related-collection-' %}
+    {% endif %}
+  {% endfor %}
+
+  {% if related_collection_handle != blank %}
+    {% comment %} Show products based on merchant-added tags prepended with 'meta-related-collection-' {% endcomment %}
+    {% assign collection_size = collections[related_collection_handle].all_products_count %}
+
+    {% if collection_size > 0 %}
+      {% assign custom_collection = collections[related_collection_handle] %}
+      {% assign products = custom_collection.products %}
+    {% endif %}
+
+    {% if custom_collection and collection_size > 0 %}
+      {% if custom_collection.products.first.id != product.id %}
+        {% assign show_custom_collection = true %}
+      {% endif %}
+    {% endif %}
+
+  {% else %}
+    {% comment %} Shopify generated dynamic recommendations, falling back to default related products (based on parent collection) {% endcomment %}
+    {% assign show_custom_collection = false %}
+    {% assign dynamic_collection = recommendations %}
+    {% assign products = recommendations.products %}
+    {% assign products_length = products.size %}
+    {% assign show_dynamic_collection = true %}
+  {% endif %}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    width: 100%;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% if section.settings.show_product_recommendations %}
+
+  {% comment %} HTML markup {% endcomment %}
+  <section class="section
+                  is-width-{{ width }}"
+          {% if animation != "none" %}
+            data-scroll-class="{{ animation }}"
+          {% endif %}>
+    {% capture product_collections_markup %}
+      <div class="container">
+        {% if section.settings.product_recommendations_heading != blank %}
+          {% include 'heading', title: section.settings.product_recommendations_heading, heading_tag: 'h4', context: 'recommended-products', text_alignment: 'center' %}
+        {% endif %}
+
+        {% if section.settings.product_recommendations_style == 'grid' %}
+          {% include 'product-loop', align_height: align_height, height: height, context: 'product_recommendations' %}
+        {% else %}
+        <div class="one-whole column related-products related-products--slider js-related-products-slider">
+          {% include 'product-slider', related_products: true, product_recommendations: true %}
+        </div>
+        {% endif %}
+      </div>
+    {% endcapture %}
+
+    <div class="product-recommendations" data-product-id="{{ product.id }}" data-limit="{{ limit }}" data-enabled="{{ section.settings.show_product_recommendations }}">
+      {{ product_collections_markup }}
+    </div>
+  </section>
+{% endif %}
+
+{% comment %} JavaScript {% endcomment %}
+  <script
+    type="application/json"
+    data-section-id="{{ section.id }}"
+    data-section-data
+  >
+    {
+      "show_custom_collection": {{ show_custom_collection | json }},
+      "show_product_recommendations": {{ section.settings.show_product_recommendations | json }}
+    }
+  </script>
+  <script data-theme-editor-load-script src="{{ 'z__jsRecommendedProducts.js' | asset_url }}"></script>
+
+{% schema %}
+
+{
+  "name": "Recommended products",
+  "class": "recommended-products-section jsRecommendedProducts",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product recommendations"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_recommendations",
+      "label": "Show dynamic recommendations",
+      "info": "Dynamic recommendations change and improve with time. [Learn more](https://help.shopify.com/en/themes/development/recommended-products)",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "product_recommendations_style",
+      "label": "Layout",
+      "default": "grid",
+      "options": [
+        {
+          "value": "slider",
+          "label": "Slider"
+        },
+        {
+          "value": "grid",
+          "label": "Grid"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "product_recommendations_heading",
+      "label": "Heading",
+      "default": "You may also like"
+    },
+    {
+      "type": "range",
+      "id": "products_per",
+      "label": "Products per row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "recommended_products_limit",
+      "label": "Limit products",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Product thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_height",
+      "label": "Align to height"
+    },
+    {
+      "type": "range",
+      "id": "collection_height",
+      "label": "Product image height",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "default": 200,
+      "unit": "px",
+      "info": "Applied when 'Align to height' is also enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022543913)"
+    }
+  ]
+}
+
+{% endschema %}

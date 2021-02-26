@@ -1,0 +1,47 @@
+{% layout none %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10, shrink-to-fit=no">
+    {{ 'styles.scss.css' | asset_url | stylesheet_tag }}
+  <!-- Facebook Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '135621817009492');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=135621817009492&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel Code -->
+  {%- if settings.favicon != nil -%}
+  <link rel="shortcut icon" type="image/x-icon" href="{{ settings.favicon | img_url: '180x180' }}">
+  <link rel="apple-touch-icon" href="{{ settings.favicon | img_url: '180x180' }}" />
+  <link rel="apple-touch-icon" sizes="57x57" href="{{ settings.favicon | img_url: '57x57' }}" />
+  <link rel="apple-touch-icon" sizes="60x60" href="{{ settings.favicon | img_url: '60x60' }}" />
+  <link rel="apple-touch-icon" sizes="72x72" href="{{ settings.favicon | img_url: '72x72' }}" />
+  <link rel="apple-touch-icon" sizes="76x76" href="{{ settings.favicon | img_url: '76x76' }}" />
+  <link rel="apple-touch-icon" sizes="114x114" href="{{ settings.favicon | img_url: '114x114' }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.favicon | img_url: '180x180' }}" />
+  <link rel="apple-touch-icon" sizes="228x228" href="{{ settings.favicon | img_url: '228x228' }}" />
+  {%- else -%}
+  <link rel="shortcut icon" type="image/x-icon" href="{{ 'favicon.png' | asset_url }}">
+  {%- endif -%}
+</head>
+<body>
+<div id="template-{{ template | replace: '.', '-' | handle }}">
+  
+  <div class="czsfpage" style="width: 100%; height: 100%; z-index: 1; position: absolute;"> </div>
+  <div class="_form_11" style="width: 80%; margin: 0 auto; z-index: 2; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+  </div><script src="https://yourzooki.activehosted.com/f/embed.php?id=11" type="text/javascript" charset="utf-8"></script>
+</div>
+</body>
+</html>

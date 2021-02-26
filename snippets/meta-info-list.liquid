@@ -1,0 +1,45 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-meta-info-list' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+
+{% assign blog_author = object.settings.blog_author %}
+{% assign blog_date = object.settings.blog_date %}
+{% assign blog_read_time = object.settings.blog_read_time %}
+{% assign blog_comment_count = object.settings.blog_comment_count %}
+
+<ul class="meta-info-list">
+  {% if blog_author %}
+    <li class="meta-info-list__item">
+      <a href="{{ routes.search_url }}?type=author&q={{ article.author }}">{{ 'blogs.article.by' | t }} {% if article %}{{ article.author }}{% else %}{{ shop.name }}{% endif %}</a>
+    </li>
+  {% endif %}
+  {% if blog_date %}
+    <li class="meta-info-list__item">
+      <span class="featured-article__date">{% if article %}{{ article.published_at | date: "%d %B, %Y" }}{% else %}{{ "today" | date: "%d %B, %Y" }}{% endif %}</span>
+    </li>
+  {% endif %}
+  {% if blog_read_time %}
+    <li class="meta-info-list__item">
+      {% include 'blog__read-time', article: article %}
+    </li>
+  {% endif %}
+  {% if settings.disqus_enabled and blog_comment_count %}
+    <li class="meta-info-list__item">
+      <a href="{{ article.url }}#disqus_thread" data-disqus-identifier="{{ article.id }}" class="disqus-comment-count">{{ 'blogs.counts.comments_with_count' | t: count: 0 }}</a>
+    </li>
+  {% elsif blog_comment_count and article.comments_count > 0 %}
+    <li class="meta-info-list__item">
+      <a href="{{ article.url }}#comments">{{ 'blogs.counts.comments_with_count' | t: count: article.comments_count }}</a>
+    </li>
+  {% endif %}
+</ul>

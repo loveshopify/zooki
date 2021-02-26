@@ -1,0 +1,416 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-contact-form' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+
+{% assign title = object.settings.title %}
+{% assign content_text = object.settings.content_text %}
+{% assign social_enable = object.settings.social_enable %}
+{% assign content_image = object.settings.content_image %}
+{% assign form_position = object.settings.form_position %}
+{% assign text_alignment = object.settings.text_alignment %}
+
+{% if title != blank or content_text != blank or content_image != nil or social_enable %}
+  {% assign form_elements = true %}
+{% else %}
+  {% assign form_elements = false %}
+{% endif %}
+{% comment %}Text{% endcomment %}
+{% assign text_color = object.settings.text_color %}
+{% comment %}Background{% endcomment %}
+{% assign background = object.settings.background %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign text_alpha = text_color | color_extract: 'alpha' %}
+
+{% if settings.form_button_style contains 'primary' %}
+  {% assign field_input_size = settings.button_primary_padding %}
+  {% assign field_input_style = 'primary-btn-style' %}
+{% elsif settings.form_button_style contains 'secondary' %}
+  {% assign field_input_size = settings.button_secondary_padding %}
+  {% assign field_input_style = 'secondary-btn-style' %}
+{% else %}
+  {% assign field_input_size = settings.button_link_padding %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+
+  .contact-form__form {
+    color: {% if text_alpha != 0 %}{{ text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+  }
+
+  .contact-form__form {
+    background-color: {% if background_alpha != 0 %}{{ background }}{% endif %};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section
+              {{ css_class }}
+              is-width-{{ width }}
+              "
+          {% if animation != 'none' %}
+            data-scroll-class="{{ animation }}"
+          {% endif %}>
+
+  {% if context == 'contact-template' %}
+    <div class="container hide-when-banner-enabled">
+      {% include 'heading', title: page.title, heading_tag: 'h1', context: 'contact-page', text_alignment: 'left' %}
+    </div>
+  {% endif %}
+
+  <div class="container
+              content
+              contact-form
+              {% if form_elements == true %}
+              contact-form--{{ form_position }}
+              {% endif %}
+              ">
+
+    {% if form_elements == true %}
+      <div class="{% if section.blocks.size > 0 %}one-half{% else %}two-thirds offset-by-three{% endif %} medium-down--one-whole column">
+        {% if content_image != nil %}
+          <div class="contact-form__image">
+            {% include 'image-element', image: content_image, alt: content_image.alt %}
+          </div>
+        {% endif %}
+
+        <div class="text-align-{{ text_alignment }}">
+          {% if title != blank %}
+            <h2 class="contact-form__heading title"><span>{{ title }}</span></h2>
+          {% endif %}
+
+          {% if content_text != blank %}
+            <div class="contact-form__text">
+              {{ content_text }}
+            </div>
+          {% endif %}
+
+          {% if social_enable %}
+            <div class="contact-form__social">
+              {% include 'social-icons' %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.blocks.size > 0 and type != "block" %}
+      <div class="{% unless form_elements == true %}offset-by-four contact-form__offset{% endunless %} one-half medium-down--one-whole column">
+        <div class="contact-form__form">
+          <div class="form__success-message"></div>
+          <div class="one-whole column contact-form__form-errors">
+            <p class="form__error"></p>
+          </div>
+
+          {% form 'contact', class: 'contact-form contact-form--contact-section' %}
+            {% if form.posted_successfully? %}
+              <div class="one-whole column">
+                <p class="quote has-margin-bottom">{{ 'contact.form.post_success' | t }}</p>
+              </div>
+            {% endif %}
+
+            {% if form.errors %}
+              <div class="one-whole column contact-form__form-errors">
+
+                <p class="quote">{{ 'general.forms.post_error' | t }}</p>
+
+                  {% assign message = 'contact.form.message' | t %}
+                  {% for field in form.errors %}
+                    {% if field == 'form' %}
+                      <p class="form__error">
+                        {{ form.errors.messages[field] }}
+                      </p>
+                    {% else %}
+                      <p class="form__error">
+                        {% assign field_name = field | replace: 'body', message %}
+                        {{ 'general.forms.post_field_error_html' | t: field: field_name, error: form.errors.messages[field] }}
+                      </p>
+                    {% endif %}
+                  {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="contact-form__blocks">
+              <div class="container">
+                {% for block in section.blocks %}
+                  <div class="one-whole column">
+                    <div class="contact-form__block contact-form__block--{{ block.type }}" {{ block.shopify_attributes }}>
+
+                      {% if block.type == 'textfield' %}
+                      {% comment %} Text field {% endcomment %}
+
+                        {% if block.settings.label != blank %}
+                          {% assign label = block.settings.label %}
+                        {% else %}
+                          {% assign label = 'Option ' | append: forloop.index %}
+                        {% endif %}
+
+                        <label for="{{ label | replace: ' ', '_' }}" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                          {{ label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        <input type="text" placeholder="{% if settings.use_placeholders %}{{ label }}{% if block.settings.required %}*{% endif %}{% endif %}" name="contact[{{ label | replace: ' ', '_' }}]" id="{{ label | replace: ' ', '_' }}" class="input is-{{ field_input_style }} is-{{ field_input_size }}" {% if block.settings.required %}required="required"{% endif %} />
+
+                      {% elsif block.type == 'paragraph' %}
+                      {% comment %} Paragraph {% endcomment %}
+
+                        {{ block.settings.text }}
+
+                      {% elsif block.type == 'dropdown' %}
+                      {% comment %} Dropdown {% endcomment %}
+
+                        <label for="{{ block.settings.label | replace: ' ', '_' }}" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                          {{ block.settings.label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        <span class="select is-wide is-{{ field_input_style }} is-{{ field_input_size }}">
+                          <select name="contact[{{ block.settings.label | replace: ' ', '_' }}]" {% if block.settings.required %}required="required"{% endif %}>
+                            {% if settings.use_placeholders %}
+                              <option value="" selected disabled>{{ block.settings.label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}</option>
+                            {% endif %}
+                            {% for index in (0..10) %}
+                              {%- capture option -%}options_{{index}}{%- endcapture -%}
+                              {% if forloop.index0 == 0 %}
+                                {% if block.settings.placeholder != blank %}
+                                  <option value="">
+                                    {{ block.settings.placeholder }}
+                                  </option>
+                                {% endif %}
+                              {% else %}
+                                {% if block.settings[option] != blank %}
+                                  <option value="{{ block.settings[option]}}">
+                                    {{ block.settings[option] }}
+                                  </option>
+                                {% endif %}
+                              {% endif %}
+                            {% endfor %}
+                          </select>
+                        </span>
+
+                      {% elsif block.type == 'radio' %}
+                      {% comment %} Radio {% endcomment %}
+
+                        {% if block.settings.label != blank %}
+                          {% assign label = block.settings.label %}
+                        {% else %}
+                          {% assign label = 'Option ' | append: forloop.index %}
+                        {% endif %}
+
+                        <label class="label">
+                          {{ label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        <ul class="contact-form__list">
+                          {% for index in (1..10) %}
+                            {%- capture option -%}options_{{index}}{%- endcapture -%}
+                            {% if block.settings[option] != blank %}
+                              <li>
+                                <input type="radio" id="radio[option]" class="radio" name="contact[{{ label }}]" value="{{ block.settings[option] }}" {% if forloop.first %}checked{% endif %}/>
+                                <label for="radio[option]">
+                                  {{ block.settings[option] }}
+                                </label>
+                              </li>
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+
+                      {% elsif block.type == 'checkbox' %}
+                      {% comment %} Checkbox {% endcomment %}
+
+                        {% assign options = block.settings.options | split: ';' %}
+                        {% if block.settings.label != blank %}
+                          {% assign label = block.settings.label %}
+                        {% else %}
+                          {% assign label = 'Option ' | append: forloop.index %}
+                        {% endif %}
+
+                        <label class="label">
+                          {{ label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        <ul class="contact-form__list" {% if block.settings.required %}data-is-required{% endif %}>
+                          {% for index in (1..10) %}
+                            {%- capture option -%}options_{{index}}{%- endcapture -%}
+                            {% if block.settings[option] != blank %}
+                              <li>
+                                <input type="checkbox" id="checkbox[option{{ index }}]" class="checkbox" name="contact[{{ label }}]" value="{{ block.settings[option] }}"/>
+                                <label for="checkbox[option{{ index }}]">
+                                  {{ block.settings[option] }}
+                                </label>
+                              </li>
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+
+                      {% elsif block.type == 'textarea' %}
+                      {% comment %} Textarea {% endcomment %}
+
+                        <label for="textarea{{ forloop.index }}" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                          {{ block.settings.label }} {% if block.settings.required %}<span class="required">*</span>{% endif %}
+                        </label>
+
+                        <textarea placeholder="{% if settings.use_placeholders %}{{ block.settings.label }}{% if block.settings.required %}*{% endif %}{% endif %}" id="textarea{{ forloop.index }}" class="textarea is-{{ field_input_style }} is-{{ field_input_size }}" name="contact[body]" {% if block.settings.required %}required="required"{% endif %}></textarea>
+
+                      {% elsif block.type == 'email' %}
+                      {% comment %} Email {% endcomment %}
+
+                        {% if block.settings.label != blank %}
+                          {% assign label = block.settings.label %}
+                        {% else %}
+                          {% assign label = 'Option ' | append: forloop.index %}
+                        {% endif %}
+
+                        <label for="contactFormEmail" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                          {{ label }} <span class="required">*</span>
+                        </label>
+
+                        <input type="email" placeholder="{% if settings.use_placeholders %}{{ label }}*{% if block.settings.required %}*{% endif %}{% endif %}" id="contactFormEmail" class="input is-{{ field_input_style }} is-{{ field_input_size }}" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required="required">
+
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <input type="hidden" name="challenge" value="false" />
+            <div class="container">
+              <div class="one-whole column">
+                {% assign submit_label = 'contact.form.send' | t %}
+                {% include 'button', label: submit_label, style: settings.form_button_style, class: 'is-within-form' %}
+              </div>
+            </div>
+          {% endform %}
+        </div>
+      </div>
+
+      {% elsif type == "block" %}
+        <div class="{% unless form_elements == true %}offset-by-four contact-form__offset{% endunless %} one-half medium-down--one-whole column">
+          <div class="contact-form__form">
+            <div class="form__success-message"></div>
+            <div class="one-whole column contact-form__form-errors">
+              <p class="form__error"></p>
+            </div>
+
+            {% form 'contact', class: 'contact-form contact-form--contact-section' %}
+              {% if form.posted_successfully? %}
+                <div class="one-whole column">
+                  <p class="quote has-margin-bottom">{{ 'contact.form.post_success' | t }}</p>
+                </div>
+              {% endif %}
+
+              {% if form.errors %}
+                <div class="one-whole column contact-form__form-errors">
+
+                  <p class="quote">{{ 'general.forms.post_error' | t }}</p>
+
+                    {% assign message = 'contact.form.message' | t %}
+                    {% for field in form.errors %}
+                      {% if field == 'form' %}
+                        <p class="form__error">
+                          {{ form.errors.messages[field] }}
+                        </p>
+                      {% else %}
+                        <p class="form__error">
+                          {% assign field_name = field | replace: 'body', message %}
+                          {{ 'general.forms.post_field_error_html' | t: field: field_name, error: form.errors.messages[field] }}
+                        </p>
+                      {% endif %}
+                    {% endfor %}
+                </div>
+              {% endif %}
+
+              <div class="contact-form__blocks">
+                <div class="container">
+
+                  <!-- name field-->
+                  <div class="one-whole column">
+                    <div class="contact-form__block contact-form__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                      {% assign name_attr = 'contact.form.name' | handle %}
+                      <label for="contactFormName" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                        {{ 'contact.form.name' | t }} <span class="required">*</span>
+                      </label>
+                      <input type="text" placeholder="{% if settings.use_placeholders %}{{ 'contact.form.name' | t }}*{% endif %}" name="contact[name_attr]" id="contactFormName" class="input is-{{ field_input_style }} is-{{ field_input_size }}" required="required" />
+                    </div>
+                  </div>
+
+                  <!-- email field-->
+                  <div class="one-whole column">
+                    <div class="contact-form__block contact-form__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                      <label for="contactFormEmail" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                        {{ 'contact.form.email' | t }} <span class="required">*</span>
+                      </label>
+                      <input type="email" placeholder="{% if settings.use_placeholders %}{{ 'contact.form.email' | t }}*{% endif %}" id="contactFormEmail" class="input is-{{ field_input_style }} is-{{ field_input_size }}" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required="required">
+                    </div>
+                  </div>
+
+                  <!-- textarea field -->
+                  <div class="one-whole column">
+                    <div class="contact-form__block contact-form__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                      <label for="contactFormMessage" class="label {% if settings.use_placeholders %}is-sr-only{% endif %}">
+                        {{ 'contact.form.message' | t }} <span class="required">*</span>
+                      </label>
+                      <textarea placeholder="{% if settings.use_placeholders %}{{ 'contact.form.message' | t }}*{% endif %}" id="contactFormMessage" class="textarea is-{{ field_input_style }} is-{{ field_input_size }}" name="contact[body]" required="required"></textarea>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <input type="hidden" name="challenge" value="false" />
+              <div class="container">
+                <div class="one-whole column">
+                  {% assign submit_label = 'contact.form.send' | t %}
+                  {% include 'button', label: submit_label, style: settings.form_button_style, class: 'is-within-form' %}
+                </div>
+              </div>
+            {% endform %}
+          </div>
+        </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ object.id }}"
+  data-section-data
+>
+  {}
+</script>
+<script src="{{ 'z__jsCustomContactForm.js' | asset_url }}"></script>

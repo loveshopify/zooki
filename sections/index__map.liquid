@@ -1,0 +1,217 @@
+{% comment %}
+** Map - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% include 'include-map' %}
+
+{% schema %}
+{
+  "name": "Map",
+  "class": "map-section jsMap",
+  "settings": [
+    {
+      "type": "text",
+      "id": "map_address",
+      "label": "Address",
+      "info": "Google Maps will find the exact location"
+    },
+    {
+      "type": "range",
+      "id": "map_height",
+      "min": 300,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Map height",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "zoom_level",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "unit": "x",
+      "label": "Map zoom level",
+      "default": 16
+    },
+    {
+      "type": "image_picker",
+      "id": "map_image",
+      "label": "Image",
+      "info": "Displayed when map isn't loaded"
+    },
+    {
+      "type": "header",
+      "content": "API key"
+    },
+    {
+      "type": "text",
+      "id": "api_key",
+      "label": "Google Maps API key",
+      "info": "You’ll need to [register a Google Maps API Key](https://help.shopify.com/manual/using-themes/troubleshooting/map-section-api-key) to display the map"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pin",
+      "label": "Show pin",
+      "info": "Requires use of API key",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "map_style",
+      "label": "Map color scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "aubergine",
+          "label": "Aubergine"
+        },
+        {
+          "value": "night",
+          "label": "Night"
+        },
+        {
+          "value": "retro",
+          "label": "Retro"
+        },
+        {
+          "value": "silver",
+          "label": "Silver"
+        }
+      ],
+      "default": "default",
+      "info": "Requires use of API key"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "half",
+          "label": "Half"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Map",
+      "category": "Store information"
+    }
+  ]
+}
+{% endschema %}

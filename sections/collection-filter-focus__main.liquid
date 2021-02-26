@@ -1,0 +1,205 @@
+{% comment %}
+** Collections - main content area **
+- Collection template
+{% endcomment %}
+
+
+{% paginate collection.products by section.settings.pagination_limit %}
+
+    <div class="one-whole column">
+
+      {% if collection.products.size == 0 %}
+          <p>{{ 'collections.general.no_matches' | t }}</p>
+      {% else %}
+        <div class="container">
+          {% assign products_per_row = section.settings.products_per_row %}
+          {% include 'product-loop' %}
+        </div>
+      {% endif %}
+
+    </div>
+
+
+
+    <div class="one-whole column text-align-center">
+      {% include 'pagination' %}
+    </div>
+
+{% endpaginate %}
+
+
+
+{% schema %}
+
+{
+  "name": "Collection - vertical",
+  "class": "collection-vertical-template",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner image"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_collection_title",
+      "label": "Show collection title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_breadcrumb",
+      "label": "Show breadcrumb links",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_tags",
+      "label": "Enable filtering by product tag",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_sort",
+      "label": "Enable collection sorting",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_menu_sidebar",
+      "label": "Show menu sidebar",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Promo section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_banner",
+      "label": "Show promo banner",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1800 x 800px recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_darken",
+      "label": "Darken banner image",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "promo_title",
+      "label": "Promo title",
+      "default": "Promo title"
+    },
+    {
+      "type": "richtext",
+      "id": "promo_text",
+      "label": "Promo text",
+      "default": "<p>Promo text goes here..</p>"
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "label": "Products per row",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "products_per_row_on_mobile",
+      "label": "Products per row on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "pagination_limit",
+      "label": "Products per page",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 48
+    },
+    // {
+    //   "type": "checkbox",
+    //   "id": "enable_masonry_layout",
+    //   "label": "Enable masonry layout",
+    //   "default": false
+    // },
+    {
+      "type": "header",
+      "content": "Featured product"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_collection_featured_product",
+      "label": "Enable"
+    },
+    {
+      "type": "product",
+      "id": "collection_featured_product",
+      "label": "Global featured product",
+      "info": "Applied to all collections. If no product is chosen, than the first product in the collection will be used."
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

@@ -1,0 +1,35 @@
+{% if page != blank %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ pages[page].title }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+  <div class="sidebar-block__content content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    {{ pages[page].content }}
+  </div>
+{% else %}
+  <h3 class="sidebar-block__heading" data-has-toggle-option>
+    {{ 'general.footer.page_block_title' | t }}
+    {% if settings.toggle_sidebar %}
+      <button data-sidebar-block__toggle-icon="closed" aria-label="toggle" class="sidebar-block__toggle-icon icon-style--{{ settings.toggle_icon_style }}">
+        {% if settings.toggle_icon_style == 'plus_and_minus' %}
+          {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+          {% include settings.icon, name: 'minus' %}
+        {% else %}
+          {% include settings.icon, name: 'down-caret', icon_class: 'icon--active' %}
+        {% endif %}
+      </button>
+    {% endif %}
+  </h3>
+  <div class="sidebar-block__content content" {% if settings.toggle_sidebar %}data-sidebar-block__content--collapsible{% endif %}>
+    <p>{{ 'homepage.onboarding.no_content' | t }}</p>
+  </div>
+{% endif %}

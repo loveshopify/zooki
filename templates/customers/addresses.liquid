@@ -1,0 +1,158 @@
+{% comment %}
+  Main view that shows details used by visitors to manage their addresses used in the checkout.
+
+  - https://help.shopify.com/en/themes/development/templates/customers-addresses
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = 'standard' %}
+{% assign padding_top = 40 %}
+{% assign padding_bottom = 40 %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section section__wrapper is-width-{{ width }} {{ css_class }}">
+  <header class="container">
+    {%- capture title -%}{{ 'customer.addresses.title' | t }}{%- endcapture -%}
+    {% include 'heading', title: title, heading_tag: 'h1', context: 'addresses', text_alignment: 'left' %}
+  </header>
+
+  <div class="container has-padding-top">
+    <aside class="one-fourth column account-sidebar">
+      <a href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a>
+      <div class="account-sidebar__content has-padding-top">
+        <div class="has-padding-bottom" id="action"><a href="#" class="button action_button button--secondary" onclick="Shopify.CustomerAddress.toggleNewForm(); return false;">{{ 'customer.addresses.add_new' | t }}</a></div>
+        {% include 'address-loop' with 'default' %}
+      </div>
+    </aside>
+    <main class="three-fourths column account-main">
+      <div id="add_address" style="display:none;">
+        {% form 'customer_address', customer.new_address %}
+          <h2 class="title" id="add_address_title">{{ 'customer.addresses.add_new' | t }}</h2>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_first_name_new">{{ 'customer.addresses.first_name' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_first_name_new" class="input" name="address[first_name]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.first_name' | t }}{% endif %}" value="{{form.first_name}}" autocapitalize="words">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_last_name_new">{{ 'customer.addresses.last_name' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_last_name_new" class="input" name="address[last_name]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.last_name' | t }}{% endif %}"value="{{form.last_name}}" autocapitalize="words">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_company_new">{{ 'customer.addresses.company' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_company_new" class="input" name="address[company]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.company' | t }}{% endif %}" value="{{form.company}}" autocapitalize="words">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_address1_new">{{ 'customer.addresses.address1' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_address1_new" class="input" name="address[address1]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.address1' | t }}{% endif %}" value="{{form.address1}}" autocapitalize="words">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_address2_new">{{ 'customer.addresses.address2' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_address2_new" class="input" name="address[address2]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.address2' | t }}{% endif %}" value="{{form.address2}}" autocapitalize="words">
+            </div>
+          </div>
+
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_city_new">{{ 'customer.addresses.city' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_city_new" class="input" name="address[city]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.city' | t }}{% endif %}" value="{{form.city}}" autocapitalize="words">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="address_country_new">{{ 'customer.addresses.country' | t }}</label>
+            <div class="control">
+              <div class="select">
+                <select id="address_country_new" name="address[country]" data-default="{{form.country}}">{{ country_option_tags }}</select>
+              </div>
+            </div>
+          </div>
+
+          <div id="address_province_container_new" style="display:none">
+            <label for="address_province_new">{{ 'customer.addresses.province' | t }}</label>
+            <div class="control">
+              <select id="address_province_new" class="select" name="address[province]" data-default="{{form.province}}"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_zip_new">{{ 'customer.addresses.zip' | t }}</label>
+            <div class="control">
+              <input type="text" id="address_zip_new" class="input" name="address[zip]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.zip' | t }}{% endif %}" value="{{form.zip}}" autocapitalize="characters">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label {% if settings.show_labels == blank %}is-sr-only{% endif %}" for="address_phone_new">{{ 'customer.addresses.phone' | t }}</label>
+            <div class="control">
+              <input type="tel" id="address_phone_new" class="input" name="address[phone]" placeholder="{% if settings.show_labels == blank %}{{ 'customer.addresses.phone' | t }}{% endif %}" value="{{form.phone}}">
+            </div>
+          </div>
+
+          <p>
+            {{ form.set_as_default_checkbox }}
+            <label for="address_default_address_new" class="inline">{{ 'customer.addresses.set_default' | t }}</label>
+          </p>
+
+          <p class="action_bottom is-flex is-align-center has-padding-bottom has-padding-top">
+            <input class="button action_button button--secondary" type="submit" value="{{ 'customer.addresses.add' | t }}" />
+            <span> {{ 'customer.addresses.or' | t }} <a href="#" onclick="Shopify.CustomerAddress.toggleNewForm(); return false;">{{ 'customer.addresses.cancel' | t }}</a></span>
+          </p>
+
+        {% endform %}
+      </div>
+
+      <div id="address_tables" class="container">
+      {% paginate customer.addresses by 10 %}
+
+        {% if customer.addresses.size > 0 %}
+          {% include 'address-loop' %}
+
+          <br class="clear" />
+
+        {% else %}
+          <p>{{ 'customer.addresses.no_addresses' | t }}</p>
+        {% endif %}
+
+        <div id="address_pagination">{{ paginate | default_pagination }}</div>
+      {% endpaginate %}
+      </div><!-- end #address_tables -->
+    </main>
+  </div>
+</section>
+
+<script type="text/javascript" charset="utf-8" >
+  // initialize observers on address selectors
+  new Shopify.CountryProvinceSelector('address_country_new', 'address_province_new', {hideElement: 'address_province_container_new'});
+  {% for address in customer.addresses %}
+    new Shopify.CountryProvinceSelector('address_country_{{address.id}}', 'address_province_{{address.id}}', {hideElement: 'address_province_container_{{address.id}}'});
+  {% endfor %}
+</script>

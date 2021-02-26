@@ -1,0 +1,75 @@
+<div class="dfu-container">
+    <div class="dfu-txt-area">
+        <h4>{{ section.settings.dfu-header }}</h4>
+        <p>{{ section.settings.dfu-txt }}</p>
+    </div>
+    <div class="dfu-img-area">
+        <div class="dfu-img-1" style="background-image: url({{ section.settings.dfu-img-1 | img_url: '1920x' }});">
+            <p>{{ section.settings.dfu-img-1-txt }}</p>
+        </div>
+        <div class="dfu-img-2" style="background-image: url({{ section.settings.dfu-img-2 | img_url: '1920x' }});">
+            <p>{{ section.settings.dfu-img-2-txt }}</p>
+        </div>
+        <div class="dfu-img-3" style="background-image: url({{ section.settings.dfu-img-3 | img_url: '1920x' }});">
+            <p>{{ section.settings.dfu-img-3-txt }}</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+{% schema %}
+{
+"name": "Directions For Use",
+"settings": [
+{
+"type": "text",
+"id": "dfu-header",
+"label": "Section heading"
+},
+{
+"type": "textarea",
+"id": "dfu-txt",
+"label": "Text area"
+},
+{
+"type": "image_picker",
+"id": "dfu-img-1",
+"label": "First image"
+},
+{
+"type": "text",
+"id": "dfu-img-1-txt",
+"label": "Text on first image"
+},
+{
+"type": "image_picker",
+"id": "dfu-img-2",
+"label": "Second image"
+},
+{
+"type": "text",
+"id": "dfu-img-2-txt",
+"label": "Text on second image"
+},
+{
+"type": "image_picker",
+"id": "dfu-img-3",
+"label": "Third image"
+},
+{
+"type": "text",
+"id": "dfu-img-3-txt",
+"label": "Text on third image"
+}
+]
+}
+{% endschema %}

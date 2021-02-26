@@ -1,0 +1,31 @@
+{% comment %}
+  Main view that is used by visitors to log in to their customer account page.
+  To edit the contents of this file, look inside the `sections` folder for the file name that comes directly after `section`. Eg. {% section 'product__main' %} or {% section 'page__banner' %}
+
+  - https://help.shopify.com/en/themes/development/templates/customers-login
+{% endcomment %}
+
+{% section 'login-form' %}
+
+<script type="text/javascript">
+  function showRecoverPasswordForm(e) {
+    e.preventDefault();
+    document.getElementById('recover-password').style.display = 'block';
+    document.getElementById('customer_login').style.display='none';
+    return false;
+  }
+
+  function hideRecoverPasswordForm(e) {
+    e.preventDefault();
+    document.getElementById('recover-password').style.display = 'none';
+    document.getElementById('customer_login').style.display = 'block';
+    return false;
+  }
+
+  if (window.location.hash == '#recover') { showRecoverPasswordForm() }
+
+  // reset_success is only true when the reset form is
+  {% if reset_success %}
+    showRecoverPasswordForm();
+  {% endif %}
+</script>

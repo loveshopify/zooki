@@ -1,0 +1,210 @@
+{% comment %}
+** Collection featured on the subcollection page **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  .on-subcollection-page.section__wrapper {
+    {% if width == 'wide' -%}
+      max-width: none;
+    {%- endif %}
+  }
+
+  {% if section.settings.collection_tags == false %}
+    .collection__tag-filter {
+      display: none;
+    }
+  {% endif %}
+
+  {% if section.settings.collection_sort == false %}
+    .collection__sort-by-filter {
+      display: none;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% paginate collection.products by section.settings.pagination_limit %}
+
+<div class="{{ css_class }}">
+  {% if collection.products.size > 0 %}
+    <div class="collection-matrix__wrapper">
+      <div class="container collection-matrix">
+        {% assign products_per_row = section.settings.products_per_row %}
+        {% include 'product-loop', limit: section.settings.pagination_limit, align_height: section.settings.align_height, height: section.settings.collection_height %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="container container--pagination">
+    <div class="one-whole column text-align-center">
+      {% include 'pagination' %}
+    </div>
+  </div>
+</div>
+
+{% endpaginate %}
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "enable_filter": {{ section.settings.collection_tags | json }},
+    "enable_sorting": {{ section.settings.collection_sort | json }}
+  }
+</script>
+<script src="{{ 'z__jsCollection.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Collection",
+  "class": "subcollection-featured-collection has-sidebar-option jsCollection",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collection_tags",
+      "label": "Show product tag filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_sort",
+      "label": "Show sort by filter",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_height",
+      "label": "Align to height",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "collection_height",
+      "label": "Product image height",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "default": 200,
+      "unit": "px",
+      "info": "Applied when 'Align to height' is also enabled. [Learn more](#)"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "label": "Products per row",
+      "min": 2,
+      "max": 7,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_products_per_row",
+      "label": "Products per row on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "pagination_limit",
+      "label": "Products per page",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

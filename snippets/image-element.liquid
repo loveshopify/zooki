@@ -1,0 +1,122 @@
+{% comment %}
+Required values
+image: <image object>
+alt: <image alt property>
+______________
+Optional values
+progressive: <boolean>
+stretch_width: <boolean>
+additional_classes: <string>
+inline_style: <string>
+back_to_basics: <boolean>
+object_fit: <boolean>
+image_crop: <boolean>
+max_height: <number>
+calculate_aspect_ratio: <boolean>
+{% endcomment %}
+
+{% comment %}Check if image is progressive (does not support transparent pngs){% endcomment %}
+{% if progressive %}
+  {%- capture srcset -%}
+    {{ image | img_url: '5000x', format: 'pjpg' }} 5000w,
+    {{ image | img_url: '4500x', format: 'pjpg' }} 4500w,
+    {{ image | img_url: '4000x', format: 'pjpg' }} 4000w,
+    {{ image | img_url: '3500x', format: 'pjpg' }} 3500w,
+    {{ image | img_url: '3000x', format: 'pjpg' }} 3000w,
+    {{ image | img_url: '2500x', format: 'pjpg' }} 2500w,
+    {{ image | img_url: '2000x', format: 'pjpg' }} 2000w,
+    {{ image | img_url: '1800x', format: 'pjpg' }} 1800w,
+    {{ image | img_url: '1600x', format: 'pjpg' }} 1600w,
+    {{ image | img_url: '1400x', format: 'pjpg' }} 1400w,
+    {{ image | img_url: '1200x', format: 'pjpg' }} 1200w,
+    {{ image | img_url: '1000x', format: 'pjpg' }} 1000w,
+    {{ image | img_url: '800x', format: 'pjpg' }} 800w,
+    {{ image | img_url: '600x', format: 'pjpg' }} 600w,
+    {{ image | img_url: '400x', format: 'pjpg' }} 400w,
+    {{ image | img_url: '200x', format: 'pjpg' }} 200w
+  {%- endcapture -%}
+{% else %}
+  {%- capture srcset -%}
+    {{ image | img_url: '5000x' }} 5000w,
+    {{ image | img_url: '4500x' }} 4500w,
+    {{ image | img_url: '4000x' }} 4000w,
+    {{ image | img_url: '3500x' }} 3500w,
+    {{ image | img_url: '3000x' }} 3000w,
+    {{ image | img_url: '2500x' }} 2500w,
+    {{ image | img_url: '2000x' }} 2000w,
+    {{ image | img_url: '1800x' }} 1800w,
+    {{ image | img_url: '1600x' }} 1600w,
+    {{ image | img_url: '1400x' }} 1400w,
+    {{ image | img_url: '1200x' }} 1200w,
+    {{ image | img_url: '1000x' }} 1000w,
+    {{ image | img_url: '800x' }} 800w,
+    {{ image | img_url: '600x' }} 600w,
+    {{ image | img_url: '400x' }} 400w,
+    {{ image | img_url: '200x' }} 200w,
+  {%- endcapture -%}
+{% endif %}
+
+{% if image_crop == true %}
+  {% capture height_style %}
+    max-height: {{ max_height }}px;
+  {% endcapture %}
+{% elsif object_fit == true %}
+  {% capture height_style %}
+      max-height: {{ max_height }}px; width: calc({{ image.width }} /  {{ image.height }} * {{ max_height }}px);
+  {% endcapture %}
+{% else %}
+  {% comment %}Used to reset variable{% endcomment %}
+  {% assign height_style = '' %}
+{% endif %}
+
+{% comment %}Loading style{% endcomment %}
+{% if settings.image_loading_style == 'blur-up' %}
+  {% comment %}Low quality image loads first{% endcomment %}
+  {% assign low_quality_image = image | img_url: '50x' %}
+{% elsif settings.image_loading_style == 'color' %}
+  {% comment %}Dominant image color loads first{% endcomment %}
+  {% assign dominant_color_image = image | img_url: '1x' %}
+  {% capture image_background_color %}
+    background: url({{ dominant_color_image }});
+  {% endcapture %}
+{% endif %}
+
+{% if back_to_basics %}
+  <div class="image-element__wrap"
+              style="{{ image_background_color }}{{ height_style }}">
+      <img  alt="{{ alt | escape }}" src="{{ image | img_url: '2000x' }}"
+            {% if inline_style %}
+              style="{{ inline_style }}"
+            {% endif %}
+            {% if additional_classes %}
+              class="{{ additional_classes }}"
+            {% endif %}
+      />
+  </div>
+{% else %}
+{% comment %}Build image element{% endcomment %}
+<div class="image-element__wrap"
+            {% if calculate_aspect_ratio %}
+              data-calculate-aspect-ratio
+            {% endif %}
+            style="{{ image_background_color }}{{ height_style }} {% unless stretch_width == true or object_fit %}max-width: {{ image.width }}px;{% endunless %}">
+  <img  alt="{{ alt | escape }}"
+        class="lazyload transition--{{ settings.image_loading_style }} {{ additional_classes }}"
+        {% if low_quality_image %}
+          src="{{ low_quality_image }}"
+        {% endif %}
+        data-src="{{ image | img_url: '1600x' }}"
+        data-sizes="auto"
+        data-aspectratio="{{ image.width }}/{{ image.height }}"
+        data-srcset="{{ srcset }}"
+        height="{{ image.height }}"
+        width="{{ image.width }}"
+        style="{{ inline_style }};{{ height_style }}"
+  />
+</div>
+{% endif %}
+
+{% comment %}Fallback for no javascript{% endcomment %}
+<noscript>
+  <img class="{{ additional_classes }}" src="{{ image | img_url: '2000x' }}" alt="{{ alt | escape }}">
+</noscript>

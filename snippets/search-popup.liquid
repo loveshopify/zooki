@@ -1,0 +1,50 @@
+<div class="search-popup js-search-popup">
+  <section class="section search-overlay__wrapper">
+    <div class="container">
+
+      <div class="one-whole column text-align-center">
+        <h2 class="search-popup__title">{{ settings.search_title }}</h2>
+      </div>
+
+      <div class="one-whole column">
+        <form class="search-form search-popup__form" action="{{ routes.search_url }}">
+          <div class="search__fields">
+            {% if settings.search_option != 'everything' %}
+              <input class="visuallyhidden" type="text" name="type" value="product" />
+            {% endif %}
+            <label for="q" class="visuallyhidden">{{ settings.search_placeholder }}</label>
+            <div class="field">
+              <div class="control has-icons-left">
+                <input class="input" id="q" type="text" name="q" placeholder="{{ settings.search_placeholder }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+                {% include settings.icon, name: 'search', class: 'icon is-left' %}
+                {% if settings.enable_autocomplete == true %}
+                  <ul class="predictive-results"></ul>
+                {% endif %}
+              </div>
+            </div>
+            <input type="submit" name="search" class="visuallyhidden" value="" />
+          </div>
+        </form>
+      </div>
+
+      {% if settings.search_menu != blank %}
+        {% assign search_menu = linklists[settings.search_menu] %}
+        <div class="one-whole column text-align-center search-menu__title">
+          <span>{{ 'general.search.common_terms' | t }}</span>
+        </div>
+        <div class="one-whole column">
+          <div class="search-menu is-flex">
+            {% for link in search_menu.links %}
+              <div class="search-menu__item">
+                <a class="{% if link.active %}is-active{% endif %}" href="{{ link.url }}">
+                  {{ link.title }}
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </section>
+</div>

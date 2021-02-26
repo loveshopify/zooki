@@ -1,0 +1,185 @@
+{% comment %}
+** Registration template - main content area **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section section__wrapper is-width-{{ width }} {{ css_class }}">
+  <header class="container">
+    {%- capture title -%}{{ 'customer.register.title' | t }}{%- endcapture -%}
+    {% include 'heading', title: title, heading_tag: 'h1', context: 'register', text_alignment: 'left' %}
+  </header>
+
+  <div class="container">
+    <div class="register one-half medium-down--one-whole column has-padding-bottom">
+      <div id="customer" class="register__form">
+
+        <!-- Create Customer -->
+        <div id="create-customer">
+
+          {% if section.settings.richtext != blank %}
+            <div class="login__text has-padding-bottom">
+              {{ section.settings.richtext }}
+            </div>
+          {% endif %}
+
+          {% form 'create_customer' %}
+
+            {{ form.errors | default_errors }}
+
+            <div id="first_name" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.first_name' | t }}</label>
+              <div class="control">
+                <input type="text" value="" name="customer[first_name]" id="first_name" class="input" size="30" placeholder="{{ 'customer.register.first_name' | t }}" />
+              </div>
+            </div>
+
+            <div id="last_name" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.last_name' | t }}</label>
+              <div class="control">
+                <input type="text" value="" name="customer[last_name]" id="last_name" class="input" size="30" placeholder="{{ 'customer.register.last_name' | t }}" />
+              </div>
+            </div>
+
+            <div id="email" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.email' | t }}*</label>
+              <div class="control">
+                <input type="email" value="" name="customer[email]" id="email" class="input" size="30" placeholder="{{ 'customer.register.email' | t }}*" />
+              </div>
+            </div>
+
+            <div id="password" class="field">
+              <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.register.password' | t }}*</label>
+              <div class="control">
+                <input type="password" value="" name="customer[password]" id="password" class="input" size="30" placeholder="{{ 'customer.register.password' | t }}" />
+              </div>
+            </div>
+
+            <div class="is-flex is-justify-space-between">
+              <input class="button button--secondary" type="submit" value="{{ 'customer.register.sign_up' | t }}" />
+              <p class="has-margin-left">* {{ 'general.forms.required_field' | t }}</p>
+            </div>
+
+            <p class="has-padding-top">
+              {{ 'customer.register.returning_customer_label' | t }} <a href="{{ routes.account_login_url }}" class="hoverButton">{{ 'customer.register.sign_in' | t }}</a>
+            </p>
+          {% endform %}
+        </div><!-- /#create-customer -->
+      </div>
+    </div>
+
+    <div class="register__image one-half medium-down--one-whole column is-order-aligned-{{ section.settings.image_position }}">
+      {% if section.settings.image %}
+        {% include 'image-element', image: section.settings.image, alt: section.settings.image.alt %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Register",
+    "class": "register-section",
+    "settings": [
+      {
+        "type": "richtext",
+        "id": "richtext",
+        "label": "Text"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "right"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

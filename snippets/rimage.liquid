@@ -1,0 +1,71 @@
+{%- comment -%}
+    It creates a style tag and it restricts an image from growing larger than its max resolution.
+
+    Dependencies:
+    - Lazysizes plugin (https://github.com/aFarkas/lazysizes) which enable responsive image with faster load time and better performance.
+    - Lazysizes Responsive Images as a Service (https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/rias) To load the correct image size with our CDN
+    - Lazysizes Bgset (https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/bgset) To use responsive images on background-image (CSS)
+
+    Accepts:
+    - max_width: {Number} Max width of the image container
+    - max_height: {Number} Max height of the image container
+    - image: {Object} Image object
+    - image_class: {String} class name of the <img />
+    - image_attributes: {String}  additional HTML attributes of the <img />
+    - wrapper_class: {String} class name of the <div> wrapper
+    - wrapper_attributes: {String} additional HTML attributes of the <div> wrapper
+    ADDED
+  - hidden: {Boolean}, if hidden is true, hide this to screenreaders. Useful if the graphic alt text is repetitive (eg. product image next to product title.)
+
+    Usage:
+    In your liquid template file, copy the following line
+    - {% render 'rimage' with image: featured_image, image_class: "css-class", wrapper_class: "wrapper-css-class", max_width: 700, max_height: 800 %}
+{%- endcomment -%}
+
+
+
+{%- comment -%}
+  The image aspect ratio tells us the orientation of the image:
+  - less than 1.0 is portrait
+  - exactly 1.0 is square
+  - greater than 1.0 is landscape
+{%- endcomment -%}
+{%- if image.aspect_ratio <= 1 -%}
+  {%- assign max_height_image = image.height -%}
+  {%- assign max_width_image = max_height_image | times: image.aspect_ratio -%}
+{%- else -%}
+  {%- assign max_width_image = image.width  -%}
+  {%- assign max_height_image = max_width_image | divided_by: image.aspect_ratio -%}
+{%- endif -%}
+
+{% if max_width_image %}
+  {% assign padding = max_height_image | divided_by: max_width_image | times: 100 %}
+  {% if paddingTop %}
+    {% assign padding = paddingTop %}
+  {% endif %}
+{% endif %}
+
+
+{%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+{%- assign size = size | default: '248x' -%}
+
+<div 
+  data-image-id="{{ image.id }}" 
+  class="rimage {{ wrapper_class }}"
+  style="padding-top:{{ padding }}%;"
+  {{ wrapper_attributes }} 
+  {% if hidden == true %}aria-hidden="true"{% endif %}>
+  <img
+    class="lazyload {{ image_class }}"    
+    data-src="{{ img_url }}"
+    data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2160, 2376, 2592, 2808, 3024]"
+    data-aspectratio="{{ image.aspect_ratio }}"
+    data-sizes="auto"
+    alt="{{ image.alt | escape }}"
+    {{ image_attributes }}
+  >
+</div>
+
+<noscript>
+  <img class="{{ image_class }}" src="{{ image | img_url: '2048x2048' }}" alt="{{ image.alt | escape }}">
+</noscript>

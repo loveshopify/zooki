@@ -1,0 +1,131 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-rich-text' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% comment %}Map settings{% endcomment %}
+{% assign api_key = object.settings.api_key %}
+{% assign map_address = object.settings.map_address %}
+{% assign map_height = object.settings.map_height %}
+{% assign map_image = object.settings.map_image %}
+{% assign map_style = object.settings.map_style %}
+{% assign show_pin = object.settings.show_pin %}
+{% assign zoom_level = object.settings.zoom_level %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{%- capture map_style_json -%}
+  {% include 'map-styles', name: map_style %}
+{%- endcapture -%}
+
+{% comment %} Section specific CSS {% endcomment %}
+{%- capture section_css -%}
+  #map--{{ id }} {
+    height: {{ map_height }}px;
+    width: 100%;
+  }
+
+  .map {
+    width: 100%;
+    height: 100%;
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% elsif width == 'half' %}
+      width: 50%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}"
+          {% if animation != "none" %}
+            data-scroll-class="{{ animation }}"
+          {% endif %} >
+
+{% if map_address != blank and api_key != blank %}
+
+  {% comment %}API Map{% endcomment %}
+  <div id="map--{{id}}" class="embed-container maps">
+      {% if api_key != blank %}
+        <div class="map-section__container map" id="map-{{ id }}"
+        data-address="{{ map_address | strip_html }}"
+        data-zoom="{{ zoom_level }}"
+        data-pin="{{ show_pin }}"
+        data-id="map-{{ id }}"
+        data-style="{{ map_style }}"
+        data-api-key="{{ api_key }}"
+        data-directions-address="{{ map_address | strip_html | handleize | replace: '_', '+' | replace: ' ', '+'}}">
+        </div>
+      {% endif %}
+  </div>
+
+{% elsif map_address != blank and api_key == blank %}
+
+  {% comment %}Iframe Map{% endcomment %}
+  <div id="map--{{id}}" class="embed-container maps">
+    <iframe width="100%"  height="{{ map_height }}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q={% if map_address != blank %}{{ map_address | strip_html | replace: ' ', '+' }}{% else %}{{ shop.address.street }}{% endif %}&amp;z={{ zoom_level }}&amp;output=embed"></iframe>
+  </div>
+
+{% else %}
+
+  {% comment %}Image Map{% endcomment %}
+  <div id="map--{{id}}" class="map__placeholder maps">
+    {% if map_image == blank %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg placeholder-svg--map' }}
+    {% else %}
+      {% include 'image-element', image: map_image, alt: map_image.alt %}
+    {% endif %}
+  </div>
+
+{% endif %}
+</section>
+
+{% if api_key %}
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ object.id }}"
+  data-section-data >
+  {
+    "api_key": {{ api_key | json }},
+    "directions_address": {{ map_address | strip_html | handleize | replace: '_', '+' | replace: ' ', '+' | json }},
+    "id": {{ id | prepend: 'map-' | json }},
+    "map_address": {{ map_address | json }},
+    "map_height": {{ map_height | json }},
+    "map_style": {{ map_style_json | strip | json }},
+    "show_pin": {{ show_pin | json }},
+    "zoom_level": {{ zoom_level | json }}
+  }
+</script>
+<script data-theme-editor-load-script src="{{ 'z__jsMap.js' | asset_url }}"></script>
+{% endif %}

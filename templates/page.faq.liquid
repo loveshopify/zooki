@@ -1,0 +1,22 @@
+{% comment %}
+  The contents of the page.gallery.liquid template can be found in /sections/page-gallery__main.liquid
+{% endcomment %}
+
+<main id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section faq-page" data-check-for-order="true">
+  {% section 'page-faq__banner' %}
+  <section class="section__wrapper section">
+    <div class="container">
+      {% section 'page-faq__main' %}
+      <div class="page-faq__column-wrap container column-wrapper">
+        <div class="one-half medium-down--one-whole column faq faq__column-1">
+          {% section 'page-faq__column1' %}
+        </div>
+        <div class="one-half medium-down--one-whole column faq faq__column-2">
+          {%- section 'page-faq__column2' -%}
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+

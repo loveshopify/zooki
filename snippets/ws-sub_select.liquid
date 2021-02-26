@@ -1,0 +1,13 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+<select name="ws_size">
+    {% for variant in product.variants %}
+        {% assign wsVariantTitle = variant.title | handle %}
+        {% if wsVariantTitle != "trial-pack" %}
+            <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}">
+                {{ variant.title }}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>
+<span class="ws_multibuy">Multibuy discounts</span>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}

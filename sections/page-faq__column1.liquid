@@ -1,0 +1,232 @@
+{% comment %}
+** FAQ page - static **
+- Column section
+- Page template section
+- Uses blocks
+{% endcomment %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for block in section.blocks %}
+      {% unless block.type == 'heading' or block.type == 'image' %}
+        {
+          "@type": "Question",
+          "name": "{{ block.settings.title | escape }}",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "{{ block.settings.answer | strip_html }}"
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {% endunless %}
+    {% endfor %}
+  ]
+}
+</script>
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{section.id}} .faq-accordion {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  {% if section.blocks.size == 0 %}
+    .faq__column-1 {
+      display: none;
+    }
+
+    .faq__column-2 {
+      width: 100%;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: section.settings.custom_css, id: section.id %}
+{% endstyle %}
+
+{% capture icon_set %}
+{% if settings.toggle_icon_style == 'carets' %}
+  {% include settings.icon, name: 'down-caret', icon_class: 'icon--rotate' %}
+{% else %}
+  {% include settings.icon, name: 'plus', icon_class: 'icon--active' %}
+  {% include settings.icon, name: 'minus' %}
+{% endif %}
+{% endcapture %}
+
+{% if section.blocks.size > 0 %}
+<dl class="{{ section.settings.css_class }}
+          faq-accordion
+          accordion-icon--{{ settings.toggle_icon_style }}">
+  {% for block in section.blocks %}
+    {% if block.type == 'content' %}
+
+      {% if block.settings.title != blank %}
+        <dt>
+          <button class="accordion-style--{{ settings.toggle_icon_style }} accordion__button" type="button" aria-controls="panel-{{ block.id }}" aria-expanded="true">
+            {{ icon_set }}
+            {{ block.settings.title }}
+          </button>
+        </dt>
+        <dd id="panel-{{ block.id }}" aria-hidden="false">
+          <div class="content">
+            {{ block.settings.answer }}
+          </div>
+        </dd>
+      {% endif %}
+
+    {% elsif block.type == 'heading' %}
+
+      {% if block.settings.title != blank %}
+        <h2 class="title faq-title">{{ block.settings.title }}</h2>
+      {% endif %}
+
+    {% elsif block.type == 'image' %}
+
+      {% if block.settings.image != blank %}
+          {% include 'image-element', image: block.settings.image, alt: block.settings.image.alt, stretch_width: true %}
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+
+    {% endif %}
+
+  {% endfor %}
+</dl>
+{% endif %}
+
+{% schema %}
+{
+  "name": "FAQ column 1",
+  "class": "faq-template-column-1",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Frequently asked question",
+      "type": "content",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Question",
+          "default": "What is your question?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Provide the answer to the question here.</p>"
+        }
+      ]
+    },
+    {
+      "name": "Heading",
+      "type": "heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Section heading"
+        }
+      ]
+    },
+    {
+      "name": "Image",
+      "type": "image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1000 x 1000px recommended"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "settings": {},
+    "blocks": [
+      {
+        "type": "heading",
+        "settings": {
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+        }
+      },
+      {
+        "type": "heading",
+        "settings": {
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+        }
+      },
+      {
+        "type": "content",
+        "settings": {
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

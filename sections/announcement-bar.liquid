@@ -1,0 +1,288 @@
+{% comment %}
+** Announcement bar - static **
+- Static section
+{% endcomment %}
+
+
+{% assign id = section.id %}
+{% assign icon = section.settings.icon_label | downcase %}
+{% assign size = section.settings.size %}
+{% assign text_color = section.settings.text_color %}
+{% assign show_close_icon = section.settings.show_close_icon %}
+
+{% comment %} Advanced {% endcomment %}
+{% assign width = section.settings.width %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign text_alpha = text_color | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .announcement-bar {
+    background-color: {{ section.settings.background }};
+  }
+
+  .announcement-bar__icon {
+    fill: {{ text_color }};
+  }
+
+  .announcement-bar__close {
+    fill: {{ text_color }};
+    background-color: {{ text_color | color_modify: 'alpha', 0.1 }};
+  }
+
+  .announcement-bar__close:hover {
+    background-color: {{ text_color | color_modify: 'alpha', 0.2 }};
+  }
+
+  .message-header {
+    color: {% if text_alpha != 0 %}{{ text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+{% capture announcement %}
+<div class="announcement-bar__container {{ css_class }}">
+  <div class="announcement-bar
+              is-{{ size }}
+              "
+        id="announcement-bar">
+    <div class="section
+                is-width-{{ width }}">
+      <div class="message-header">
+        <div class="announcement-bar__content is-justify-{{ section.settings.alignment }} show-close-icon-{{ show_close_icon }}">
+          {% if section.settings.icon_label != blank %}
+            <span class="announcement-bar__icon
+                        is-{{ size }}
+                       ">
+              {% include settings.icon, name: icon %}
+            </span>
+          {% endif %}
+
+          <div class="announcement-bar__text text-align-{{ section.settings.alignment }}">
+            {{ section.settings.text }}
+            <p class="buttons">
+              {% if section.settings.button_label != blank %}
+                {% include 'button', label: section.settings.button_label, href: section.settings.link, type: "link", style: section.settings.button_style %}
+              {% endif %}
+            </p>
+          </div>
+        </div>
+        {% if show_close_icon %}
+          <button class="close announcement-bar__close js-close-announcement" aria-label="close">
+            {% include settings.icon, name: 'x' %}
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="announcement-bar__shadow" id="announcement-bar__shadow" aria-visible="false"></div>
+</div>
+{% endcapture %}
+
+{% if section.settings.homepage_only %}
+  {% if template == 'index' %}
+    {{ announcement }}
+  {% endif %}
+{% else %}
+  {{ announcement }}
+{% endif %}
+
+{% comment %}Javascript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "homepage_only": {{ section.settings.homepage_only | json }},
+    "enable_sticky": {{ section.settings.enable_sticky | json }},
+    "show_close_icon": {{ section.settings.show_close_icon | json }}
+  }
+</script>
+<script src="{{ 'z__jsAnnouncementBar.js' | asset_url }}"></script>
+
+{% comment %}Schema{% endcomment %}
+{% schema %}
+
+{
+  "name": "Announcement",
+  "class": "announcement-container jsAnnouncementBar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "icon_label",
+      "label": "Icon",
+      "placeholder": "Enter icon name",
+      "info": "[Icon list](https://help.outofthesandbox.com/hc/en-us/articles/360021570294)",
+      "default": "tag"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Draw attention to promos + sales!</p>"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "size",
+      "label": "Base size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "regular",
+          "label": "Regular"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "regular"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ],
+      "default": "button--primary"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "homepage_only",
+      "label": "Home page only",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable sticky on scroll",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close_icon",
+      "label": "Show close icon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

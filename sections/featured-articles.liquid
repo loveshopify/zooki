@@ -1,0 +1,77 @@
+{% assign id = section.id %}
+{% assign custom_css = section.settings.custom_css %}
+
+
+
+{%style%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%endstyle%}
+
+
+<div class="container featured-articles">
+    <div class="articles-img-section">
+        <div class="articles-img">
+            {% render 'rimage', image: section.settings.img, size: '1280x' %}
+        </div>
+    </div>
+
+    <div class="articles-txt">
+        <h6> {{ section.settings.preheader }} </h6>
+        <h2> {{ section.settings.title }} </h2>
+        <p> {{ section.settings.txt }} </p>
+        <button><a href="{{ section.settings.btn-url }}">{{ section.settings.btn-txt }}</a></button>
+    </div>
+</div>
+
+
+
+
+
+{% schema %}
+{
+"name": "Featured Articles",
+"settings": [
+{
+"type": "image_picker",
+"id": "img",
+"label": "Choose an image"
+},
+{
+"type": "text",
+"id": "preheader",
+"label": "Choose Preheader"
+},
+{
+"type": "text",
+"id": "title",
+"label": "Choose the title"
+},
+{
+"type": "textarea",
+"id": "txt",
+"label": "Type text"
+},
+{
+"type": "url",
+"id": "btn-url",
+"label": "Choose button URL"
+},
+{
+"type": "text",
+"id": "btn-txt",
+"label": "Choose button text"
+},
+{
+"type": "textarea",
+"id": "custom_css",
+"label": "Custom CSS"
+}
+],
+"presets": [
+{
+"category": "Little Vitamin",
+"name":"Featured Articles"
+}
+]
+}
+{% endschema %}

@@ -1,0 +1,149 @@
+{% assign id = section.id %}
+{% assign custom_css = section.settings.custom_css %}
+
+
+
+{%style%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%endstyle%}
+
+
+<div class="container promo-container">
+    <div id="left-promo" style="background-color: {{ section.settings.l-promo-bg-color }}">
+        <div class="promo-text">
+            <h2>{{ section.settings.l-promo-title }}</h2>
+            <section>{{ section.settings.l-promo-txt }}</section>
+            <button><a href="{{ section.settings.l-link }}">{{ section.settings.l-link-txt }}</a></button>
+        </div>
+        <div class="promo-img">
+            <img src="{{ section.settings.l-prom-desk-img | img_url: '680x' }}" class="l-d-img">
+            {% comment %}{% render 'rimage', image: section.settings.l-prom-mobile-img, size: '680x', wrapper_class: 'l-m-img' %}{% endcomment %}
+            <img src="{{ section.settings.l-prom-mobile-img | img_url: '680x' }}" class="l-m-img">
+        </div>
+    </div>
+    <div id="right-promo" style="background-color: {{ section.settings.r-promo-bg-color }};">
+        <div class="promo-text">
+            <h2>{{ section.settings.r-promo-title }}</h2>
+            <section>{{ section.settings.r-promo-txt }}</section>
+            <button><a href="{{ section.settings.r-link }}">{{ section.settings.r-link-txt }}</a></button>
+        </div>
+        <div class="promo-img">
+            <img src="{{ section.settings.r-prom-desk-img | img_url: '680x' }}" class="r-d-img">
+            {% comment %}{% render 'rimage', image: section.settings.r-prom-desk-img, wrapper_class: 'r-d-img', size: '1280x' %}{% endcomment %}
+            <img src="{{ section.settings.r-prom-mobile-img | img_url: '680x' }}" class="r-m-img">
+        </div>
+    </div>
+</div>
+
+
+
+{% schema %}
+{
+"name": "Featured Promotions",
+"settings": [
+{
+"type": "color",
+"id": "l-promo-bg-color",
+"label": "Select background color for the left promotion.",
+"default": "#F5AB8F"
+},
+{
+"type": "text",
+"id": "l-promo-title",
+"label": "Heading",
+"default": "Title",
+"placeholder": "Left promotion heading"
+},
+{
+"type": "richtext",
+"id": "l-promo-txt",
+"label": "Text",
+"default": "<p>Left promotion text</p>"
+},
+{
+"type": "url",
+"id": "l-link",
+"label": "Left promotion button URL"
+},
+{
+"type": "text",
+"id": "l-link-txt",
+"label": "Button text"
+},
+{
+"type": "image_picker",
+"id": "l-prom-desk-img",
+"label": "Select left promotion desktop image"
+},
+{
+"type": "image_picker",
+"id": "l-prom-mobile-img",
+"label": "Select left promotion mobile image"
+},
+{
+"type": "color",
+"id": "r-promo-bg-color",
+"label": "Select background color for the right promotion.",
+"default": "#9FC89A"
+},
+{
+"type": "text",
+"id": "r-promo-title",
+"label": "Heading",
+"default": "Title",
+"placeholder": "Right promotion heading"
+},
+{
+"type": "richtext",
+"id": "r-promo-txt",
+"label": "Text",
+"default": "<p>Right promotion text</p>"
+},
+{
+"type": "url",
+"id": "r-link",
+"label": "Right promotion button URL"
+},
+{
+"type": "text",
+"id": "r-link-txt",
+"label": "Button text"
+},
+{
+"type": "image_picker",
+"id": "r-prom-desk-img",
+"label": "Select right promotion desktop image"
+},
+{
+"type": "image_picker",
+"id": "r-prom-mobile-img",
+"label": "Select right promotion mobile image"
+},
+{
+"type": "textarea",
+"id": "custom_css",
+"label": "Custom CSS"
+}
+
+],
+
+
+
+"presets": [
+{
+"category": "Little Vitamin",
+"name":"Featured Promotions"
+}
+]
+}
+{% endschema %}
+
+
+
+
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,436 @@
+{% comment %}
+** Featured promotions - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign show_gutter = section.settings.show_gutter %}
+{% assign img_border_radius = section.settings.border_radius %}
+{% comment %} Layout {% endcomment %}
+{% assign width = section.settings.width %}
+{% assign animation = section.settings.animation %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign overlay_alpha = section.settings.overlay_background | color_extract: 'alpha' %}
+{% assign overlay_text_alpha = section.settings.overlay_text | color_extract: 'alpha' %}
+
+{% comment %} Opacity level {% endcomment %}
+{% if overlay_alpha != 0 %}
+  {% assign overlay_background_alpha = section.settings.overlay_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% capture section_css -%}
+  .featured-promotions__content {
+    border-radius: {{ img_border_radius }}px;
+  }
+
+  .featured-promotions__overlay {
+    border-radius: {{ img_border_radius }}px;
+    color: {% if overlay_text_alpha != 0 %}{{ section.settings.overlay_text }}{% else %}{{ settings.regular_color }}{% endif %};
+    border-color: {% if overlay_text_alpha != 0 %}{{ section.settings.overlay_text }}{% else %}{{ settings.regular_color }}{% endif %};
+  }
+
+  .featured-promotions__overlay .featured-promotions__link {
+    color: {{ section.settings.overlay_text }};
+  }
+
+  .has-color-override,
+  .has-color-override strong {
+    color: {% if overlay_text_alpha != 0 %}{{ section.settings.overlay_text }}{% else %}{{ settings.regular_color }}{% endif %};
+    border-color: {% if overlay_text_alpha != 0 %}{{ section.settings.overlay_text }}{% else %}{{ settings.regular_color }}{% endif %};
+  }
+
+  .featured-promotions__content:before {
+    background-color: {% if overlay_alpha != 0 %}{{ section.settings.overlay_background | color_modify: 'alpha', overlay_background_alpha }};{% endif %}
+  }
+
+{%- endcapture -%}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section
+        {{ css_class }}
+        is-width-{{ width }}
+        {% if show_gutter == false %}
+          has-no-side-gutter
+          has-background
+        {% else %}
+          has-gutter-enabled
+        {% endif %}
+        {% if width == 'wide' %}
+          equal-columns--outside-trim
+        {% endif %}
+        "
+        {% if animation != "none" %}data-scroll-class="{{ animation }}"{% endif %}>
+  {% if section.blocks.size > 0 %}
+    {% if section.blocks.size > 3 %}
+      <div class="container">
+        <div class="featured-promotions__nav-wrapper one-whole column is-flex">
+          <div class="featured-promotions__nav featured-promotions__nav--prev">
+            {% include settings.icon, name: 'left-arrow' %}
+          </div>
+          <div class="featured-promotions__nav featured-promotions__nav--next ">
+            {% include settings.icon, name: 'right-arrow' %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    <div class="featured-promotions__wrapper {% if section.blocks.size <= 3 %} container {% endif %}" {% if section.blocks.size > 3 %} data-featured-promotions-slider {% endif %}>
+      {% for block in section.blocks %}
+
+        <div id="shopify-section-{{ block.id }}"
+            class="featured-promotions__block
+              featured-promotions__block--{{ forloop.length }}
+              {% if block.settings.link %}
+                featured-promotions__block--has-link
+              {% endif %}
+              {% if section.settings.crop_images %}
+                has-image-crop
+              {% endif %}
+              medium-down--one-whole
+              {% if section.blocks.size == 1 %}
+                one-whole
+              {% elsif section.blocks.size == 2 %}
+                one-half
+              {% else %}
+                one-third
+              {% endif %}
+              column
+              has-color-override" data-promo-index={{ forloop.index0 }} {{ block.shopify_attributes }}>
+          {% comment %} Is the color set to transparent? {% endcomment %}
+          {% assign block_overlay_alpha = block.settings.overlay_background | color_extract: 'alpha' %}
+          {% assign block_overlay_text_alpha = block.settings.overlay_text | color_extract: 'alpha' %}
+
+          {% comment %} Opacity level {% endcomment %}
+          {% if block_overlay_alpha != 0 %}
+            {% assign block_overlay_background_alpha = block.settings.overlay_background_opacity | divided_by: 100.00 %}
+          {% endif %}
+
+          {% comment %} Block specific CSS {% endcomment %}
+          {% capture block_css -%}
+            .has-color-override,
+            .has-color-override strong {
+              color: {%- if block_overlay_text_alpha != 0 -%}{{ block.settings.overlay_text }}{% endif %};
+              border-color: {%- if block_overlay_text_alpha != 0 -%}{{ block.settings.overlay_text }}{% endif %};
+            }
+
+            .featured-promotions__content:before {
+              background-color: {%- if block_overlay_alpha != 0 -%}{{ block.settings.overlay_background | color_modify: 'alpha', block_overlay_background_alpha }}{% endif %};
+            }
+
+            .featured-promotions__overlay {
+              color: {%- if block_overlay_text_alpha != 0 -%}{{ block.settings.overlay_text }}{% endif %};
+              border-color: {%- if block_overlay_text_alpha != 0 -%}{{ block.settings.overlay_text }}{% endif %};
+            }
+
+            .featured-promotions__overlay .featured-promotions__link {
+              color: {%- if block_overlay_text_alpha != 0 -%}{{ block.settings.overlay_text }}{% endif %};
+            }
+          {%- endcapture -%}
+          {% style %}
+            {% include 'css-loop', css: block_css, id: block.id %}
+          {% endstyle %}
+          <div class="featured-promotions__content">
+            {% if block.settings.image != blank %}
+              {% include 'image-element', image: block.settings.image, alt: block.settings.image.alt %}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+            {% if block.settings.link %}
+              <a href="{{ block.settings.link }}" class="featured-promotions__link">
+            {% endif %}
+              <div class="featured-promotions__overlay {% if section.settings.show_border %}has-border{% endif %}">
+                {% if block.settings.icon_label != blank %}
+                  {% include settings.icon, name: block.settings.icon_label | downcase %}
+                {% endif %}
+                {% if block.settings.title != blank %}
+                  <h3 class="featured-promotions__title has-color-override">{{ block.settings.title }}</h3>
+                {% endif %}
+                {% if block.settings.text != blank %}
+                  <div class="subtitle featured-promotions__subtitle has-color-override">
+                    {{ block.settings.text }}
+                  </div>
+                {% endif %}
+              </div>
+            {% if block.settings.link %}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+
+{% comment %}JavaScript{% endcomment %}
+<script data-theme-editor-load-script src="{{ 'z__jsFeaturedPromos.js' | asset_url }}"></script>
+
+
+{% schema %}
+{
+  "name": "Featured promotions",
+  "class": "featured-promotions jsFeaturedPromos",
+  "max_blocks": 21,
+  "settings": [
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 25,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "crop_images",
+      "label": "Crop images",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_background",
+      "label": "Background",
+      "default": "#939393"
+    },
+    {
+      "type": "range",
+      "id": "overlay_background_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "color",
+      "id": "overlay_text",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show border",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gutter",
+      "label": "Show gutter",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Promotion",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "800 x 600px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Overlay"
+        },
+        {
+          "type": "color",
+          "id": "overlay_background",
+          "label": "Background",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "range",
+          "id": "overlay_background_opacity",
+          "label": "Background opacity",
+          "min": 0,
+          "max": 100,
+          "step": 10,
+          "default": 70,
+          "unit": "%"
+        },
+        {
+          "type": "color",
+          "id": "overlay_text",
+          "label": "Text",
+          "default": "#FFFFFF",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "text",
+          "id": "icon_label",
+          "label": "Icon",
+          "placeholder": "Enter icon name",
+          "info": "[Icon list](https://help.outofthesandbox.com/hc/en-us/articles/360021570294)",
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Special deal"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Promotion description details.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured promotions",
+      "category": "Image",
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "icon_label": "truck"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "icon_label": "bag"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "icon_label": "tag"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

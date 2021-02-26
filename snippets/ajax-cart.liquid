@@ -1,0 +1,37 @@
+<div id="theme-ajax-cart" class="theme-ajax-cart shopify-section {% if context == 'mobile-header' %}jsAjaxCart{% endif %} is-{{ settings.cart_action | replace: '_', '-' }} theme-ajax-cart--header-{{ settings.header_layout }}" data-ajax-cart-{{ settings.cart_action }}>
+  <section class="ajax-cart ajax-cart--{{ settings.cart_action | replace: '_', '-' }}">
+    {% comment %} Inner ajax cart content can be found in templates/cart.ajax.liquid {% endcomment %}
+
+    {% if settings.cart_action == 'mini_cart' %}
+      <div class="card has-shadow">
+        <div class="ajax-cart__close-icon" data-ajax-cart-close>
+          {% include settings.icon, name: 'x' %}
+        </div>
+        <div id="ajax-cart__content" data-ajax-cart-content></div>
+        <div class="tab-content-overlay"></div>
+      </div>
+    {% elsif settings.cart_action == 'drawer' %}
+      <div class="ajax-cart__close-icon" data-ajax-cart-close>
+        {% include settings.icon, name: 'x' %}
+      </div>
+      <div id="ajax-cart__content" data-ajax-cart-content></div>
+    {% endif %}
+  </section>
+
+  {% comment %}JavaScript{% endcomment %}
+  <script
+    type="application/json"
+    data-section-id="theme-ajax-cart"
+    data-section-data
+  >
+    {
+      "cart_action": {{ settings.cart_action | json }},
+      "display_tos_checkbox": {{ settings.display_tos_checkbox | json }}
+    }
+  </script>
+  <script src="{{ 'z__jsAjaxCart.js' | asset_url }}"></script>
+</div>
+
+{% if settings.cart_action == 'drawer' %}
+  <div class="ajax-cart__overlay" data-ajax-cart-close></div>
+{% endif %}

@@ -1,0 +1,270 @@
+{% comment %}
+** Top bar - static **
+- Static section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %} Top bar {% endcomment %}
+{% assign top_bar_background = section.settings.top_bar_background %}
+{% assign top_bar_text = section.settings.top_bar_text %}
+{% assign top_bar_link = section.settings.top_bar_link %}
+{% assign top_bar_link_hover = section.settings.top_bar_link_hover %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign top_bar_background_alpha = top_bar_background | color_extract: 'alpha' | floor  %}
+{% assign top_bar_text_alpha = top_bar_text | color_extract: 'alpha' | floor  %}
+{% assign top_bar_link_alpha = top_bar_link | color_extract: 'alpha' | floor %}
+{% assign top_bar_link_hover_alpha = top_bar_link_hover | color_extract: 'alpha' | floor  %}
+{% assign cart_button_background_alpha = section.settings.cart_button_background | color_extract: 'alpha' | floor %}
+{% assign cart_button_text_alpha = section.settings.cart_button_text | color_extract: 'alpha' | floor %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .top-bar,
+  .top-bar #currency-convertor {
+    font-family: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    font-weight: {{ section.settings.font.weight }};
+    font-style: {{ section.settings.font.style }};
+    letter-spacing: {{ section.settings.letter_spacing }}px;
+    font-size: {{ section.settings.font_size }}px;
+    text-transform: {{ section.settings.font_style }};
+    background-color: {%- if top_bar_background_alpha != 0 -%}{{ top_bar_background }}{%- endif -%};
+  }
+
+  .top-bar__cart {
+    background-color: {%- if top_bar_link_alpha != 0 -%}{{ top_bar_link_hover }} {%- else -%} {{ settings.link_hover_color }} {%- endif -%};
+  }
+
+  .social-icons a {
+    color: {%- if top_bar_link_alpha != 0 -%}{{ top_bar_link }}{%- else -%}{{ settings.link_color }}{%- endif -%};
+  }
+
+  .social-icons a:hover {
+    color: {%- if top_bar_link_hover_alpha != 0 -%}{{ top_bar_link_hover }}{%- else -%}{{ settings.link_hover_color }}{%- endif -%};
+  }
+
+  .header__link {
+    color: {%- if top_bar_link_alpha != 0 -%}{{ top_bar_link }}{%- else -%}{{ settings.link_color }}{%- endif -%};
+  }
+
+  .header__link:hover {
+    color: {%- if top_bar_link_hover_alpha != 0 -%}{{ top_bar_link_hover }}{%- else -%}{{ settings.link_hover_color }}{%- endif -%};
+  }
+
+  .top-bar p {
+    color: {%- if top_bar_text_alpha != 0 -%}{{ top_bar_text }}{%- endif -%};
+  }
+
+  .header-cart {
+    background-color: {%- if cart_button_background_alpha != 0 -%}{{ section.settings.cart_button_background }}{%- endif -%};
+  }
+
+  .header-cart > a {
+    color: {%- if cart_button_text_alpha != 0 -%}{{ section.settings.cart_button_text }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+{% style %}
+  {{ section.settings.font | font_face }}
+
+  #shopify-section-{{ id }} {
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %}HTML markup{% endcomment %}
+<div class="{{ css_class }} top-bar navbar is-justify-space-between">
+  <section class="top-bar__content is-flex is-align-center is-justify-space-between">
+    <div class="top-bar__info is-flex is-align-center is-justify-space-between">
+
+      {% if section.settings.show_social_icons %}
+        <div class="top-bar__social">
+          {% include 'social-icons' %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.text != blank %}
+        <div class="top-bar__richtext">
+          {{ section.settings.text }}
+        </div>
+      {% endif %}
+
+    </div>
+
+    {% include 'header__action-icons', header_icon_class: 'top-bar__icons' %}
+
+  </section>
+</div>
+
+{% schema %}
+
+{
+  "name": "Top bar",
+  "class": "top-bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_social_icons",
+      "label": "Show social icons",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Add a phone number or other information.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Top bar typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "open_sans_n4"
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Capitalization",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Base size",
+      "min": 10,
+      "max": 20,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 6,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Top bar colors"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_background",
+      "label": "Background",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_link",
+      "label": "Link",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_link_hover",
+      "label": "Link hover",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_text",
+      "label": "Text",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "icons",
+          "label": "Icons only"
+        },
+        {
+          "value": "text",
+          "label": "Text only"
+        },
+        {
+          "value": "icons_text",
+          "label": "Icons and text"
+        }
+      ],
+      "default": "icons"
+    },
+    {
+      "type": "color",
+      "id": "cart_button_background",
+      "label": "Cart button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cart_button_text",
+      "label": "Cart button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

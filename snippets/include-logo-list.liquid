@@ -1,0 +1,133 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-logo-list' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+  {% assign loop = "1,2,3,4,5,6,7,8" | split: ',' %}
+{% else %}
+  {% assign object = section %}
+  {% assign loop = section.blocks %}
+{% endif %}
+
+{% assign id = object.id %}
+{% assign items_per_row = object.settings.logos_per_row %}
+{% assign size = object.settings.logo_size %}
+{% comment %}Background{% endcomment %}
+{% assign background = object.settings.background %}
+{% assign gradient = object.settings.gradient %}
+{% assign gradient_rotation = object.settings.gradient_rotation %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = background | color_extract: 'alpha' %}
+{% assign gradient_alpha = gradient | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+
+  .section {
+    background-image: linear-gradient({{ gradient_rotation }}deg, rgba(255,255,255,0), {{ gradient }});
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% elsif width == 'half' %}
+      width: 50%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if background_alpha != 0 or gradient_alpha != 0  %}
+                  has-background
+                {% endif %}
+                "
+                {% if animation != "none" %}
+                  data-scroll-class="{{ animation }}"
+                {% endif %}>
+  <div class="container
+              has-column-padding-bottom
+              is-justify-center
+              is-align-center
+              small-down--has-limit
+              is-{{ size }}
+              logo-list__wrapper
+              ">
+    {% if section.blocks.size > 0 or loop.length > 0 %}
+      {% for item in loop %}
+
+        {% if type == 'block' %}
+          {% capture index %}{{ forloop.index }}{% endcapture %}
+        {% else %}
+          {% assign block = item %}
+        {% endif %}
+
+        {% comment %}Add number to id for each loop{% endcomment %}
+        {% capture image %}image{{ index }}{% endcapture %}
+        {% capture link %}link{{ index }}{% endcapture %}
+        {% capture show_logo %}show_logo{{ index }}{% endcapture %}
+
+        {% if block.settings[show_logo] or object != block %}
+          <div class="logo-list__item
+            small-down--one-half
+            column
+            {% if items_per_row == 1 %}
+              one-whole
+            {% elsif items_per_row == 2 %}
+              one-half
+            {% elsif items_per_row == 3 %}
+              one-third
+            {% elsif items_per_row == 4 %}
+              one-fourth
+            {% elsif items_per_row == 5 %}
+              one-fifth
+            {% elsif items_per_row == 6 %}
+              one-sixth
+            {% elsif items_per_row == 7 %}
+              one-seventh
+            {% elsif items_per_row == 8 %}
+              one-eighth
+            {% endif %}" {% if type != 'block' %}{{ block.shopify_attributes }}{% endif %}>
+            {% if block.settings[link] != blank %}
+              <a href="{{ block.settings[link] }}" class="logo-list__link">
+            {% endif %}
+            {% if block.settings[image] %}
+              {% assign alt_text = block.settings[image].alt %}
+              {% include 'image-element', image: block.settings[image], alt: alt_text %}
+            {% else %}
+              {{ 'logo' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+            {% if block.settings[link] != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>

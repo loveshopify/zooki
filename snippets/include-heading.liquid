@@ -1,0 +1,138 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-heading' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+
+{% comment %}Preheading{% endcomment %}
+{% assign preheading = object.settings.preheading %}
+{% assign preheading_color = object.settings.preheading_color %}
+{% comment %}Heading{% endcomment %}
+{% assign title = object.settings.title %}
+{% assign heading_color = object.settings.heading_color %}
+{% comment %}Subheading{% endcomment %}
+{% assign subheading = object.settings.subheading %}
+{% assign subheading_color = object.settings.subheading_color %}
+{% comment %}Background{% endcomment %}
+{% assign background = object.settings.background %}
+{% assign gradient = object.settings.gradient %}
+{% assign gradient_rotation = object.settings.gradient_rotation %}
+{% comment %}Layout{% endcomment %}
+{% assign heading_alignment = object.settings.heading_alignment %}
+{% assign vertical_spacing = object.settings.vertical_spacing %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign heading_alpha = heading_color | color_extract: 'alpha' %}
+{% assign preheading_alpha = preheading_color | color_extract: 'alpha' %}
+{% assign subheading_alpha = subheading_color | color_extract: 'alpha' %}
+
+{% assign background_alpha = background | color_extract: 'alpha' %}
+{% assign gradient_alpha = gradient | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+
+  .section {
+    background-image: linear-gradient({{ gradient_rotation }}deg, rgba(255,255,255,0), {{ gradient }});
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+  }
+
+  .heading-section__heading {
+    color: {%- if heading_alpha != 0 -%}{{ heading_color }}{%- else -%}{{ settings.heading_color }}{%- endif -%};
+  }
+
+  .heading-section__preheading {
+    color: {%- if preheading_alpha != 0 -%}{{ preheading_color }}{%- else -%}{{ settings.heading_color }}{%- endif -%};
+  }
+
+  .heading-section__subheading {
+    color: {%- if subheading_alpha != 0 -%}{{ subheading_color }}{%- else -%}{{ settings.heading_color }}{%- endif -%};
+  }
+
+{%- endcapture -%}
+
+{% style %}
+
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- elsif width == 'half' -%}
+      width: 50%;
+    {%- endif %}
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+{% if title != blank or subheading != blank or preheading != blank %}
+  <section class="section
+                  {{ css_class }}
+                  is-width-{{ width }}
+                  {% if background_alpha != 0 or gradient_alpha != 0  %}
+                    has-background
+                  {% endif %}
+                  "
+            data-section-id="{{ section.id }}"
+            {% if animation != "none" %}
+              data-scroll-class="{{ animation }}"
+            {% endif %}>
+    <div class="container
+                ">
+      <div class="one-whole column">
+        <div class="heading-section__content
+                    is-flex
+                    is-flex-column
+                    is-align-{{ heading_alignment }}
+                    text-align-{{ heading_alignment }}
+                    vertical-spacing-{{ vertical_spacing }}">
+          {% if preheading != blank %}
+            <div class="heading-section__preheading subtitle">
+              {{ preheading }}
+            </div>
+          {% endif %}
+
+          {% if title != blank %}
+            <h2 class="heading-section__heading title">{{ title }}</h2>
+          {% endif %}
+
+          {% if subheading != blank %}
+            <div class="heading-section__subheading subtitle">
+              {{ subheading }}
+            </div>
+          {% endif %}
+
+          {% if settings.display_heading_divider == true %}
+            <div class="heading-divider
+                      heading-divider--{{ settings.heading_divider_style }}"
+                  {% if settings.heading_divider_animation != "none" %}
+                    data-scroll-class="{{ settings.heading_divider_animation }}"
+                  {% endif %}>
+            </div>
+          {% endif %}
+      </div>
+    </div>
+  </section>
+{% endif %}

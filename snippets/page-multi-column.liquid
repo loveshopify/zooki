@@ -1,0 +1,36 @@
+{% assign cols = content | split: '<!-- split -->' %}
+{% if cols.size == 2 %}
+  <div class="one-half column">
+    {{ cols[0] }}
+  </div>
+  <div class="one-half column">
+    {{ cols[1] }}
+  </div>
+{% elsif cols.size == 3 %}
+  <div class="one-third column">
+    {{ cols[0] }}
+  </div>
+  <div class="one-third column">
+    {{ cols[1] }}
+  </div>
+  <div class="one-third column">
+    {{ cols[2] }}
+  </div>
+{% elsif cols.size == 4 %}
+  <div class="one-fourth column">
+    {{ cols[0] }}
+  </div>
+  <div class="one-fourth column">
+    {{ cols[1] }}
+  </div>
+  <div class="one-fourth column">
+    {{ cols[2] }}
+  </div>
+  <div class="one-fourth column">
+    {{ cols[3] }}
+  </div>
+{% else %}
+  <div class="one-whole column">
+    {{ content }}
+  </div>
+{% endif %}

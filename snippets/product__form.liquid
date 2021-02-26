@@ -1,0 +1,285 @@
+{% if type == 'product' and section.settings.show_payment_button %}
+{% assign show_payment_button = true %}
+{% elsif type == 'product' and block.settings.show_payment_button %}
+{% assign show_payment_button = true %}
+{% elsif type == 'quickshop' and settings.show_dynamic_checkout_button %}
+{% assign show_payment_button = true %}
+{% else %}
+{% assign show_payment_button = false %}
+{% endif %}
+
+{% assign variant = product.selected_or_first_available_variant %}
+
+<div
+{% unless product.available %}style="display: none !important;"{% endunless %}
+  class="clearfix product_form init smart-payment-button--{{ show_payment_button }} {% if product.variants.size > 1 or product.options.size > 1 %}product_form_options{% endif %} product_form--{{ settings.product_form_style }}"
+  id="product-form-{{ product.id }}" data-product-form data-money-format="{{ shop.money_format }}"
+  data-shop-currency="{{ shop.currency }}"
+  data-select-id="product-select-{{ product.id }}{{ product-form }}{{ object.id }}{{ block.id }}"
+  data-enable-state="{% if template contains 'product' %}true{% else %}false{% endif %}"
+  data-product="{{ product | json | escape }}" {% if settings.limit_quantity or settings.display_inventory_left %}
+  data-variant-inventory='[{%- for v in product.variants -%}{"id":{{v.id}},"inventory_quantity":{{v.inventory_quantity}},"inventory_management":"{{v.inventory_management}}","inventory_policy":"{{v.inventory_policy}}"}{% if forloop.last == false %},{% endif %}{%- endfor -%}]'
+  {% endif %} data-product-id="{{ product.id }}">
+  {% form 'product', product %}
+  <div> 
+  {% if product.variants.size > 1 %}
+  {% if product.options.size > 1 %}
+  <div class="select-container">
+    {% if type == 'quickshop' %}
+    <div class="select">
+      {% endif %}
+      <select id="product-select-{{ product.id }}{{ product-form }}{{ object.id }}{{ block.id }}" name="id"
+        class="multi_select" data-variant-selector>
+        {% for v in product.variants %}
+        <option {% if v == variant %}selected="selected" {% endif %} value="{{ v.id }}"
+          data-image-id="{{ v.featured_image.id }}" data-sku="{{ v.sku }}">{{ v.title }}</option><span
+          class="bold_ro_desc" data-product-id="{{ v.id }}-{{ forloop.index0 }}"></span>
+
+        {% endfor %}
+      </select>
+      {% if type == 'quickshop' %}
+    </div>
+    {% endif %}
+  </div>
+  {% elsif product.options.size == 1 and product.variants.size > 1 or product.options.size == 1 and product.options[0] != "Title" %}
+  <div class="select-container">
+    <label class="label">{{ product.options[0] }}</label>
+    <div>
+      {% if type == 'quickshop' %}
+      <div class="select">
+        {% endif %}
+        <select id="product-select-{{ product.id }}{{ product-form }}{{ object.id }}{{ block.id }}" name="id"
+          data-variant-selector>
+          {% for v in product.variants %}
+          <option {% if v == variant %}selected="selected" {% endif %} value="{{ v.id }}"
+            data-image-id="{{ v.featured_image.id }}" data-sku="{{ v.sku }}">{{ v.title }}</option>
+          {% endfor %}
+        </select>
+        {% if type == 'quickshop' %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  {% else %}
+  <input type="hidden" name="id" value="{{ variant.id }}" />
+  {% endif %}
+
+  {% if product.variants.size > 1 %}
+  {% if settings.product_form_style == "swatches" and product.variants.size > 1 or settings.product_form_style == "swatches" and product.options[0] != "Title" %}
+  <div class="swatch_options collection_swatches">
+    {% for option in product.options %}
+    {% include 'product__swatch', option: option %}
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endif %}
+ 
+  {% if product.available %}
+  {% if settings.display_inventory_left %}
+  <p class="items_left">
+    {% if variant.inventory_management != blank and variant.inventory_quantity > 0 %}
+    {% capture items_left_text %}
+    {% if variant.inventory_quantity == 1 %}
+    {{ 'products.product.items_left_count.one' | t }}
+    {% else %}
+    {{ 'products.product.items_left_count.other' | t }}
+    {% endif %}
+    {% endcapture %}
+    {% if variant.inventory_quantity <= settings.inventory_threshold %}
+    {{ variant.inventory_quantity }} {{ items_left_text }}
+    {% endif %}
+    {% endif %}
+  </p>
+  {% endif %}
+ 
+  <div class="purchase-details {% if settings.display_product_quantity %}has-quantity-box{% endif %}">
+    {% if settings.display_product_quantity %}
+    <div class="purchase-details__quantity product-quantity-box quantity-box--{{ settings.qty_box_style }}">
+      {% include 'quantity-box' %}
+    </div>
+    {% endif %}
+    {% comment %} Error message for add to cart action {% endcomment %}
+    <div class="cart-warning"></div>
+    <div class="purchase-details__buttons purchase-details__spb--{{ show_payment_button }}">
+      {% if settings.cart_action == 'reload_page' %}
+      <input type="hidden" name="return_to" value="back" />
+      {% elsif settings.cart_action == 'redirect_checkout' %}
+      <input type="hidden" name="return_to" value="/checkout" />
+      {% endif %}
+
+      {% capture add_to_cart_label %}{% if collection_handles contains 'pre-order' %}{{ 'collections.general.pre_order' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endif %}{% endcapture %}
+   
+
+      </div>
+
+
+
+      
+{%- comment -%} Price and Add to cart button in one place {%- endcomment -%}
+{%- comment -%} product price code is from product_main.liquid file {%- endcomment -%}
+
+      <div class="price-n-cartBtn">
+
+        {% comment %} Name {% endcomment %}
+      
+      
+        {% for tag in product.tags %}
+          {% if tag contains 'meta-size-chart-' %}
+            {% assign meta-size-chart = true %}
+          {% endif %}
+        {% endfor %}
+
+        {% comment %} Size chart Mobile {% endcomment %}
+        {% if settings.size_chart != blank or meta-size-chart %}
+          <a href="javascript:;" class="product__size-chart size-chart--medium-down" data-fancybox data-src="#size-chart{{product.id}}" data-type="inline">{{ 'products.product.size_chart' | t }} {% include settings.icon, name: 'right-caret' %}</a>
+          {% include 'popup-size-chart', product_id: product.id %}
+        {% endif %}
+
+        {% comment %} Price {% endcomment %}
+        <!-- <p class="modal_price subtitle">
+          {% if collection_handles contains 'coming-soon' %}
+            {% if settings.stickers_enabled == false %}
+              {{ 'collections.general.coming_soon' | t }}
+            {% endif %}
+          {% else %}
+
+            {% comment %} Sold out {% endcomment %}
+            <span class="sold_out">{% if variant.available == false %}{{ 'products.product.sold_out' | t }}{% endif %}</span>
+
+
+            {% comment %} Current price {% endcomment %}
+            <div class="price-container">
+              <span class="{% if variant.compare_at_price > variant.price %}sale{% endif %}">
+                <span class="current_price {% if product.available == false %}hidden{% endif %}">
+                  {% if variant.price > 0 %}
+                    <span class="money">{{ variant.price | money }}</span>
+                  {% else %}
+                    {{ settings.free_price_text }}
+                  {% endif %}
+                </span>
+                  <p class="cancel-Anytime">Auto re-order, cancel anytime</p>
+              </span>
+          </div>
+
+            {% comment %} Compare at (original) price {% endcomment %}
+            <span class="was-price">
+              {% if variant.price < variant.compare_at_price and variant.available %}
+                <span class="money">{{ variant.compare_at_price | money }}</span>
+              {% endif %}
+            </span>
+
+            {% comment %} Size chart {% endcomment %}
+            {% if settings.size_chart != blank or meta-size-chart %}
+              <a href="javascript:;" class="product__size-chart medium-down--hidden" data-fancybox data-src="#size-chart{{product.id}}" data-type="inline">{{ 'products.product.size_chart' | t }} {% include settings.icon, name: 'right-caret' %}</a>
+              {% include 'popup-size-chart', product_id: product.id %}
+            {% endif %}
+
+            {% comment %} Savings {% endcomment %}
+            {% if section.settings.display_savings %}
+              <span class="sale savings">
+                {% if variant.price < variant.compare_at_price and variant.available %}
+                  {{ 'products.product.savings' | t }}  {{ variant.compare_at_price | minus: variant.price | times: 100 | divided_by: variant.compare_at_price }}% (<span class="money">{{ variant.compare_at_price | minus: variant.price | money }}</span>)
+                {% endif %}
+              </span>
+            {% endif %}
+          {% endif %}
+        </p> -->
+
+
+        
+<div class="ro_widget"></div>
+      <!-- <button
+      type="{% if settings.cart_action == 'mini_cart' or settings.cart_action == 'drawer' %}button{% else %}submit{% endif %}"
+      name="add"
+      class="button {% if settings.cart_action == 'mini_cart' or settings.cart_action == 'drawer' %} ajax-submit {% endif %}action_button button--add-to-cart {% if show_payment_button %} action_button--secondary {% endif %}"
+      data-label={{ add_to_cart_label | json }} data-add-to-cart-trigger>
+      {% if  settings.button_cart_icon != blank and settings.button_cart_icon_position == 'left' %}
+      {% include settings.icon, name: settings.button_cart_icon, icon_class: 'icon--cart' %}
+      {% endif %}
+      <span class="text">{{ add_to_cart_label }}</span>
+      {% if  settings.button_cart_icon != blank and settings.button_cart_icon_position == 'right' %}
+      {% include settings.icon, name: settings.button_cart_icon, icon_class: 'icon--cart icon--right' %}
+      {% endif %}
+      <svg x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" class="checkmark">
+        <path fill="none" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10"
+          d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11" />
+      </svg>
+    </button> -->
+
+
+
+
+
+
+      </div>
+ {%- comment -%} END Price and Add to cart button in one place {%- endcomment -%}
+
+
+
+
+      <!-- sticky button on the product page -->
+      <div class="text-fixed-buy-button">
+        <button
+          type="{% if settings.cart_action == 'mini_cart' or settings.cart_action == 'drawer' %}button{% else %}submit{% endif %}"
+          name="add"
+          class="sticky-btn button {% if settings.cart_action == 'mini_cart' or settings.cart_action == 'drawer' %} ajax-submit {% endif %}action_button button--add-to-cart {% if show_payment_button %} action_button--secondary {% endif %}"
+          data-label={{ add_to_cart_label | json }} data-add-to-cart-trigger>
+          {% if  settings.button_cart_icon != blank and settings.button_cart_icon_position == 'left' %}
+          {% include settings.icon, name: settings.button_cart_icon, icon_class: 'icon--cart' %}
+          {% endif %}
+          <span class="text">{{ add_to_cart_label }}</span>
+          {% if  settings.button_cart_icon != blank and settings.button_cart_icon_position == 'right' %}
+          {% include settings.icon, name: settings.button_cart_icon, icon_class: 'icon--cart icon--right' %}
+          {% endif %}
+          <svg x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" class="checkmark">
+            <path fill="none" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10"
+              d="M9,17l3.9,3.9c0.1,0.1,0.2,0.1,0.3,0L23,11" />
+          </svg>
+        </button>
+      </div>
+      {% if show_payment_button %}
+      {{ form | payment_button }}
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  {% endform %}
+
+
+  <!-- <div class="sticky-btn-modal">
+    <div class="sticky-btn-modal-content">
+      <span class="sticky-close-button">×</span>
+    </div>
+  </div> -->
+</div>
+
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+{% assign wsTrialPack = false %}
+{% for tag in product.tags %}
+  {% if tag contains 'WS_trial:' %}
+    {% assign trialHandle = tag | replace: 'WS_trial:', '' %}
+    {% assign trialProduct = all_products[trialHandle] %}
+    {% for variant in trialProduct.variants %}
+      {% assign wsVariantTitle = variant.title | handle %}
+      {% if wsVariantTitle == "trial-pack" %}
+        <script>
+          const trialID = '{{ variant.id }}';
+          window.BOLD.common.Shopify.saveProduct({{ trialProduct.handle | json }}, {{ trialProduct.id | json }});
+          window.BOLD.common.Shopify.saveVariant({{ variant.id | json }}, {product_id: {{ trialProduct.id | json }}, price: {{ variant.price | json }}, group_id: '{{ variant.metafields.bold_rp.rp_group_id }}'});
+        </script>
+        {% render 'ws-ro_widget' with variantId: variant.id %}
+        {% assign wsTrialPack = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{% if wsTrialPack %}
+  {% render 'ws-sub_trial' %}
+{% else %}
+  {% render 'ws-sub_notrial_tabs' %}
+{% endif %}
+{% render 'ws-sub_pricing' %}
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}

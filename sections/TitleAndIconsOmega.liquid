@@ -1,0 +1,135 @@
+<div class="tai-container">
+    <div class="tai-txt-area">
+        <h2>{{ section.settings.tai_heading }}</h2>
+        <p>{{ section.settings.tai_txt }}</p>
+    </div>
+    <div class="tai-icons-area">
+        <div class="tai-f-3-icons">
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/micelle_icon_Absorbtion.svg?v=1600128649" alt="">
+                <p>{{ section.settings.tai_1_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/Heart_icon_Heart.svg?v=1600128822" alt="">
+                <p>{{ section.settings.tai_2_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/Brain_icon_Brain.svg?v=1600128847" alt="">
+                <p>{{ section.settings.tai_3_txt }}</p>
+            </div>
+        </div>
+        <div class="tai-s-3-icons">
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/Vision_icon_Eye.svg?v=1600128864" alt="">
+                <p>{{ section.settings.tai_4_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/whole_family_Kids.svg?v=1600128883" alt="">
+                <p>{{ section.settings.tai_5_txt }}</p>
+            </div>
+            <div class="single-icon">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/Immune_icon_Immune_System.svg?v=1600128907" alt="">
+                <p>{{ section.settings.tai_6_txt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% schema %}
+{
+"name": "Title and Icons",
+"settings": [
+{
+"type": "text",
+"id": "tai_heading",
+"label": "Heading",
+"default": "Title"
+},
+{
+"type": "textarea",
+"id": "tai_txt",
+"label": "Text"
+},
+{
+"type": "image_picker",
+"id": "tai_1_img",
+"label": "First icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_1_txt",
+"label": "First icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_2_img",
+"label": "Second icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_2_txt",
+"label": "Second icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_3_img",
+"label": "Third icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_3_txt",
+"label": "Third icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_4_img",
+"label": "Fourth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_4_txt",
+"label": "Fourth icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_5_img",
+"label": "Fifth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_5_txt",
+"label": "Fifth icon text"
+},
+{
+"type": "image_picker",
+"id": "tai_6_img",
+"label": "Sixth icon",
+"info": "60px height recommended"
+},
+{
+"type": "textarea",
+"id": "tai_6_txt",
+"label": "Sixth icon text"
+}
+
+]
+}
+{% endschema %}

@@ -1,0 +1,229 @@
+{% comment %}
+** Login template - main content area **
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+
+  a.hoverButton {
+	text-decoration: underline;
+	color: #f28d1b;
+}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section section__wrapper is-width-{{ width }} {{ css_class }}">
+  <header class="container">
+    {%- capture title -%}{{ 'customer.login.title' | t }}{%- endcapture -%}
+    {% include 'heading', title: title, heading_tag: 'h1', context: 'login', text_alignment: 'left' %}
+  </header>
+
+  <div class="container">
+
+    <div id="recover" class="login one-half medium-down--one-whole column has-padding-bottom" style='display:none'>
+      <div class="animated fadeInUp">
+
+        <h2 class="has-padding-bottom">{{ 'customer.recover_password.title' | t }}</h2>
+
+        {% form 'recover_customer_password' %}
+          {{ form.errors | default_errors }}
+
+          {% if form.posted_successfully? %}
+            {% assign reset_success = true %}
+          {% endif %}
+
+          <div id="recover_email">
+            <div class="field">
+              <label class="label" for="email">{{ 'customer.recover_password.email' | t }}</label>
+              <div class="control">
+                <input type="email" value="" size="30" name="email" id="recover-email" class="input" autocorrect="off" autocapitalize="off" placeholder="{{ 'customer.login.email' | t }}" />
+              </div>
+            </div>
+          </div>
+
+          <p class="recover-note has-padding-top has-padding-bottom">
+            <em>{{ 'customer.recover_password.subtext' | t }}</em>
+          </p>
+
+          <div class="recover-options is-flex is-align-center is-justify-space-between">
+            <input class="button button--secondary" type="submit" value="{{ 'customer.recover_password.submit' | t }}" />
+            <span class="has-margin-left"><a href="#" class="cancel-recover-password">{{ 'customer.recover_password.cancel' | t }}</a></span>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+
+    <div id="login" class="login one-half medium-down--one-whole column has-padding-bottom">
+
+      <div id="customer" class="login__form">
+
+        {% if section.settings.richtext != blank %}
+          <div class="login__text has-padding-bottom">
+            {{ section.settings.richtext }}
+          </div>
+        {% endif %}
+
+        {% form 'customer_login' %}
+          {{ form.errors | default_errors }}
+
+          <div class="field">
+            <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.email' | t }}*</label>
+            <div class="control">
+              <input type="email" value="" name="customer[email]" id="customer_email" class="input" size="30"  autocorrect="off" autocapitalize="off" tabindex="1" placeholder="{{ 'customer.login.email' | t }}"/>
+            </div>
+          </div>
+
+          {% if form.password_needed %}
+
+            {% comment %}
+              Customer Account Login
+            {% endcomment %}
+
+          {% endif %}
+          <div class="field">
+            <label class="label" for="{{ label | replace: ' ', '_' }}">{{ 'customer.login.password' | t }}*</label>
+            <div class="control">
+              <input type="password" value="" name="customer[password]" id="customer_password" class="input" size="16" tabindex="2" placeholder="{{ 'customer.login.password' | t }}"/>
+            </div>
+          </div>
+
+          <div class="is-flex is-justify-space-between  is-align-center">
+            <input class="button button--secondary" type="submit" value="{{ 'customer.login.sign_in' | t }}" style="margin-bottom: 5px !important" tabindex="3" />
+            <small class="right has-margin-left"><a class="js-recover-password" href="#">{{ 'customer.login.forgot_password' | t }}</a></small>
+          </div>
+
+          {% unless shop.checkout.guest_login %}
+            <p class="has-padding-top">
+              {{ 'customer.login.new_customer_label' | t }} {{ 'customer.login.sign_up_html' | t | customer_register_link | replace: 'id="customer_register_link"', 'class="hoverButton"' }}
+            </p>
+          {% endunless %}
+
+        {% endform %}
+        {% if shop.checkout.guest_login %}
+          <span class="has-padding-top"> {{ 'customer.login.or' | t }} </span>
+          {% form 'guest_login' %}
+            <input class="button button--secondary" type="submit" value="{{ 'customer.login.guest_title_html' | t }}" />
+          {% endform %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="login__image one-half medium-down--one-whole column is-order-aligned-{{ section.settings.image_position }}">
+      {% if section.settings.image %}
+        {% include 'image-element', image: section.settings.image, alt: section.settings.image.alt %}
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+{% comment %}JavaScript{% endcomment %}
+<script src="{{ 'z__jsAccounts.js' | asset_url }}"></script>
+
+
+{% schema %}
+  {
+    "name": "Login",
+    "class": "login-page jsAccounts",
+    "settings": [
+      {
+        "type": "richtext",
+        "id": "richtext",
+        "label": "Text"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image",
+        "info": "1000 x 700px recommended"
+      },
+      {
+        "type": "select",
+        "id": "image_position",
+        "label": "Image position",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "right"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 40,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ]
+  }
+{% endschema %}

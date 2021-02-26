@@ -1,0 +1,92 @@
+<div class="js-quick-shop quick-shop__popup">
+  <div class="quick-shop js-product_section">
+    <div class="quick-shop__container container section js-quick-shop-container quickshop__gallery--{{ settings.quickshop_gallery_position }} quickshop__arrows--{{ settings.quickshop_show_arrows }}">
+      <div class="quick-shop__gallery
+                  one-half
+                  column
+                  medium-down--one-whole
+                  gallery-wrap
+                  js-gallery-wrap
+                  ">
+        <div class="image__container is-relative">
+          <div class="gallery
+                      product-gallery
+                      js-gallery-modal
+                      product-{{ product.id }}-gallery
+                      slideshow_animation--{{ settings.quickshop_gallery_transition_styles }}
+                      "
+              data-zoom="{{ settings.quickshop_magnify_images }}">
+
+          </div>
+        </div>
+        {% if settings.show_product_gallery_thumbnails %}
+          <div class="gallery product-gallery__nav js-gallery-carousel">
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="quick-shop__text-wrap has-product-sticker one-half column text-modal-wrap medium-down--one-whole">
+
+      <!--Product banners inserted with JS - updateVariant() -->
+      <div class="
+            sticker-holder
+            sticker-shape-{{ settings.sticker_shape }}
+            sticker-position-{{ settings.sticker_position }}">
+        <div class="sticker-holder__content sticker-holder__content--product">
+          <div class="best-seller-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+          <div class="coming-soon-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+          <div class="new-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+          <div class="pre-order-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+          <div class="sale-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+          <div class="staff-pick-sticker thumbnail-sticker is-hidden">
+            <span class="sticker-text"></span>
+          </div>
+        </div>
+      </div>
+
+        {% if settings.quickshop_show_vendor %}
+          <p class="vendor">
+            <span class="vendor js-product-vendor"></span>
+          </p>
+        {% endif %}
+        <h3 class="quick-shop__title js-product-title"></h3>
+        <div class="feature_divider"></div>
+
+        <p class="modal_price has-padding-top has-padding-bottom">
+          <span class="sold_out js-sold-out"></span>
+          <span class="current_price js-current-price"><span class="money"></span></span>
+          <span class="was-price js-was-price"><span class="money"></span></span>
+          {% if settings.quickshop_show_price_savings %}
+            <span class="sale savings js-savings"></span>
+          {% endif %}
+        </p>
+        <span class="js-notify-form"></span>
+
+        {% if settings.quickshop_truncate_words == false %}
+          <span class="js-full-description clearfix"></span>
+          <span class="js-product-details"></span>
+        {% else %}
+          <p>
+            <span class="js-regular-description"></span>
+            <span class="js-product-details"></span>
+          </p>
+        {% endif %}
+
+        <span class="js-product-form"></span>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ 'z__jsProduct.js' | asset_url }}"></script>

@@ -1,0 +1,142 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+<script>
+    'use strict';
+    const WSFunctions = {
+        // Get Shopify cart object
+        getCart: async function () {
+            var data = await $.ajax({
+                url: '/cart.json',
+                type: 'GET'
+            });
+            return data;
+        },
+        // Get Shopify product data
+        getProduct: async function (handler) {
+            var data = await $.ajax({
+                url: `/products/${handler}.json`,
+                type: 'GET'
+            });
+            return data;
+        },
+        // Get BOLD subscription group data
+        getGroup: async (group_id) => {
+            var data;
+            try {
+                data = await $.ajax({
+                    url: `https://ro.boldapps.net/api/widget/group/${group_id}?shop=${BOLD.recurring_orders.app.api.defaultQuery.shop_url}`,
+                    type: "GET"
+                });
+                return data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        // Update cart items quantities
+        updateCart: async function (data) {
+            // Update cart
+            try {
+                var result = await $.ajax({
+                    url: '/cart/update.js',
+                    type: 'POST',
+                    data: data
+                });
+            } catch (error) { }
+        },
+        // Enable arrows on the product gallery
+        enableArrows: function () {
+            $('.product-gallery .flickity-button').removeAttr('disabled');
+        },
+        // Change buy type on the RO Widget (one-time and subscription)
+        updateType: function (buyType) {
+            const roType = buyType == 'one-time' ? 0 : 2;
+            setTimeout(() => {
+                var $input = $(`[name="bold-ro__selector_radio_button"][value="${roType}"]`);
+                $input.trigger('click');
+            }, 0);
+        },
+        // Format to price string
+        formatPrice: function (price, currency = '£') {
+            const stringPrice = Math.abs(price).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            return price < 0 ? `-${currency}${stringPrice}` : `${currency}${stringPrice}`;
+        },
+        // Update price on subscription buy type
+        updatePrice: function (buyType) {
+            if (buyType == 'one-time') {
+                $('.ws-div-price').removeClass('ws_then');
+                $('.ws_reorder').hide();
+            } else {
+                // Get group data
+                var groupData = null;
+                for (const [groupId, data] of Object.entries(BOLD.recurring_orders.cached_group)) {
+                    if (buyType == 'subscription' && data.conversion == false) {
+                        groupData = data;
+                        break;
+                    }
+                    if (buyType == 'trial' && data.conversion != false) {
+                        groupData = data;
+                        break;
+                    }
+                }
+                // Update price
+                var regularPrice = groupData.conversion
+                    ? this.formatPrice(groupData.conversion.unformatted_discount_price / 100)
+                    : this.formatPrice(groupData.price / 100);
+                var discountedPrice = this.formatPrice(groupData.unformatted_discount_price / 100);
+                $(".ws-div-price .ws_dicounted_price").text(regularPrice);
+                $(".ws-div-lbprice-subsave .ws_total b").text(discountedPrice);
+                // Messages
+                if (buyType == 'subscription') {
+                    $('.ws-div-price').removeClass('ws_then');
+                    $('.ws_reorder').show();
+                    $('.ws-div-price label.ws_dicounted_price').show();
+                } else if (buyType == 'trial') {
+                    $('.ws_reorder').show();
+                    $('.ws-div-price label.ws_dicounted_price').show();
+                    $('.ws-div-price').addClass('ws_then');
+                }
+            }
+        },
+        // Fill select options with frequency options
+        fillSelect: async function () {
+            if (!widgetInitialized) {
+                const $selectInput = $('.subscription [name="ws_size"]');
+                const variantData = BOLD.common.Shopify.variants[productData.variants[0].id];
+                const frequency = typeof BOLD.recurring_orders.cached_group[variantData.group_id] != 'undefined'
+                    ? BOLD.recurring_orders.cached_group[variantData.group_id].frequency_num.length
+                    : (await WSFunctions.getGroup(variantData.group_id)).frequency_num;
+                // Fill select element with frequency num
+                $selectInput.empty();
+                for (let index = 1; index < frequency + 1; index++) {
+                    const option = `<option value="${productData.variants[0].id}-${index}">${productData.variants[0].title} every ${index} weeks</option>`;
+                    $selectInput.append(option);
+                }
+                // Select default frequency interval
+                var defaultInterval = typeof _wsDefault == 'undefined' ? 4 : parseInt(_wsDefault);
+                if ($selectInput.find(`[value="${productData.variants[0].id}-${defaultInterval}"]`).length) {
+                    setTimeout(() => {
+                        $selectInput.val(`${productData.variants[0].id}-${defaultInterval}`).trigger('change');
+                        $('.ws_button [value="subscription"]').click();
+                    }, 0);
+                }
+                widgetInitialized = true;
+            }
+        },
+        // Adjust widget height on resize
+        fixWidgetHeight: function () {
+            var newHeight = $('.ws_info').outerHeight(true) + $('.ws_options').outerHeight(true);
+            $('.ws_container.ws_widget').css('height', `${newHeight}px`);
+        },
+        // Remove attributes to prevent that the app detects a convertible subscription
+        cleanAttributes: async function () {
+            const cart = BOLD.common.Shopify.cart;
+            if (cart.items.length == 0 && typeof cart.attributes.newDate != 'undefined') {
+                this.updateCart({
+                    attributes: {
+                        newDate: null
+                    }
+                });
+            }
+        }
+    }
+</script>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}

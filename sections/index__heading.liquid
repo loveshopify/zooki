@@ -1,0 +1,248 @@
+{% comment %}
+** Heading - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% include 'include-heading' %}
+
+{% schema %}
+  {
+    "name": "Heading",
+    "class": "heading-section",
+    "settings": [
+      {
+        "type": "richtext",
+        "id": "preheading",
+        "label": "Preheading",
+        "default": "<p>Add a preheading</p>"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Section heading"
+      },
+      {
+        "type": "richtext",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "<p>Additional text or description of section</p>"
+      },
+      {
+        "type": "header",
+        "content": "Text colors"
+      },
+      {
+        "type": "color",
+        "id": "preheading_color",
+        "label": "Preheading",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "color",
+        "id": "heading_color",
+        "label": "Heading",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "color",
+        "id": "subheading_color",
+        "label": "Subheading",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "header",
+        "content": "Background"
+      },
+      {
+        "type": "color",
+        "id": "background",
+        "label": "Background",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "color",
+        "id": "gradient",
+        "label": "Gradient",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "range",
+        "id": "gradient_rotation",
+        "label": "Gradient rotation",
+        "min": 0,
+        "max": 180,
+        "step": 10,
+        "default": 0,
+        "unit": "deg"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "heading_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "start",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "end",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "select",
+        "id": "vertical_spacing",
+        "label": "Vertical spacing",
+        "options": [
+          {
+            "value": "small",
+            "label": "Small"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "large",
+            "label": "Large"
+          }
+        ],
+        "default": "medium"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "half",
+            "label": "Half"
+          },
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_left",
+        "label": "Left spacing",
+        "min": 0,
+        "max": 80,
+        "default": 0,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_right",
+        "label": "Right spacing",
+        "default": 0,
+        "min": 0,
+        "max": 80,
+        "unit": "px"
+      },
+      {
+        "type": "select",
+        "id": "animation",
+        "label": "Animation",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "fadeIn",
+            "label": "Fade in"
+          },
+          {
+            "value": "fadeInDown",
+            "label": "Fade in down"
+          },
+          {
+            "value": "fadeInLeft",
+            "label": "Fade in left"
+          },
+          {
+            "value": "fadeInRight",
+            "label": "Fade in right"
+          },
+          {
+            "value": "slideInLeft",
+            "label": "Slide in left"
+          },
+          {
+            "value": "slideInRight",
+            "label": "Slide in right"
+          },
+          {
+            "value": "zoomIn",
+            "label": "Zoom in"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Heading",
+        "category": "Layout",
+        "settings": {
+
+        }
+      }
+    ]
+  }
+{% endschema %}

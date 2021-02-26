@@ -1,0 +1,125 @@
+{% comment %} Is the color set to transparent? {% endcomment %}
+{%- assign mobile_menu_background_color = settings.mobile_menu_background_color | color_extract: 'alpha' -%}
+{%- assign mobile_menu_link_color = settings.mobile_menu_link_color | color_extract: 'alpha' -%}
+{%- assign mobile_menu_link_hover_color = settings.mobile_menu_link_hover_color | color_extract: 'alpha' -%}
+
+{% comment %} Opacity level {% endcomment %}
+{%- assign mobile_menu_opacity = settings.mobile_menu_opacity | divided_by: 100.00 -%}
+
+{% comment %} Mobile specific CSS {% endcomment %}
+{%- style -%}
+  .mobile-menu {
+    background-color: {% if mobile_menu_background_color != 0.0 %}{{ settings.mobile_menu_background_color | color_modify: 'alpha', mobile_menu_opacity }}{% else %}{{ settings.header_background | color_modify: 'alpha', mobile_menu_opacity }}{% endif %};
+  }
+
+  {%- if mobile_menu_link_color != 0.0 -%}
+    .mobile-menu-link,
+    .mobile-menu__item,
+    .mobile-menu a {
+      color: {{ settings.mobile_menu_link_color }};
+    }
+  {%- endif -%}
+
+  {%- if mobile_menu_link_hover_color != 0.0 -%}
+    .mobile-menu-link:hover,
+    .mobile-menu__item:hover,
+    .mobile-menu a:hover {
+      color: {{ settings.mobile_menu_link_hover_color }};
+    }
+  {%- endif -%}
+{%- endstyle -%}
+
+{% comment %} HTML markup {% endcomment %}
+<div id="mobile-header" class="mobile-header">
+  <div class="mobile-header__content
+              mobile-layout--{{ settings.logo_menu_position }}
+              mobile-logo__position--{{ settings.logo_mobile_position }}
+              header__icon-style-{{ settings.icon_style | replace: '_', '-' }}">
+    <div data-show-mobile-menu="false" class="mobile-menu__toggle-button mobile-toggle__position--{{ settings.logo_menu_position }}">
+      <div class="mobile-dropdown mobile-dropdown__position--{{ settings.logo_menu_position }}">
+        <div class="mobile-menu__toggle-icon">
+          <div class="mobile-header__open-menu" data-show-mobile-menu="false">
+            {% include settings.icon, name: 'menu' %}
+          </div>
+          <div class="mobile-header__close-menu">
+            {% comment %}{% include settings.icon, name: 'x' %}{% endcomment %}
+            {% render 'icon' with 'menu-close' %}
+          </div>
+          <div class="mobile_menu_back">
+            <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve"> <g> <g> <path d="M361.5,140.148H50.689l43.529-43.71c5.846-5.87,5.826-15.368-0.044-21.214c-5.871-5.847-15.368-5.826-21.213,0.044 L4.372,144.143c-2.969,2.982-4.417,6.899-4.361,10.8C0.009,155.012,0,155.079,0,155.148c0,5.201,2.649,9.781,6.669,12.472 l66.292,66.568c5.847,5.87,15.343,5.889,21.213,0.044c5.87-5.846,5.89-15.344,0.044-21.214l-42.692-42.87H361.5 c66.444,0,120.5,54.056,120.5,120.5s-54.056,120.5-120.5,120.5H15c-8.284,0-15,6.716-15,15s6.716,15,15,15h346.5 c82.986,0,150.5-67.514,150.5-150.5S444.486,140.148,361.5,140.148z"/> </g> </g> </svg>
+          </div>
+        </div>
+        {% include 'mobile-menu', nav_blocks: header_blocks %}
+      </div>
+    </div>
+    <div class="mobile-logo">
+      {% if settings.logo_mobile != blank %}
+        <a class="mobile-header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+          {% include 'image-element', image: settings.logo_mobile, alt: settings.logo_mobile.alt, additional_classes: 'primary-logo' %}
+        </a>
+      {% elsif section.settings.logo != blank %}
+        <a class="mobile-header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+          <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/YourZooki_logo_140px_width.svg?v=1600194994" alt="" style="width: 140px; margin-left: auto; margin-right: auto;" class="primary-logo">
+        </a>
+      {% else %}
+        <a href="{{ shop.url }}" class="header__link header__logo-text primary-brand">
+          <span>{{ shop.name }}</span>
+        </a>
+      {% endif %}
+    </div>
+    <div class="mobile-icons {% if settings.show_search_icon_mobile == false %}has-one-icon{% endif %}">
+      {% if settings.show_search_icon_mobile %}
+        {% comment %} Search icon {% endcomment %}
+        <a class="header__link action-area__link" data-show-search-trigger>
+          {% include settings.icon, name: 'search', icon_class: 'header__icon' %}
+          <span class="icon-caption">{{ 'general.search.title' | t | escape }}</span>
+        </a>
+      {% endif %}
+
+      {% comment %} Cart icon {% endcomment %}
+      <div class="header-cart action-area__link {% if cart.item_count != 0 %}has-cart-count{% endif %}" data-ajax-cart-trigger>
+        <a data-toggle-cart class="header__link" {% if settings.cart_action != 'mini_cart' %}href="{{ routes.cart_url }}"{% endif %} >
+          <span class="header-cart__icon">
+            {% comment %}{% include settings.icon, name: settings.cart_icon, icon_class: 'header__icon' %}{% endcomment %}
+            <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="icon/bag" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="icon-account">
+                        <rect id="bounding-box" x="0" y="0" width="24" height="24"></rect>
+                        <path d="M12,0.5 C14.6589665,0.5 15.8481716,1.84437068 16.2858415,5.00268581 L16.1727442,5 C18.8207872,5 21.0096242,7.06457439 21.1642164,9.70810104 L21.8762129,21.8832404 C21.9406974,22.985926 21.0990692,23.9321044 19.9963836,23.9965889 L19.879624,24 L4.120376,24 C3.0158065,24 2.120376,23.1045695 2.120376,22 L2.12378711,21.8832404 L2.83578356,9.70810104 C2.98817963,7.1021283 5.11743412,5.05877547 7.71468413,5.0012457 C8.15182839,1.84437068 9.34103352,0.5 12,0.5 Z M15.393415,6.00021699 L8.60666117,5.99934685 C8.53166456,6.85532894 8.5,7.85078846 8.5,9 C8.5,9.27614237 8.27614237,9.5 8,9.5 C7.72385763,9.5 7.5,9.27614237 7.5,9 C7.5,7.88145832 7.53114261,6.88600988 7.60457698,6.00636544 C5.65469954,6.11344547 4.06308238,7.62035808 3.85108446,9.56330647 L3.83407801,9.76648083 L3.12208156,21.9416202 C3.12094476,21.9610594 3.120376,21.9805276 3.120376,22 C3.120376,22.5128358 3.50641619,22.9355072 4.00375488,22.9932723 L4.120376,23 L19.9380038,22.9982944 C20.449965,22.9683552 20.8493784,22.558298 20.8780105,22.0584352 L20.8780105,21.9416202 L20.165922,9.76648083 C20.046595,7.72598881 18.4122575,6.11667339 16.394697,6.00606929 C16.4688574,6.88600988 16.5,7.88145832 16.5,9 C16.5,9.27614237 16.2761424,9.5 16,9.5 C15.7238576,9.5 15.5,9.27614237 15.5,9 L15.4963971,8.35335933 C15.4862086,7.4730973 15.4539266,6.69121884 15.393415,6.00021699 Z M12,1.5 C10.0481722,1.5 9.10835587,2.48030454 8.72405953,4.99940842 L15.2759579,4.99952261 C14.8916725,2.48033417 13.9518573,1.5 12,1.5 Z" id="Combined-Shape" fill="#1A1A1A" fill-rule="nonzero"></path>
+                    </g>
+                </g>
+            </svg>
+            <span class="header-cart__count header-cart__count--badge badge" data-bind="itemCount">
+              {{ cart.item_count }}
+            </span>
+          </span>
+          <span class="header-cart__caption icon-caption">
+            {{ 'layout.general.cart' | t | escape }}
+            {%- if object.settings.icon_style == 'text' -%}
+              <span class="header-cart__count cart__count--text" data-bind="itemCount">{{ cart.item_count }}</span>
+            {%- endif -%}
+          </span>
+        </a>
+        {% if settings.cart_action == 'mini_cart' or settings.cart_action == 'drawer' %}
+          {% include 'ajax-cart', context: 'mobile-header' %}
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  {% if settings.logo_mobile_position == 'below' %}
+    <div class="mobile-logo__outer">
+      {% if settings.logo_mobile != blank %}
+        <a class="mobile-header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+          {% include 'image-element', image: settings.logo_mobile, alt: settings.logo_mobile.alt, additional_classes: 'primary-logo' %}
+        </a>
+      {% else %}
+        <a href="{{ shop.url }}" class="header__link header__logo-text primary-brand">
+          {{ shop.name }}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>

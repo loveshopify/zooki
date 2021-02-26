@@ -1,0 +1,53 @@
+<div class="search-overlay animated fadeIn" data-search-type="overlay">
+
+  {% include settings.icon, name: 'x', icon_class: 'search-overlay__close' %}
+
+  <section class="section search-overlay__wrapper">
+    <div class="container">
+
+      <div class="one-whole column text-align-center">
+        <h1 class="search-overlay__title">{{ settings.search_title}}</h1>
+      </div>
+
+      <div class="one-whole column">
+        <form class="search-form search-popup__form" action="{{ routes.search_url }}">
+          <div class="search__fields">
+            {% if settings.search_option != 'everything' %}
+              <input class="visuallyhidden" type="text" name="type" value="product" />
+            {% endif %}
+            <label for="q" class="visuallyhidden">{{ settings.search_placeholder }}</label>
+            <div class="field">
+              <div class="control has-icons-left">
+                {% if settings.enable_autocomplete == true %}
+                  <ul class="predictive-results"></ul>
+                {% endif %}
+                <input class="input" id="q" type="text" name="q" placeholder="{{ settings.search_placeholder }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+                {% include settings.icon, name: 'search', class: 'icon is-left' %}
+              </div>
+            </div>
+            <input type="submit" name="search" class="visuallyhidden" value="" />
+          </div>
+        </form>
+      </div>
+
+      {% if settings.search_menu != blank %}
+        {% assign search_menu = linklists[settings.search_menu] %}
+        <div class="one-whole column text-align-center">
+          <div class="search-menu">
+            <span>{{ 'general.search.common_terms' | t }}:</span>
+            <ul class="search-menu__list">
+              {% for link in search_menu.links %}
+                <li class="search-menu__item">
+                  <a class="{% if link.active %}is-active{% endif %}" href="{{ link.url }}">
+                    {{ link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </section>
+</div>

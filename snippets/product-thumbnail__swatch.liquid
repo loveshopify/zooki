@@ -1,0 +1,39 @@
+{% if settings.collection_swatches %}
+  {% assign file_extension = 'png' %}
+
+  {% for option in product.options %}
+    {% assign downcased_option = option | downcase %}
+    {% if downcased_option contains 'color' or downcased_option contains 'colour' %}
+      {% assign option_index = forloop.index0 %}
+      {% assign values = '' %}
+      <div class="thumbnail-swatch is-justify-{{ settings.thumbnail_text_alignment }} is-flex-wrap">
+
+        {% for variant in product.variants %}
+          {% assign value = variant.options[option_index] %}
+          {% unless values contains value %}
+            {% assign values = values | join: ',' %}
+            {% assign values = values | append: ',' | append: value %}
+            {% assign values = values | split: ',' %}
+
+            <a href="{{ variant.url | within: collection }}" class="swatch swatch__style--{{ settings.collection_swatches_shape }}" data-swatch-name="meta-{{ downcased_option }}_{{ value | replace: ' ', '_' | downcase }}">
+              <span {% if section.settings.products_per_row == '2'%}
+                      data-image="{{ variant.featured_image | img_url: '600x' }}"
+                    {% elsif section.settings.products_per_row == '3' %}
+                      data-image="{{ variant.featured_image | img_url: '500x' }}"
+                    {% else %}
+                      data-image="{{ variant.featured_image | img_url: '400x' }}"
+                    {% endif %}
+                    style="background-color: {{ value | split: ' ' | last | handle }};">
+                  {% assign image_name = value | handle | append: '.' | append: file_extension %}
+                  {% assign swatch = images[image_name] %}
+
+                  <img class="swatch__image {% if swatch == empty %}swatch__image--empty{% endif %}" src="{{ swatch | img_url: '50x' }}" alt="{{ variant.title }}">
+                </span>
+            </a>
+          {% endunless %}
+        {% endfor %}
+
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

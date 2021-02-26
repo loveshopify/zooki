@@ -1,0 +1,177 @@
+{% comment %} JSON-LD Structured data - https://developers.google.com/search/docs/guides/intro-structured-data {% endcomment %}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@id": "{{ shop.url }}",
+          "name": "{{ 'general.breadcrumbs.home' | t }}"
+        }
+      },
+      {% if template contains 'product' %}
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            {% if collection %}
+              "@id": "{{ collection.url }}",
+              "name": "{{ collection.title }}"
+            {% else %}
+              "@id": "{{ routes.all_products_collection_url }}",
+              "name": "{{ collections.all.title }}"
+            {% endif %}
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@id": "{{ product.url }}",
+            "name": "{{ product.title }}"
+          }
+        }
+      {% elsif template contains 'collection' %}
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@id": "{{ shop.url }}{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}",
+            "name": "{{ collection.title }}"
+          }
+        }
+        {% if current_tags %}
+          {% for tag in current_tags %}
+            {% unless tag contains 'meta-' %}
+              ,
+              {
+                "@type": "ListItem",
+                "position": {{ forloop.index | plus: 2 }},
+                "item": {
+                  "@id": "{{ shop.url }}{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}/{{ tag | handleize }}",
+                  "name": "{{ tag }}"
+                }
+              }
+            {% endunless %}
+          {% endfor %}
+        {% endif %}
+      {% elsif type == 'article' %}
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@id": "{{ blog.url }}",
+            "name": "{{ blog.title }}"
+          }
+        }
+      {% endif %}
+    ]
+  }
+</script>
+
+{% if settings.breadcrumb_separator == 'caret' %}
+  {% assign breadcrumb_separator = 'right-caret' %}
+{% elsif settings.breadcrumb_separator == 'arrow' %}
+  {% assign breadcrumb_separator = 'right-arrow' %}
+{% elsif settings.breadcrumb_separator == 'bullet' %}
+  {% assign breadcrumb_separator = 'bullet' %}
+{% elsif settings.breadcrumb_separator == 'slash' %}
+  {% assign breadcrumb_separator = 'slash' %}
+{% endif %}
+
+<nav class="breadcrumb
+            is-{{ settings.breadcrumb_size }}
+            is-{{ settings.breadcrumb_capitalization }}"
+            aria-label="breadcrumbs">
+  <ul>
+    <li>
+      <a href="{{ shop.url }}" title="{{ shop.name | escape }}">
+        {{ 'general.breadcrumbs.home' | t }}
+      </a>
+    </li>
+    {% if template contains 'product' %}
+      <li>
+        <span class="breadcrumb-separator">
+          {% include settings.icon, name: breadcrumb_separator %}
+        </span>
+        <a href="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}" title="{{ collection.title | escape }}">
+          {% unless collection.title %} All {% else %} {{ collection.title }} {% endunless %}
+        </a>
+      </li>
+      {% if current_tags %}
+        {% for tag in current_tags %}
+          <li>
+            <span class="breadcrumb-separator">
+              {% include settings.icon, name: breadcrumb_separator %}
+            </span>
+            <a href="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %} {{ tag | handleize }}" title="{{ tag | escape }}">
+              {{ tag }}
+            </a>
+          </li>
+        {% endfor %}
+      {% endif %}
+    {% elsif template contains 'collection' %}
+      <li>
+        <span class="breadcrumb-separator">
+          {% include settings.icon, name: breadcrumb_separator %}
+        </span>
+        <a href="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}" title="{{ collection.title | escape }}">
+          {% unless collection.title %} {{ 'collections.general.all' | t }} {% else %} {{ collection.title }} {% endunless %}
+        </a>
+      </li>
+    {% elsif template contains 'search' %}
+      <li>
+        <span class="breadcrumb-separator">
+          {% include settings.icon, name: breadcrumb_separator %}
+        </span>
+        <a href="{{ routes.search_url }}" title="{{ 'general.search.title' | t | escape }}">
+          {{ 'general.search.title' | t }}
+        </a>
+      </li>
+    {% elsif type == 'article' %}
+      <li>
+        <span class="breadcrumb-separator">
+          {% include settings.icon, name: breadcrumb_separator %}
+        </span>
+        <a href="{{ blog.url }}" title="{{ blog.title | escape }}">
+          {{ blog.title }}
+        </a>
+      </li>
+    {% endif %}
+    {% if product.handle != blank %}
+      <li>
+        <span class="breadcrumb-separator">
+          {% include settings.icon, name: breadcrumb_separator %}
+        </span>
+        {{ product.title }}
+      </li>
+    {% endif %}
+    {% if template contains 'collection' %}
+      {% paginate collection.products by section.settings.pagination_limit %}
+        {% if paginate.pages != 0 %}
+          <li class="breadcrumb__page-count js-breadcrumb-text is-hidden">
+            <span class="breadcrumb-separator">
+              {% include settings.icon, name: breadcrumb_separator %}
+            </span>
+            <span data-breadcrumb-text></span>
+          </li>
+        {% endif %}
+      {% endpaginate %}
+    {% endif %}
+    {% if template contains 'search' %}
+      {% paginate search.results by section.settings.pagination_limit %}
+        {% if paginate.pages != 0 %}
+          <li class="breadcrumb__page-count js-breadcrumb-text is-hidden">
+            <span class="breadcrumb-separator">
+              {% include settings.icon, name: breadcrumb_separator %}
+            </span>
+            <span data-breadcrumb-text></span>
+          </li>
+        {% endif %}
+      {% endpaginate %}
+    {% endif %}
+  </ul>
+</nav>

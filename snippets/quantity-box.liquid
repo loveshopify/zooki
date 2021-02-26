@@ -1,0 +1,26 @@
+{% if settings.qty_box_style == 'stacked' %}
+  {% assign icon-plus = 'up-caret' %}
+  {% assign icon-minus = 'down-caret' %}
+{% else %}
+  {% assign icon-plus = 'plus' %}
+  {% assign icon-minus = 'minus' %}
+{% endif %}
+
+{% if item.quantity %}
+  {% assign value = item.quantity %}
+{% else %}
+  {% assign value = 1 %}
+{% endif %}
+
+<label class="label is-sr-only" for="quantity">{{ 'products.product.quantity' | t }}</label>
+<div class="quantity-wrapper field has-addons quantity-style--{{ settings.qty_box_style }} {{ size }}">
+  <div class="control minus-control">
+    <span class="quantity-minus quantity-element button is-inverse" data-update-quantity="minus" {% if value == 1 %}disabled{% endif %}>{% include settings.icon, name: icon-minus %}</span>
+  </div>
+  <div class="control quantity-input-control {% unless show_payment_button %}quantity-input-control--fill{% endunless %}">
+    <input class="quantity-input quantity-element input" type="number" min="1" size="2" name="quantity" value="{{ value }}" {% if settings.limit_quantity and variant.inventory_management != blank and variant.inventory_policy == "deny" %}max="{{ variant.inventory_quantity }}" {% endif %} data-line-id="{{ forloop.index }}" />
+  </div>
+  <div class="control plus-control">
+    <span class="quantity-plus quantity-element button is-inverse" data-update-quantity="plus" {% if settings.limit_quantity and variant.inventory_management != blank and variant.inventory_policy == "deny" %}{% if variant.inventory_quantity == value %}disabled{% endif %}{% endif %}>{% include settings.icon, name: icon-plus %}</span>
+  </div>
+</div>

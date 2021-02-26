@@ -1,0 +1,114 @@
+{% comment %} Store all of the liquid variables that you want to reference in your js on global namespaced objects - allows you to run linters on your javascript! {% endcomment %}
+{% capture js_variables %}
+
+Shopify = window.Shopify || {};
+
+{% comment %} /* # Currency
+================================================== */ {% endcomment %}
+Currency = window.Currency || {};
+Currency.show_multiple_currencies = {% if shop.enabled_currencies.size > 1 %}false{% else %}{{ settings.show_multiple_currencies | json }}{% endif %};
+Currency.shop_currency = {{ shop.currency | strip_html | json }};
+Currency.default_currency = {{ settings.default_currency | default: shop.currency | json }};
+Currency.display_format = {{ settings.currency_format | json }};
+Currency.money_format = {{ shop[settings.currency_format] | strip_html | json }};
+Currency.money_format_no_currency = {{ shop.money_format | strip_html | json }};
+Currency.money_format_currency = {{ shop.money_with_currency_format | strip_html | json }};
+Currency.native_multi_currency = {% if shop.enabled_currencies.size > 1 %}true{% else %}false{% endif %};
+
+{% comment %} /* # Window
+================================================== */ {% endcomment %}
+
+Window.theme = {};
+Window.theme.allCountryOptionTags = {{ all_country_option_tags | json }};
+
+{% comment %} /* # Theme settings
+================================================== */ {% endcomment %}
+Shopify.theme_settings = {};
+Shopify.contentCreator = {};
+Shopify.theme_settings.icon_style = {{ settings.icon | json }};
+Shopify.theme_settings.is_ie_11 = !!window.MSInputMethodContext && !!document.documentMode;
+Shopify.theme_settings.image_loading_style = {{ settings.image_loading_style | json }};
+{% comment %} Account {% endcomment %}
+Shopify.theme_settings.userLoggedIn = {% if shop.customer_accounts_enabled and customer %}true{% else %}false{% endif %};
+Shopify.theme_settings.userAddress = '{% if shop.customer_accounts_enabled and customer %}{{ customer.default_address }}{% endif %}';
+{% comment %} Inventory {% endcomment %}
+Shopify.theme_settings.display_inventory_left = {{ settings.display_inventory_left }};
+Shopify.theme_settings.inventory_threshold = "{{ settings.inventory_threshold | escape }}";
+Shopify.theme_settings.limit_quantity = "{{ settings.limit_quantity | escape }}";
+{% comment %} Layout {% endcomment %}
+Shopify.theme_settings.announcement_enabled = {{ settings.show_announcement_bar | json }};
+Shopify.theme_settings.header_layout = {{ settings.header_layout | json }};
+Shopify.theme_settings.footer_layout = {{ settings.footer_layout | json }};
+Shopify.theme_settings.search_layout = {{ settings.search_display_style | json }};
+{% comment %} Product {% endcomment %}
+Shopify.theme_settings.product_form_style = {{ settings.product_form_style | json }};
+Shopify.theme_settings.show_multiple_currencies = {{ settings.show_multiple_currencies | json }};
+Shopify.theme_settings.stickers_enabled = {{ settings.stickers_enabled | json }};
+Shopify.theme_settings.show_secondary_image = {{ settings.show_secondary_image | json }};
+Shopify.theme_settings.enable_shopify_collection_badges = {{ settings.enable_shopify_collection_badges | json }};
+Shopify.theme_settings.show_collection_swatches = {{ settings.collection_swatches | json }};
+Shopify.theme_settings.enable_quickshop = {{ settings.enable_quickshop | json }};
+{% comment %} Search {% endcomment %}
+Shopify.theme_settings.enable_autocomplete = {{ settings.enable_autocomplete | json }};
+Shopify.theme_settings.search_to_display = {{ settings.search_to_display | json }};
+Shopify.theme_settings.search_option = {{ settings.search_option | json }};
+{% comment %} Shipping Information {% endcomment %}
+Shopify.theme_settings.shipping_calculator_enabled = {% if settings.enable_shipping_calculator %}true{% else %}false{% endif %};
+Shopify.theme_settings.customer_logged_in = {% if customer and customer.default_address.country %}true{% else %}false{% endif %};
+
+{% comment %} /* # Breakpoints
+================================================== */ {% endcomment %}
+Shopify.breakpoints = Shopify.breakpoints || {};
+Shopify.breakpoints.small = 480;
+Shopify.breakpoints.medium = 798;
+Shopify.breakpoints.large = 1024;
+Shopify.breakpoints.widescreen = 1400;
+
+{% comment %} /* # Translation
+================================================== */ {% endcomment %}
+Shopify.translation = Shopify.translation || {};
+Shopify.translation.product_savings = "{{ 'products.product.savings' | t | strip_newlines | escape }}";
+Shopify.translation.free_price_text = "{{ settings.free_price_text }}";
+{% comment %} Breadcrumbs {% endcomment %}
+Shopify.translation.page_text = "{{ 'general.breadcrumbs.page_text' | t | strip_newlines | escape }}";
+Shopify.translation.of_text = "{{ 'general.breadcrumbs.of_text' | t | strip_newlines | escape }}";
+{% comment %} Notify form {% endcomment %}
+Shopify.translation.notify_form_success = "{{ 'products.notify_form.post_success' | t | strip_newlines | escape }}";
+Shopify.translation.notify_form_email = "{{ 'products.notify_form.email' | t | strip_newlines | escape }}";
+Shopify.translation.contact_email = "{{ contact.fields.email }}";
+Shopify.translation.customer_email = "{{ customer.email }}";
+Shopify.translation.notify_form_send = "{{ 'products.notify_form.send' | t | strip_newlines | escape }}";
+Shopify.translation.email_content = "{{ 'products.notify_form.email_content' | t | strip_newlines | escape }}";
+{% comment %} Cart {% endcomment %}
+Shopify.translation.cartItemsOne = "{{ 'layout.counts.items.one' | t | strip_newlines | escape }}";
+Shopify.translation.cartItemsOther = "{{ 'layout.counts.items.other' | t | strip_newlines | escape }}";
+Shopify.translation.addToCart = "{{ 'products.product.add_to_cart' | t | strip_newlines | escape }}";
+Shopify.translation.soldOut = "{{ 'products.product.sold_out' | t | strip_newlines | escape }}";
+Shopify.translation.unavailable = "{{ 'products.product.unavailable' | t | strip_newlines | escape }}";
+{% comment %} Search {% endcomment %}
+Shopify.translation.all_results = "{{ 'general.search.all_results' | strip_html | t | strip_newlines | escape }}";
+Shopify.translation.no_results = "{{ 'general.search.no_results' | strip_html | t | strip_newlines | escape }}";
+{% comment %} Product {% endcomment %}
+Shopify.translation.product_count_one = "{{ 'products.product.items_left_count.one' | t | strip_newlines | escape }}";
+Shopify.translation.product_count_other = "{{ 'products.product.items_left_count.other' | t | strip_newlines | escape }}";
+Shopify.translation.sold_out = "{{ 'products.product.sold_out' | t | strip_newlines | escape }}";
+Shopify.translation.savings = "{{ 'products.product.savings' | t | strip_newlines | escape }}";
+Shopify.translation.best_seller = "{{ 'collections.general.best_seller' | t | strip_newlines | escape }}";
+Shopify.translation.coming_soon = "{{ 'collections.general.coming_soon' | t | strip_newlines | escape }}";
+Shopify.translation.new_sticker = "{{ 'collections.general.new' | t | strip_newlines | escape }}";
+Shopify.translation.pre_order = "{{ 'collections.general.pre_order' | t | strip_newlines | escape }}";
+Shopify.translation.sale = "{{ 'collections.general.sale' | t | strip_newlines | escape }}";
+Shopify.translation.staff_pick = "{{ 'collections.general.staff_pick' | t | strip_newlines | escape }}";
+Shopify.translation.free = "{{ settings.free_price_text | strip_newlines | escape }}";
+{% comment %} Newsletter form {% endcomment %}
+Shopify.translation.newsletter_form_success = "{{ 'general.newsletter_form.success_text' | t | strip_newlines | escape }}";
+{% comment %} Contact form {% endcomment %}
+Shopify.translation.contact_form_success = "{{ 'contact.form.post_success' | strip_html | t | strip_newlines | escape }}";
+Shopify.translation.contact_form_checkbox_error = "{{ 'contact.form.checkbox_validation' | strip_html | t | strip_newlines | escape}}";
+{% comment %} Shipping Calculator {% endcomment %}
+Shopify.translation.shipping_calculator_submit_btn = "{{ 'cart.shipping_calculator.submit_button_label' | t | strip_newlines | escape }}";
+Shopify.translation.shipping_calculator_submit_btn_disabled = "{{ 'cart.shipping_calculator.submit_button_label_disabled' | t | strip_newlines | escape }}";
+Shopify.translation.shipping_calculator_zip_code = "{{ 'cart.shipping_calculator.zip_code' | t | strip_newslines | escape }}";
+{% endcapture %}
+{%- assign js_variables = js_variables | split: 'Shopify.' -%}
+{%- for variable in js_variables -%}{%- assign variableblock = variable | strip -%}{% if forloop.first %}{{ variableblock }}{% else %}{{ variableblock | prepend: 'Shopify.' }}{% endif %}{%- endfor -%}

@@ -1,0 +1,350 @@
+{% comment %}
+** Collections - main view **
+- Collection main area that holds the promotion banner, thumbnails and pagination
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  .on-subcollection-page.section__wrapper {
+    {% if width == 'wide' -%}
+      max-width: none;
+    {%- endif %}
+  }
+
+  {% if object.settings.collection_breadcrumb == false %}
+    .breadcrumb__container {
+      display: none;
+    }
+  {% endif %}
+
+  {% if object.settings.pagination_type != 'basic_pagination' %}
+    .breadcrumb__page-count {
+      display: none;
+    }
+  {% endif %}
+
+  {% if object.settings.collection_tags == false %}
+    .collection__tag-filter {
+      display: none;
+    }
+  {% endif %}
+
+  {% if object.settings.collection_sort == false %}
+    .collection__sort-by-filter {
+      display: none;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% paginate collection.products by object.settings.pagination_limit %}
+
+<div class="collection__main {{ css_class }}">
+  {% if object.settings.show_promo_banner %}
+    <div class="collection-promo-banner container">
+      <div class="banner__wrapper
+                  one-whole
+                  column
+                  dark-overlay-{{ object.settings.image_darken }}
+                  is-{{ object.settings.banner_height }}
+                  has-margin-bottom">
+        {% if object.settings.image != blank %}
+          {% include 'image-element', image: object.settings.image, alt: object.settings.image.alt, stretch_width: true %}
+        {% else %}
+          {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+        <div class="banner__content card-content">
+          <div class="banner__text text-align-center">
+            <h1 class="banner__heading title">{{ object.settings.promo_title }}</h1>
+            {% if object.settings.promo_text != blank %}
+              <div class="banner__subheading subtitle">{{ object.settings.promo_text }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if collection.products.size == 0 %}
+    <div class="container container--no-products-in-collection text-align-center has-padding-bottom has-padding-top">
+      <div class="one-whole column">
+        <p>{{ 'collections.general.no_matches' | t }}</p>
+      </div>
+    </div>
+  {% else %}
+    <div class="collection-matrix__wrapper">
+      <div class="container collection-matrix" {% if object.settings.pagination_type != 'basic_pagination' %}data-load-more--grid {% endif %}>
+        {% assign products_per_row = object.settings.products_per_row %}
+        {% include 'product-loop', limit: object.settings.pagination_limit, align_height: object.settings.align_height, height: object.settings.collection_height %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="container container--pagination">
+    <div class="one-whole column text-align-center">
+      {% assign load_more_text = 'collections.general.pagination_button' | t %}
+      {% include 'pagination', pagination_type: object.settings.pagination_type, load_more_text: load_more_text %}
+    </div>
+  </div>
+</div>
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ object.id }}"
+  data-section-data
+>
+  {
+    "enable_filter": {{ object.settings.collection_tags | json }},
+    "enable_sorting": {{ object.settings.collection_sort | json }},
+    "enable_breadcrumb": {{ object.settings.collection_breadcrumb | json}},
+    "pagination_type": {{ object.settings.pagination_type | json }},
+    "number_of_pages": {{ paginate.pages | json }}
+  }
+</script>
+
+{% endpaginate %}
+
+<script src="{{ 'z__jsCollection.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "Collection",
+  "class": "collection-template-classic collection-main has-sidebar-option jsCollection",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collection_breadcrumb",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_tags",
+      "label": "Show product tag filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "collection_sort",
+      "label": "Show sort by filter",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Promotional banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo_banner",
+      "label": "Show promotional banner",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1800 x 800px recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_darken",
+      "label": "Darken banner image",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "promo_title",
+      "label": "Heading",
+      "default": "Special sale on now!"
+    },
+    {
+      "type": "richtext",
+      "id": "promo_text",
+      "label": "Text",
+      "default": "<p>Description of promotion with lots of details.</p>"
+    },
+    {
+      "type": "select",
+      "id": "banner_height",
+      "label": "Banner height",
+      "default": "medium",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Product thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_height",
+      "label": "Align to height",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "collection_height",
+      "label": "Product image height",
+      "min": 150,
+      "max": 400,
+      "step": 10,
+      "default": 200,
+      "unit": "px",
+      "info": "Applied when 'Align to height' is also enabled. [Learn more](#)"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "label": "Products per row",
+      "min": 2,
+      "max": 7,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_products_per_row",
+      "label": "Products per row on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "pagination_limit",
+      "label": "Products per page",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "Pagination type",
+      "options": [
+        {
+          "value": "infinite_scroll",
+          "label": "Infinite scroll"
+        },
+        {
+          "value": "infinite_load_more",
+          "label": "Infinite load more button"
+        },
+        {
+          "value": "load_more",
+          "label": "Load more button"
+        },
+        {
+          "value": "basic_pagination",
+          "label": "Page links"
+        }
+      ],
+      "default": "basic_pagination"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

@@ -1,0 +1,141 @@
+{% comment %}
+** 404 page - main content area **
+- Appears when a file path cannot be found
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% style %}
+
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- endif %}
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<main class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                ">
+
+  <header class="container hide-when-banner-enabled">
+    {% capture heading_title %}{{ 'general.404.title' | t }}{% endcapture %}
+    {% include 'heading', title: heading_title, heading_tag: 'h1', context: 'page-not-found', text_alignment: 'left' %}
+  </header>
+
+  <div class="container">
+    <div class="one-whole column content">
+      {{ section.settings.not_found_text }}
+
+      {% if section.settings.display_search_field %}
+        <form class="search-form" action="{{ routes.search_url }}">
+          <div class="search__fields">
+            {% if settings.search_option != 'everything' %}
+              <input class="visuallyhidden" type="text" name="type" value="product" />
+            {% endif %}
+            <label for="q" class="visuallyhidden">{{ settings.search_placeholder }}</label>
+            <div class="field">
+              <div class="control has-icons-left">
+                <input class="input" id="q" type="text" name="q" placeholder="{{ settings.search_placeholder }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+                {% include settings.icon, name: 'search', class: 'icon is-left' %}
+              </div>
+            </div>
+            <input type="submit" name="search" class="visuallyhidden" value="" />
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</main>
+
+{% schema %}
+
+{
+  "name": "Page not found",
+  "class": "not-found-404__page",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "not_found_text",
+      "label": "Text",
+      "default": "<p>We're sorry, but the page you requested could not be found.</p><p>Try searching or <a href='{{ routes.all_products_collection_url }}'>continue shopping</a>.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_search_field",
+      "label": "Display search field",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

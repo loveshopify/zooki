@@ -1,0 +1,46 @@
+{% assign text_alpha = block.settings.promo_text | color_extract: 'alpha' %}
+
+{% comment %} Block specific CSS {% endcomment %}
+{% capture block_css -%}
+
+    .sidebar__promo-container {
+      background-color: {{ block.settings.promo_background }};
+      color: {% if text_alpha != 0 %}{{ block.settings.promo_text }}{% else %} color: {{ settings.regular_color }}{% endif %};
+    }
+    
+{%- endcapture -%}
+{% style %}
+  {% include 'css-loop', css: block_css, id: id %}
+{% endstyle %}
+
+<aside class="is-align-center sidebar__promo-container card-content">
+  <div class="sidebar__promo-image">
+    {% if block.settings.promo_link %}
+      <a href="{{ block.settings.promo_link }}">
+    {% endif %}
+      {% if block.settings.promo_image %}
+        {% include 'image-element', image: block.settings.promo_image, alt: block.settings.logo.alt %}
+      {% else %}
+        {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    {% if block.settings.promo_link %}
+      </a>
+    {% endif %}
+  </div>
+  <div class="sidebar__promo-content container text-align-left has-no-side-gutter">
+    <div class="one-whole column">
+      {% if block.settings.richtext != blank %}
+        <div class="has-padding-top">
+          {{ block.settings.richtext }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.button_label != blank %}
+        <div class="has-padding-top">
+          {% include 'button', label: block.settings.button_label, href: block.settings.promo_link, type: "link", style: block.settings.button_style %}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</aside>

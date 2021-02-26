@@ -1,0 +1,95 @@
+<header id="tablet-header" class="tablet-header dropdown-style-{{ settings.dropdown_style }} box-shadow-{{ settings.show_dropdown_shadow }}">
+    <section class="section
+                    is-width-{{ width }}">
+      <div class="wrapper">
+        <div class="navbar is-align-center is-justify-space-between vertical-alignment-{{ section.settings.vertical_alignment }} one-whole column">
+          <div class="header__brand">
+            {% if section.settings.enable_overlay and section.settings.overlay_logo != blank %}
+              {% if template contains 'index' %}
+                <h1 class="visuallyhidden">{{ shop.name }}</h1>
+              {% endif %}
+              <div class="overlay-logo__content">
+                <a class="header__logo header__link overlay-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                  {% include 'image-element', image: section.settings.overlay_logo, alt: section.settings.overlay_logo.alt, additional_classes: 'overlay-logo', back_to_basics: true %}
+                </a>
+              </div>
+              <div class="logo__content">
+                {% if section.settings.logo != blank %}
+                  <h1 class="visuallyhidden">{{ shop.name }}</h1>
+                  <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                    <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/YourZooki_logo_140px_width.svg?v=1600194994" alt="" class="primary-logo">
+                  </a>
+                {% else %}
+                  <h1 class="header__logo-text">
+                    <a href="{{ shop.url }}" class="header__link primary-brand">
+                      {{ shop.name }}
+                    </a>
+                  </h1>
+                {% endif %}
+              </div>
+            {% elsif section.settings.logo != blank %}
+              {% if template contains 'index' %}
+                <h1 class="visuallyhidden">{{ shop.name }}</h1>
+              {% endif %}
+              <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+                <img src="https://cdn.shopify.com/s/files/1/0287/3828/9738/files/YourZooki_logo_140px_width.svg?v=1600194994" alt="" class="primary-logo">
+              </a>
+            {% else %}
+              {% if template contains 'index' %}
+                <h1 class="header__logo-text">
+                  <a href="{{ shop.url }}" class="header__link primary-brand">
+                    {{ shop.name }}
+                  </a>
+                </h1>
+              {% else %}
+                <a href="{{ shop.url }}" class="header__logo-text header__link primary-brand">
+                  {{ shop.name }}
+                </a>
+              {% endif %}
+            {% endif %}
+          </div>
+          {%- comment -%} Added by westmountsolutions.com WSDEV200904-DV - Put black colors on all items on not active links {%- endcomment -%}
+          {% assign main_menu = linklists[section.settings.mob_main_linklist] %}
+          {% assign wsActive = false %}
+          {% for link in main_menu.links %}
+            {% if link.active or link.child_active %}
+              {% assign wsActive = true %}
+            {% endif %}
+          {% endfor %}
+          <div ppp class="header__menu is-justify-{{ section.settings.menu_alignment }} {% unless wsActive %}ws_all_black{% endunless %}">
+          {%- comment -%} End of added by westmountsolutions.com WSDEV200904-DV - Put black colors on all items on not active links {%- endcomment -%}
+            <nav class="header__menu-items is-flex is-flex-wrap is-justify-{{ section.settings.menu_alignment }} header__dropdown--{{ settings.dropdown_position }}" role="navigation" aria-label="main navigation">
+              {% for link in main_menu.links %}
+                {% if link.links == blank %}
+                  <div class="navbar-item header__item {% if link.active or link.child_active %}is-active{% endif %}" data-navlink-handle="{{ link.title | handleize }}">
+                    <a data-loop="{{forloop.index}} "href="{{ link.url }}" class="navbar-link header__link {% if link.active %}is-active{% endif %} is-arrowless">
+                    {% if forloop.index == 2 %} 
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"> <g fill="none" fill-rule="evenodd"> <g> <g> <g> <g> <g> <path d="M0 0H24V24H0z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> <path fill="#E9550D" d="M18.078 5.043c0 1.062-1.083 1.933-2.44 2.457H22c.276 0 .5.224.5.5v5c0 .276-.224.5-.5.5h-.5V22c0 .245-.177.45-.41.492L21 22.5H3c-.276 0-.5-.224-.5-.5v-8.5H2c-.245 0-.45-.177-.492-.41L1.5 13V8c0-.276.224-.5.5-.5h5.94C6.581 6.976 5.5 6.105 5.5 5.043c0-2.252 1.81-3.27 4.24-1.938.955.523 1.673 1.316 2.05 2.172.375-.856 1.093-1.65 2.047-2.172 2.43-1.331 4.24-.314 4.24 1.938zM11 13.5H3.5v8H11v-8zm9.5 0H13v8h7.5v-8zm-9.5-5H2.5v4H11v-4zm10.5 0H13v4h8.5v-4zM9.26 3.982C7.486 3.01 6.5 3.564 6.5 5.043c0 .97 2.488 2 4.259 2 .271 0 .411-.303.268-.91-.19-.805-.83-1.637-1.767-2.151zm5.058 0c-.938.514-1.578 1.346-1.768 2.15-.143.608-.003.911.269.911 1.771 0 4.259-1.03 4.259-2 0-1.48-.986-2.033-2.76-1.061z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> </g> </g> </g> </g> </svg>
+                    {% endif %}
+                    {{ link.title }}
+                    </a>
+                  </div>
+                {% else %}
+                  <div class="navbar-item header__item has-dropdown has-dropdown--{{ settings.dropdown_style }} is-hoverable {% if link.active or link.child_active %}is-active{% endif %}" aria-haspopup="true" aria-expanded="false" data-navlink-handle="{{ link.title | handleize }}">
+                    <a class="navbar-link header__link {% if link.active or link.child_active %}is-active{% endif %}"
+                      {% unless link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %} href="{{ link.url }}" {% endunless %}>
+                      {% if forloop.index == 2 %} 
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="margin-right: 5px;"> <g fill="none" fill-rule="evenodd"> <g> <g> <g> <g> <g> <path d="M0 0H24V24H0z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> <path fill="#E9550D" d="M18.078 5.043c0 1.062-1.083 1.933-2.44 2.457H22c.276 0 .5.224.5.5v5c0 .276-.224.5-.5.5h-.5V22c0 .245-.177.45-.41.492L21 22.5H3c-.276 0-.5-.224-.5-.5v-8.5H2c-.245 0-.45-.177-.492-.41L1.5 13V8c0-.276.224-.5.5-.5h5.94C6.581 6.976 5.5 6.105 5.5 5.043c0-2.252 1.81-3.27 4.24-1.938.955.523 1.673 1.316 2.05 2.172.375-.856 1.093-1.65 2.047-2.172 2.43-1.331 4.24-.314 4.24 1.938zM11 13.5H3.5v8H11v-8zm9.5 0H13v8h7.5v-8zm-9.5-5H2.5v4H11v-4zm10.5 0H13v4h8.5v-4zM9.26 3.982C7.486 3.01 6.5 3.564 6.5 5.043c0 .97 2.488 2 4.259 2 .271 0 .411-.303.268-.91-.19-.805-.83-1.637-1.767-2.151zm5.058 0c-.938.514-1.578 1.346-1.768 2.15-.143.608-.003.911.269.911 1.771 0 4.259-1.03 4.259-2 0-1.48-.986-2.033-2.76-1.061z" transform="translate(-423 -28) translate(0 1) translate(423 26.437) translate(0 .563)"/> </g> </g> </g> </g> </g> </svg>
+                      {% endif %}
+                      {{ link.title }}
+                    </a>
+                    {% include 'header__dropdown-menu' %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </nav>
+          </div>
+
+          {% include 'header__action-icons' %}
+        </div>
+      </div>
+    </section>
+    <div class="navigation-overlay">
+
+    </div>
+  </header>

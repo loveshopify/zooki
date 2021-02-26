@@ -1,0 +1,130 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}
+<script>
+    'use strict';
+    const WSEvents = {
+        productTemplate: () => {
+            // Slide on product gallery with arrows
+            $('.product-gallery').on('click', '.flickity-button', function (e) {
+                if ($(this).hasClass('next')) {
+                    $('.product-gallery__main').flickity('next');
+                } else if ($(this).hasClass('previous')) {
+                    $('.product-gallery__main').flickity('previous');
+                }
+            });
+
+            // Custom radio button functionality
+            $(document).on("click", ".ws_radio_btn", function (e) {
+                $('.ws_radio_btn').removeClass('rad_selected');
+                $(e.currentTarget).addClass('rad_selected');
+                $(e.currentTarget).siblings('input').trigger('click');
+            });
+
+            // WIDGET EVENTS
+            // Change selection on subscription widget
+            $(document).on("change", '.ws_widget [name="ws_type"]', function (e) {
+                var buyType = $(e.currentTarget).val();
+                $('.ws_widget .is-selected').removeClass('is-selected');
+                $(`.ws_widget .ws_info .${buyType}`).addClass('is-selected');
+                $(e.currentTarget).closest('.ws_type').addClass('is-selected');
+                // Change purchase type on current widget
+                if (buyType == "trial") {
+                    $(`.swatch_options [data-variant-id="${trialID}"]`).trigger('click');
+                } else {
+                    WSFunctions.updateType(buyType);
+                    $(`.${buyType} select`).trigger('change');
+                }
+                WSFunctions.updatePrice(buyType);
+                $(window).trigger('resize');
+            });
+
+            // Variant change on the subscription widget      
+            $(document).on("change", '.ws_info select', function (e) {
+                const variantId = $(e.currentTarget).find(':selected').val().split('-')[0];
+                const buyType = $('[name="ws_type"]:checked').val();
+                $(`.swatch_options [data-variant-id="${variantId}"]`).trigger('click');
+                // Update subscription frequency
+                if (buyType == 'subscription') {
+                    let frequency = $(e.currentTarget).find(':selected').val().split('-')[1];
+                    $('.shopify-product-form [name="properties[frequency_num]"]').val(frequency);
+                    // Update pricing
+                    WSFunctions.updatePrice(buyType);
+                } else if (buyType == 'one-time') {
+                    WSFunctions.updateType(buyType);
+                    // Update pricing on one-time purchase
+                    const selectedIndex = $(e.currentTarget).find(':selected').index();
+                    const priceUp = $('.current_price span.money').text();
+                    var qtyArray = _qtyTags.replace(/WS:/g, '').split('-');
+                    var variantPrice = productData.variants[0].price;
+                    var priceDiscount = parseFloat(variantPrice * qtyArray[selectedIndex]);
+                    priceDiscount = WSFunctions.formatPrice(priceDiscount / 100);
+                    $('.ws-div-lbprice-subsave .ws_total b').text(priceUp);
+                    $('.ws-div-price label.ws_dicounted_price').text(priceDiscount);
+                    // Toggle discount price text
+                    if (selectedIndex == 0) {
+                        $('.ws-div-price label.ws_dicounted_price').hide();
+                    } else {
+                        $('.ws-div-price label.ws_dicounted_price').show();
+                    }
+                }
+            });
+
+            // Add to the cart
+            $(document).on("click", '.ws-bt', function (e) {
+                e.stopImmediatePropagation();
+                const buyType = $('[name="ws_type"]:checked').val();
+                const $addToCartBtn = $(e.currentTarget);
+                // Animate button
+                $addToCartBtn.attr('disabled', 'disabled').addClass('disabled');
+                $addToCartBtn.find('span').removeClass("fadeInDown").addClass('animated zoomOut');
+                window.setTimeout(function () {
+                    $addToCartBtn.find('.checkmark').addClass('checkmark-active');
+                    window.setTimeout(function () {
+                        $addToCartBtn.removeAttr('disabled').removeClass('disabled');
+                        $addToCartBtn.find('.checkmark').removeClass('checkmark-active');
+                        $addToCartBtn.find('.text, .icon').removeClass('zoomOut').addClass('fadeInDown');
+                        $addToCartBtn.on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
+                            $addToCartBtn.find('span').removeClass('fadeInDown');
+                        });
+                    }, 1000);
+                }, 300);
+
+                // Append attribute of the next date
+                if (buyType == 'trial') {
+                    $('.ro_widget').append(`<input type='hidden' name='attributes[newDate]' value='${_newDate}'>`);
+                    $('#AddToCartForm').trigger('submit');
+                } else {
+                    $('.text-fixed-buy-button .sticky-btn').click();
+                }
+            });
+
+            // Add to cart without redirect to the cart page
+            $(document).on("submit", '#AddToCartForm', function (e) {
+                e.preventDefault();
+                // Add property to be able to link the products on the cart page
+                if (!$('#ws_original_product').length) {
+                    $(e.target).append(`<input id='ws_original_product' type='hidden' name='properties[_ws_original_product]' value='${productData.handle}'/>`)
+                }
+                $.ajax({
+                    url: '/cart/add',
+                    type: 'POST',
+                    data: $(e.target).serialize()
+                }).always(function () {
+                    // Update cart drawer
+                    Shopify.theme.jsAjaxCart.showDrawer();
+                    Shopify.theme.jsAjaxCart.updateView();
+                });
+            });
+
+            // Detect when BOLD has refreshed the template
+            BOLD.recurring_orders.app.ee.on('template_refreshed', function (data) {
+                var buyType = $('[name="ws_type"]:checked').val();
+                WSFunctions.updateType(buyType);
+                WSFunctions.updatePrice(buyType);
+            });
+
+            // Adjust widget height on window resize
+            $(window).on('resize', WSFunctions.fixWidgetHeight);
+        }
+    };
+</script>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DVHV {%- endcomment -%}

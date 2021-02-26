@@ -1,0 +1,40 @@
+{% assign collection_handles = product.collections | map: 'handle' %}
+{% assign variant = product.selected_or_first_available_variant %}
+{% capture image_paths_alts %}{% for image in product.images %}{{ image | img_url: "master" }}^{{ image.alt | escape }}^{{ image.id }}^{{ image.width }}{% unless forloop.last %}~{% endunless %}{% endfor %}{% endcapture %}
+{% assign collection_handles = product.collections | map: 'handle' %}
+
+{% if settings.quickshop_truncate_words %}
+  {%- capture productDescription -%}
+    {{ product.description | strip_html | truncatewords: settings.quickshop_truncate_words_limit | replace: 'Description', '' | replace: 'Dimensions', '' | replace: 'Details', '' | replace: 'Specs', '' | replace: 'Shipping', '' | replace: 'Size', '' | escape }}
+  {%- endcapture - %}
+{% else %}
+  {%- capture productDescription -%}
+    {{ product.description | strip_html | replace: 'Description', '' | replace: 'Dimensions', '' | replace: 'Details', '' | replace: 'Specs', '' | replace: 'Shipping', '' | replace: 'Size', '' | escape }}
+  {%- endcapture -%}
+{% endif %}
+
+<div class="quick-shop__buttons animated fadeInUp">
+  <span class="quick_shop button action_button {{ settings.quickshop_button_style }} js-quick-shop-link"
+  data-id="{{ product.id }}"
+  data-handle="{{ product.handle }}"
+  data-single-variant="{% if product.has_only_default_variant %}true{% else %}false{% endif %}"
+  data-url="{{ product.url | within: collection }}"
+  data-title="{{ product.title | escape }}"
+  data-details-text="{{ 'collections.general.view_product_details_html' | t | escape}}"
+  data-full-description="{{ product.description | split: '<!-- split -->' | first | escape }}"
+  data-regular-description="{{ productDescription }}"
+  data-featured-image="{{ product.featured_image | img_url: '800x' }}"
+  data-images="{{ image_paths_alts }}"
+  data-collection-handles="{{ collection_handles | join: ','}}"
+>
+  {{ 'collections.general.quick_shop' | t }}
+  </span>
+
+  <div class="quickshop-forms__container js-quickshop-forms__container js-quickshop-forms--{{ product.id }}">
+      {% unless collection_handles contains 'coming-soon' %}
+        {% include 'product__notify-me-form' %}
+        {% include 'product__form', type: 'quickshop' %}
+      {% endunless %}
+    </div>
+</div>
+

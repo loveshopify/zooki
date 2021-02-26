@@ -1,0 +1,46 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+<div class="ws_container ws_widget trial_pack two">{%- comment -%}Add a new class two{%- endcomment -%}
+    <div class="ws_options">
+        <div class="ws_type">
+            <div class="ws_button">
+                <input type="radio" name="ws_type" value="one-time">
+                <div class="ws_radio_btn">
+                    <div class="ws_fill"></div>
+                </div>
+            </div>
+            <div class="ws_title">
+                <span>One time purchase</span>
+            </div>
+            <div class="ws_skirt"></div>
+        </div>
+        <div class="ws_type is-selected item-last-child">
+            <div class="ws_button">
+                <input type="radio" name="ws_type" value="subscription" checked>
+                <div class="ws_radio_btn rad_selected">
+                    <div class="ws_fill"></div>
+                </div>
+            </div>
+            <div class="ws_title">
+                <span>Subscribe and save</span>
+            </div>
+            <div class="ws_skirt"></div>
+        </div>
+        {%- comment -%}the content of the div element with the class ws_type was deleted{%- endcomment -%}
+    <div class="ws_info">
+        <div class="ws_skirt"></div>
+        <div class="one-time">
+            {% render 'ws-sub_select' %}
+        </div>
+        <div class="subscription is-selected">
+            {% render 'ws-sub_select' %}
+            <div class="ws_details">
+                <div><span><i class="fas fa-shipping-fast"></i>Available next-day delivery</span></div>
+                <div><span><i class="fas fa-certificate"></i>Save £5</span></div>
+                <div><span><i class="far fa-thumbs-up"></i>Cancel anytime</span></div>
+            </div>
+        </div>
+        {%- comment -%}the content of the div element with the class trial was deletedR{%- endcomment -%}
+    </div>
+</div>
+</div>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}

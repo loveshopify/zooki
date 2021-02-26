@@ -1,0 +1,3190 @@
+{% comment %}
+** Product - main content area **
+- Product template
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  }
+
+  .section--has-sidebar-option.has-sidebar-enabled {
+    {% if width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  .section--has-sidebar-option.has-sidebar-disabled {
+    width: 100%;
+    max-width: none;
+  }
+
+  {% if section.settings.product_breadcrumb == false %}
+    .breadcrumb__container {
+      display: none;
+    }
+  {% endif %}
+
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% assign collection_handles = product.collections | map: 'handle' %}
+{% assign variant = product.selected_or_first_available_variant %}
+{% assign product_tags = product.tags | join: ' ' %}
+
+{% include 'product__structured-data' %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section is-width-{{ width }} {{ css_class }}">
+  <div class="product-{{ product.id }}">
+    <div class="product_section
+                js-product_section
+                container
+                is-justify-space-between
+                has-padding-bottom
+                {% if section.settings.product_images_position == 'right' %}
+                  is-flex-row-reverse
+                {% endif %}"
+                data-rv-handle="{{ product.handle }}">
+
+      <div class="product__images
+                  one-half
+                  column
+                  medium-down--one-whole">
+        {% include 'product__images' %}
+      </div>
+
+      <div class="product__information
+                  has-product-sticker
+                  one-half
+                  column
+                  medium-down--one-whole">
+
+        {% comment %} Sale sticker {% endcomment %}
+        {% if settings.stickers_enabled %}
+          {% include 'product-thumbnail__sticker', context: 'product' %}
+        {% endif %}
+
+        {% comment %} Review stars {% endcomment %}
+        {% if section.settings.enable_shopify_product_badges and settings.enable_shopify_review_comments %}
+          <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+        {% endif %}
+
+        {% comment %} Vendor {% endcomment %}
+        {% if section.settings.display_vendor %}
+          <p class="vendor">
+            <span class="vendor">{{ product.vendor | link_to_vendor }}</span>
+          </p>
+        {% endif %}
+
+        {% comment %} Sku {% endcomment %}
+        {% if variant.sku != blank and section.settings.display_sku %}
+          <p class="sku">
+            {{ variant.sku }}
+          </p>
+        {% endif %}
+
+
+
+        <div>
+
+          {% comment %} Name {% endcomment %}
+          <h1 class="product_name title">{{ product.title }}</h1>
+          testing
+          <div class="yotpo bottomLine"
+  data-product-id="{{ product.id }}">
+{%- assign yotpo_offload_content = shop.metafields.yotpo.yotpo_offload_content %}
+{%- assign time_now = 'now' | date: '%s' %}
+{%- assign yotpo_live_time = shop.metafields.yotpo.yotpo_live | date: '%s' %}
+{%- assign diff_seconds_from_live = time_now | minus: yotpo_live_time %}
+{%- assign yotpo_bottomline_last_updated = product.metafields.yotpo.bottomline_update_time | date: '%s' %}
+{%- assign diff_seconds_from_last_bottomline_update = time_now | minus: yotpo_bottomline_last_updated %}
+{%- if yotpo_live_time and diff_seconds_from_live < 86400 or yotpo_bottomline_last_updated and diff_seconds_from_last_bottomline_update < 86400 -%}
+   {%- assign yotpo_bottomline_obsolete = false %}
+{%- else %}
+   {%- assign yotpo_bottomline_obsolete = true %}
+{%- endif %}
+{%- if yotpo_offload_content == 'yes' and yotpo_bottomline_obsolete != true -%}
+   {{ product.metafields.yotpo.bottomline }}
+{%- endif %}
+</div>
+          
+          {% for tag in product.tags %}
+            {% if tag contains 'meta-size-chart-' %}
+              {% assign meta-size-chart = true %}
+            {% endif %}
+          {% endfor %}
+
+          {% comment %} Size chart Mobile {% endcomment %}
+          {% if settings.size_chart != blank or meta-size-chart %}
+            <a href="javascript:;" class="product__size-chart size-chart--medium-down" data-fancybox data-src="#size-chart{{product.id}}" data-type="inline">{{ 'products.product.size_chart' | t }} {% include settings.icon, name: 'right-caret' %}</a>
+            {% include 'popup-size-chart', product_id: product.id %}
+          {% endif %}
+
+          {% comment %} Price {% endcomment %}
+          <p class="modal_price subtitle">
+            {% if collection_handles contains 'coming-soon' %}
+              {% if settings.stickers_enabled == false %}
+                {{ 'collections.general.coming_soon' | t }}
+              {% endif %}
+            {% else %}
+
+              {% comment %} Sold out {% endcomment %}
+              <span class="sold_out">{% if variant.available == false %}{{ 'products.product.sold_out' | t }}{% endif %}</span>
+
+              {% comment %} Current price {% endcomment %}
+              <span class="{% if variant.compare_at_price > variant.price %}sale{% endif %}">
+                <span class="current_price {% if product.available == false %}hidden{% endif %}">
+                  {% if variant.price > 0 %}
+                    <span class="money">{{ variant.price | money }}</span>
+                  {% else %}
+                    {{ settings.free_price_text }}
+                  {% endif %}
+                </span>
+              </span>
+
+              {% comment %} Compare at (original) price {% endcomment %}
+              <span class="was-price">
+                {% if variant.price < variant.compare_at_price and variant.available %}
+                  <span class="money">{{ variant.compare_at_price | money }}</span>
+                {% endif %}
+              </span>
+
+              {% comment %} Size chart {% endcomment %}
+              {% if settings.size_chart != blank or meta-size-chart %}
+                <a href="javascript:;" class="product__size-chart medium-down--hidden" data-fancybox data-src="#size-chart{{product.id}}" data-type="inline">{{ 'products.product.size_chart' | t }} {% include settings.icon, name: 'right-caret' %}</a>
+                {% include 'popup-size-chart', product_id: product.id %}
+              {% endif %}
+
+              {% comment %} Savings {% endcomment %}
+              {% if section.settings.display_savings %}
+                <span class="sale savings">
+                  {% if variant.price < variant.compare_at_price and variant.available %}
+                    {{ 'products.product.savings' | t }}  {{ variant.compare_at_price | minus: variant.price | times: 100 | divided_by: variant.compare_at_price }}% (<span class="money">{{ variant.compare_at_price | minus: variant.price | money }}</span>)
+                  {% endif %}
+                </span>
+              {% endif %}
+            {% endif %}
+          </p>
+        </div>
+
+        {% comment %} Description - top {% endcomment %}
+        {% if section.settings.product_description_position == "top" %}
+          {% if product.description != blank %}
+            <div class="description content has-padding-top">
+              {{ product.description | split: '<!-- split -->' | first }}
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% comment %} Purchase form {% endcomment %}
+        <div class="product-form-container has-padding-top">
+
+          {% comment %} Notify form {% endcomment %}
+          {% include 'product__notify-me-form' %}
+
+          {% comment %} Product form {% endcomment %}
+          {% unless collection_handles contains 'coming-soon' %}
+            {% include 'product__form' with 'product', type: 'product' %}
+          {% endunless %}
+        </div>
+
+        {% comment %} Description - bottom {% endcomment %}
+        {% if section.settings.product_description_position == "bottom" %}
+          {% if product.description != blank %}
+            <div class="description content bottom has-padding-top">
+              {{ product.description | split: '<!-- split -->' | first }}
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% comment %} Collections, type, tags {% endcomment %}
+        {% if section.settings.display_collections or section.settings.display_tags or section.settings.display_type %}
+          <div class="product__classification-links has-padding-top">
+            {% if section.settings.display_collections %}
+              <p class="product__collections-list tags">
+                <span class="product__classification-title">{{ 'products.product.collections' | t }}:</span>
+                {% for col in product.collections %}
+                  <span class="tag tag--{{ settings.tag_style }}">
+                    <a href="{{ col.url }}" title="{{ col.title }}">{{ col.title }}</a>
+                  </span>
+                {% endfor %}
+              </p>
+            {% endif %}
+
+            {% if section.settings.display_type %}
+              <p class="product__type-list tags">
+                <span class="product__classification-title">{{ 'products.product.product_types' | t }}:</span>
+                <span class="tag tag--{{ settings.tag_style }}">{{ product.type | link_to_type }}</span>
+              </p>
+            {% endif %}
+
+            {% if section.settings.display_tags and product.tags.size > 0 %}
+              <p class="product__tags-list tags">
+                <span class="product__classification-title">{{ 'products.product.tags' | t }}:</span>
+                {% for tag in product.tags %}
+                  {% unless tag contains 'meta-' %}
+                    <span class="tag tag--{{ settings.tag_style }}">
+                      <a href="{{ routes.collections_url }}/{% if collection %}{{ collection.handle }}{% else %}all{% endif %}/{{ tag | handle }}" title="{{ 'products.product.products_tagged' | t: tag: tag }}">{{ tag }}</a>
+                    </span>
+                  {% endunless %}
+                {% endfor %}
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% comment %} Social share icons {% endcomment %}
+        <div class="product__social-share has-padding-top">
+          {% if section.settings.display_social_buttons %}
+            {% include 'social-share-buttons' %}
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    {% comment %} Description - split {% endcomment %}
+    {% if product.description contains "<!-- split -->"  %}
+      <div class="product-description-split">
+        <div class="description content">
+          {{ product.description | split: '<!-- split -->' | last }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "gallery_arrows": {{ section.settings.gallery_arrows | json }},
+    "thumbnail_arrows": {{ section.settings.gallery_arrows | json }},
+    "enable_zoom": {{ section.settings.enable_zoom | json }},
+    "enable_product_lightbox": {{ section.settings.enable_product_lightbox | json }},
+    "enable_thumbnail_slider": {{ section.settings.enable_thumbnail_slider | json }},
+    "slideshow_speed": {{ section.settings.slideshow_speed | json }},
+    "slideshow_transition": {{ section.settings.slideshow_transition | json }},
+    "thumbnail_position": {{ section.settings.thumbnail_position | json }},
+    "product_images_amount": {{ product.images.size }},
+    "template": "classic"
+  }
+</script>
+<script src="{{ 'z__jsProduct.js' | asset_url }}"></script>
+
+{% if section.blocks.size > 0 %}
+
+  <div class="product__blocks dynamic-blocks is-flex is-flex-wrap is-justify-center" data-check-for-order="true">
+    {% for block in section.blocks %}
+      <div id="shopify-section-{{ block.id }}" {{ block.shopify_attributes }} class="shopify-section product__block block__{{ block.type | downcase | replace: '_', '-' }}
+        {% if block.type == 'featured_collection' %}
+          jsFeaturedCollection
+        {% elsif block.type == 'image_with_overlay' %}
+          overlaid-header-option
+        {% elsif block.type == 'featured_product' %}
+          jsProduct
+        {% elsif block.type == 'map' %}
+          jsMap
+        {% elsif block.type == 'video' %}
+          jsVideo
+        {% endif %}">
+        {% if block.type == 'product_reviews' %}
+          {% comment %} Product reviews {% endcomment %}
+          {% include 'include-reviews', type: 'block' %}
+
+        {% elsif block.type == 'image_with_overlay' %}
+          {% comment %} Image with text overlay {% endcomment %}
+          {% include 'include-image-with-text-overlay', type: 'block' %}
+
+        {% elsif block.type == 'image_with_text' %}
+          {% comment %} Image with text {% endcomment %}
+          {% include 'include-one-image-with-text', type: 'block' %}
+
+        {% elsif block.type == 'rich_text' %}
+          {% comment %} Rich text {% endcomment %}
+          {% include 'include-rich-text', type: 'block' %}
+
+        {% elsif block.type == 'video' %}
+          {% comment %} Featured video {% endcomment %}
+          {% include 'include-video', type: 'block' %}
+
+        {% elsif block.type == "blog" %}
+          {% comment %} Blog {% endcomment %}
+          {% include 'include-featured-blog', type: 'block' %}
+
+        {% elsif block.type == 'featured_collection' %}
+          {% comment %} Featured collection {% endcomment %}
+          {% include 'include-featured-collection', type: 'block' %}
+
+        {% elsif block.type == 'logo_list' %}
+          {% comment %} Logo list {% endcomment %}
+          {% include 'include-logo-list', type: 'block' %}
+
+        {% elsif block.type == "divider" %}
+          {% comment %} Divider {% endcomment %}
+          {% include 'include-divider', type: 'block' %}
+
+        {% elsif block.type == 'map' %}
+          {% comment %} Map {% endcomment %}
+          {% include 'include-map', type: 'block' %}
+
+        {% elsif block.type == "page" %}
+          {% comment %} Page {% endcomment %}
+          {% include 'include-content-page', type: 'block' %}
+
+        {% elsif block.type == 'recommended_products' %}
+          {% comment %} Recommended products {% endcomment %}
+          <section class="section is-width-{{ width }}" data-product-recommendations-container
+              {% if block.settings.animation != "none" %}
+              data-scroll-class="{{ block.settings.animation }}"
+              {% endif %}>
+          </section>
+
+          {% style %}
+            #shopify-section-{{ block.id }} {
+              padding-top: {{ block.settings.padding_top }}px;
+              padding-bottom: {{ block.settings.padding_bottom }}px;
+              width: 95%;
+              {% if block.settings.width == 'wide' %}
+                width: 100%;
+              {% endif %}
+            }
+          {% endstyle %}
+
+        {% endif %}
+      </div>
+
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% schema %}
+
+{
+  "name": "Product",
+  "max_blocks": 10,
+  "class": "product-template product-main has-sidebar-option jsProduct",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "product_breadcrumb",
+      "label": "Show breadcrumb links"
+    },
+    {
+      "type": "header",
+      "content": "Product gallery"
+    },
+    {
+      "type": "checkbox",
+      "id": "gallery_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Magnify on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_product_lightbox",
+      "label": "Enable lightbox",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "slideshow_speed",
+      "label": "Gallery speed",
+      "min": 0,
+      "max": 6,
+      "unit": "sec",
+      "default": 3,
+      "info": "Set to 0 to disable autoplay."
+    },
+    {
+      "type": "select",
+      "id": "slideshow_transition",
+      "label": "Gallery transition",
+      "options": [
+        {
+          "value": "slide",
+          "label": "Slide"
+        },
+        {
+          "value": "fade",
+          "label": "Fade"
+        }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "select",
+      "id": "thumbnail_position",
+      "label": "Thumbnails",
+      "options": [
+        {
+          "value": "left-thumbnails",
+          "label": "Left"
+        },
+        {
+          "value": "right-thumbnails",
+          "label": "Right"
+        },
+        {
+          "value": "bottom-thumbnails",
+          "label": "Bottom"
+        },
+        {
+          "value": "no-thumbnails",
+          "label": "None"
+        }
+      ],
+      "default": "bottom-thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_thumbnail_slider",
+      "label": "Enable thumbnail slider",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "product_images_position",
+      "label": "Gallery position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Dynamic Checkout Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_button",
+      "label": "Show dynamic checkout button",
+      "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https:\/\/help.shopify.com\/manual\/using-themes\/change-the-layout\/dynamic-checkout)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product information"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_sku",
+      "label": "Show SKU",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_shopify_product_badges",
+      "label": "Show star rating",
+      "info": "Reviews app must be enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360008549274#section2)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_savings",
+      "label": "Show price savings",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_collections",
+      "label": "Show collections",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_type",
+      "label": "Show type",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_tags",
+      "label": "Show tags",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "display_social_buttons",
+      "label": "Show social media share icons",
+      "default": true
+    },
+    {
+      "type": "radio",
+      "id": "product_description_position",
+      "label": "Description position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Above 'add to cart'"
+        },
+        {
+          "value": "bottom",
+          "label": "Below 'add to cart'"
+        }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "blog",
+      "name": "Blog posts",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Recent blog posts"
+        },
+        {
+          "type": "blog",
+          "id": "blog_widget_select",
+          "label": "Blog"
+        },
+        {
+          "type": "range",
+          "id": "home_page_articles",
+          "label": "Posts",
+          "min": 2,
+          "max": 4,
+          "default": 3
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_tags",
+          "label": "Show tags",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_author",
+          "label": "Show author",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "read_time",
+          "label": "Show estimated read time",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_date",
+          "label": "Show date",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_comment_count",
+          "label": "Show comment count",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "blog_show_excerpt",
+          "label": "Show excerpts",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show-border",
+          "label": "Show border",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Read more"
+        },
+        {
+          "type": "select",
+          "id": "button_type",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            }
+          ],
+          "default": "button--primary"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ],
+          "default": "standard"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        {
+          "type": "select",
+          "id": "divider_style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "short",
+              "label": "Short horizontal"
+            },
+            {
+              "value": "long",
+              "label": "Long horizontal"
+            },
+            {
+              "value": "vertical",
+              "label": "Vertical"
+            }
+          ],
+          "default": "short"
+        },
+        {
+          "type": "range",
+          "id": "divider_width",
+          "label": "Thickness",
+          "min": 0,
+          "max": 5,
+          "default": 2,
+          "unit": "px"
+        },
+        {
+          "type": "color",
+          "id": "divider_color",
+          "label": "Color",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "standard",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "featured_collection",
+      "name": "Featured collection",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Featured collection"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "header",
+          "content": "Product"
+        },
+        {
+          "type": "range",
+          "id": "products_per",
+          "label": "Products per row",
+          "min": 2,
+          "max": 7,
+          "default": 3
+        },
+        {
+          "type": "select",
+          "id": "mobile_products_per_row",
+          "label": "Products per row on mobile",
+          "info": "Applied only when 'Collection layout' is set to 'Grid'.",
+          "options": [
+            {
+              "value": "1",
+              "label": "1"
+            },
+            {
+              "value": "2",
+              "label": "2"
+            }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "range",
+          "id": "products_limit",
+          "label": "Limit products",
+          "min": 3,
+          "max": 20,
+          "default": 6
+        },
+        {
+          "type": "checkbox",
+          "id": "align_height",
+          "label": "Align to height"
+        },
+        {
+          "type": "range",
+          "id": "collection_height",
+          "label": "Product image height",
+          "min": 150,
+          "max": 400,
+          "step": 10,
+          "default": 200,
+          "unit": "px",
+          "info": "Applied when 'Align to height' is also enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022543913)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "radio",
+          "id": "collection_style",
+          "label": "Collection layout",
+          "default": "grid",
+          "options": [
+            {
+              "value": "slider",
+              "label": "Slider"
+            },
+            {
+              "value": "grid",
+              "label": "Grid"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ],
+          "default": "standard"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_gutter",
+          "label": "Show gutter",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image_with_overlay",
+      "name": "Image with text overlay",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1800 x 900px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Only active in absence of buttons"
+        },
+        {
+          "type": "header",
+          "content": "Text"
+        },
+        {
+          "type": "richtext",
+          "id": "pretext",
+          "label": "Preheading",
+          "default": "<p>Preheading</p>"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Image with Text Overlay"
+        },
+        {
+          "type": "richtext",
+          "id": "subtitle",
+          "label": "Subheading",
+          "default": "<p>Additional info in the subheading</p>"
+        },
+        {
+          "type": "color",
+          "id": "pretext_color",
+          "label": "Preheading",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color",
+          "label": "Subheading",
+          "default": "#000000"
+        },
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "text_horizontal_position",
+          "label": "Horizontal position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "text_vertical_position",
+          "label": "Vertical position",
+          "options": [
+            {
+              "value": "top",
+              "label": "Top"
+            },
+            {
+              "value": "middle",
+              "label": "Middle"
+            },
+            {
+              "value": "bottom",
+              "label": "Bottom"
+            }
+          ],
+          "default": "middle"
+        },
+        {
+          "type": "header",
+          "content": "Text background"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "range",
+          "id": "background_opacity",
+          "label": "Background opacity",
+          "min": 0,
+          "max": 100,
+          "default": 77,
+          "unit": "%"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Border",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "label": "Border width",
+          "min": 0,
+          "max": 20,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "text_width",
+          "label": "Text width",
+          "min": 40,
+          "max": 100,
+          "default": 40,
+          "unit": "%"
+        },
+        {
+          "type": "header",
+          "content": "Buttons"
+        },
+        {
+          "type": "text",
+          "id": "button_1",
+          "label": "Button 1 label",
+          "default": "Button 1"
+        },
+        {
+          "type": "url",
+          "id": "button_1_link",
+          "label": "Button 1 link"
+        },
+        {
+          "type": "select",
+          "id": "button_1_style",
+          "label": "Button 1 style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--secondary"
+        },
+        {
+          "type": "text",
+          "id": "button_2",
+          "label": "Button 2 label",
+          "default": "Button 2"
+        },
+        {
+          "type": "url",
+          "id": "button_2_link",
+          "label": "Button 2 link"
+        },
+        {
+          "type": "select",
+          "id": "button_2_style",
+          "label": "Button 2 style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--secondary"
+        },
+        {
+          "type": "header",
+          "content": "Mobile"
+        },
+        {
+          "type": "select",
+          "id": "mobile_image_crop",
+          "label": "Image cropping",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile_text_below_image",
+          "label": "Show text below image",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "pretext_color_mobile",
+          "label": "Preheading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "heading_color_mobile",
+          "label": "Heading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color_mobile",
+          "label": "Subheading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "options": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ],
+          "default": "wide"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Left spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_right",
+          "label": "Right spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image_with_text",
+      "name": "Image with text",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Image"
+        },
+        {
+          "type": "select",
+          "id": "image_position",
+          "label": "Image position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1024 x 1024px recommended"
+        },
+        {
+          "type": "select",
+          "id": "image_crop",
+          "label": "Image cropping",
+          "default": "none",
+          "info": "Only applied when text area is taller than the image.",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Text"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading text here"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Base size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "regular",
+              "label": "Regular"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ],
+          "default": "regular"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "View all"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        },
+        {
+          "type": "header",
+          "content": "Text layout"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "select",
+          "id": "vertical_position",
+          "label": "Vertical position",
+          "options": [
+            {
+              "value": "start",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "end",
+              "label": "Bottom"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Colors"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "standard",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "id": "show_gutter",
+          "label": "Show gutter",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "logo_list",
+      "name": "Logo list",
+      "settings": [
+        {
+          "type": "range",
+          "id": "logos_per_row",
+          "label": "Logos per row",
+          "min": 1,
+          "max": 8,
+          "default": 4
+        },
+        {
+          "type": "select",
+          "id": "logo_size",
+          "label": "Logo size",
+          "default": "medium",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo1",
+          "label": "Show logo 1",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image1",
+          "label": "Logo 1",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link1",
+          "label": "Link 1"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo2",
+          "label": "Show logo 2",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image2",
+          "label": "Logo 2",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link2",
+          "label": "Link 2"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo3",
+          "label": "Show logo 3",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image3",
+          "label": "Logo 3",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link3",
+          "label": "Link 3"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo4",
+          "label": "Show logo 4",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image4",
+          "label": "Logo 4",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link4",
+          "label": "Link 4"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo5",
+          "label": "Show logo 5"
+        },
+        {
+          "type": "image_picker",
+          "id": "image5",
+          "label": "Logo 5",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link5",
+          "label": "Link 5"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo6",
+          "label": "Show logo 6"
+        },
+        {
+          "type": "image_picker",
+          "id": "image6",
+          "label": "Logo 6",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link6",
+          "label": "Link 6"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo7",
+          "label": "Show logo 7"
+        },
+        {
+          "type": "image_picker",
+          "id": "image7",
+          "label": "Logo 7",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link7",
+          "label": "Link 7"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_logo8",
+          "label": "Show logo 8"
+        },
+        {
+          "type": "image_picker",
+          "id": "image8",
+          "label": "Logo 8",
+          "info": "800 x 800px recommended"
+        },
+        {
+          "type": "url",
+          "id": "link8",
+          "label": "Link 8"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "map",
+      "name": "Map",
+      "settings": [
+        {
+          "type": "text",
+          "id": "map_address",
+          "label": "Address",
+          "info": "Google Maps will find the exact location"
+        },
+        {
+          "type": "range",
+          "id": "map_height",
+          "min": 300,
+          "max": 600,
+          "step": 10,
+          "unit": "px",
+          "label": "Map height",
+          "default": 400
+        },
+        {
+          "type": "range",
+          "id": "zoom_level",
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "unit": "x",
+          "label": "Map zoom level",
+          "default": 16
+        },
+        {
+          "type": "image_picker",
+          "id": "map_image",
+          "label": "Image",
+          "info": "Displayed when map isn't loaded"
+        },
+        {
+          "type": "header",
+          "content": "API key"
+        },
+        {
+          "type": "text",
+          "id": "api_key",
+          "label": "Google Maps API key",
+          "info": "You’ll need to [register a Google Maps API Key](https://help.shopify.com/manual/using-themes/troubleshooting/map-section-api-key) to display the map"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_pin",
+          "label": "Show pin",
+          "info": "Requires use of API key",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "map_style",
+          "label": "Map color scheme",
+          "options": [
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "aubergine",
+              "label": "Aubergine"
+            },
+            {
+              "value": "night",
+              "label": "Night"
+            },
+            {
+              "value": "retro",
+              "label": "Retro"
+            },
+            {
+              "value": "silver",
+              "label": "Silver"
+            }
+          ],
+          "default": "default",
+          "info": "Requires use of API key"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "wide",
+          "options": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Left spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_right",
+          "label": "Right spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "page",
+      "name": "Page",
+      "settings": [
+        {
+          "type": "page",
+          "id": "content_page",
+          "label": "Content page"
+        },
+        {
+          "type": "header",
+          "content": "Background"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#EEEEEE"
+        },
+        {
+          "type": "color",
+          "id": "gradient",
+          "label": "Gradient",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "range",
+          "id": "gradient_rotation",
+          "label": "Gradient rotation",
+          "min": 0,
+          "max": 180,
+          "step": 10,
+          "default": 0,
+          "unit": "deg"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "standard",
+          "options": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 40,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 40,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Left spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_right",
+          "label": "Right spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "product_reviews",
+      "name": "Product reviews",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Reviews app must be enabled. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360008549274#section2)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recommended Products",
+      "type": "recommended_products",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "This block can be configured using the Recommended Products section settings. [Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022889333)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "wide",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+        {
+      "type": "rich_text",
+      "name": "Rich text",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Catchy heading"
+        },
+        {
+          "type": "font_picker",
+          "id": "heading_font",
+          "label": "Font",
+          "default": "open_sans_n4"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "select",
+          "id": "heading_alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "justify",
+              "label": "Justified"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "label": "Base size",
+          "min": 20,
+          "max": 120,
+          "default": 30,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "Text"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this section to create some callout text on your page, or add more details about your shop, services, promotions, etc.<br>You can keep the background color solid or use a background image instead.</p>"
+        },
+        {
+          "type": "font_picker",
+          "id": "text_font",
+          "label": "Font",
+          "default": "open_sans_n4"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "label": "Text alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "justify",
+              "label": "Justified"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "label": "Base size",
+          "min": 8,
+          "max": 40,
+          "default": 14,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "columns",
+          "label": "Columns",
+          "min": 1,
+          "max": 3,
+          "default": 1
+        },
+        {
+          "type": "header",
+          "content": "Button"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Read more"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        },
+        {
+          "type": "header",
+          "content": "Background"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#EEEEEE"
+        },
+        {
+          "type": "color",
+          "id": "gradient",
+          "label": "Gradient",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "range",
+          "id": "gradient_rotation",
+          "label": "Gradient rotation",
+          "min": 0,
+          "max": 180,
+          "step": 10,
+          "default": 0,
+          "unit": "deg"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "standard",
+          "options": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 40,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 40,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Left spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_right",
+          "label": "Right spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "select",
+          "id": "aspect_ratio",
+          "label": "Aspect ratio",
+          "options": [
+            {
+              "value": "16:9",
+              "label": "16:9"
+            },
+            {
+              "value": "4:3",
+              "label": "4:3"
+            }
+          ],
+          "default": "16:9"
+        },
+        {
+          "type": "checkbox",
+          "id": "autoplay",
+          "label": "Autoplay on compatible devices",
+          "info": "[Learn more](https:\/\/help.outofthesandbox.com\/hc\/en-us\/articles\/360000661568)",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "autoloop",
+          "label": "Autoloop video",
+          "default": true
+        },
+        {
+          "type": "video_url",
+          "id": "iframe_video",
+          "label": "YouTube or Vimeo video URL",
+          "accept": ["youtube", "vimeo"],
+          "default": "https://www.youtube.com/watch?v=8NxS0vrPcsA"
+        },
+        {
+          "type": "checkbox",
+          "id": "controls",
+          "label": "Enable HTML5 video controls",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "html5_video",
+          "label": "HTML5 MP4/OGV File URL"
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1600 x 900px recommended"
+        },
+        {
+          "type": "text",
+          "id": "pretext",
+          "label": "Preheading"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Featured video"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subheading",
+          "default": "Embed a Youtube or Vimeo video."
+        },
+        {
+          "type": "color",
+          "id": "pretext_color",
+          "label": "Preheading",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color",
+          "label": "Subheading",
+          "default": "#000000"
+        },
+        {
+          "type": "select",
+          "id": "horizontal_text_position",
+          "label": "Horizontal position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "vertical_text_position",
+          "label": "Vertical position",
+          "options": [
+            {
+              "value": "start",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "end",
+              "label": "Bottom"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "label": "Text alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Play video"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "default": "button--secondary",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Overlay"
+        },
+        {
+          "type": "select",
+          "id": "overlay_style",
+          "label": "Overlay style",
+          "default": "text_only",
+          "options": [
+            {
+              "value": "full",
+              "label": "Full"
+            },
+            {
+              "value": "text_only",
+              "label": "Text only"
+            },
+            {
+              "value": "none",
+              "label": "None"
+            }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "video_overlay_color",
+          "label": "Overlay",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "gradient",
+          "label": "Gradient",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "range",
+          "id": "gradient_rotation",
+          "label": "Gradient rotation",
+          "min": 0,
+          "max": 180,
+          "default": 180,
+          "unit": "deg",
+          "step": 10
+        },
+        {
+          "type": "range",
+          "id": "background_opacity",
+          "label": "Background opacity",
+          "default": 77,
+          "min": 0,
+          "max": 100,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "text_width",
+          "label": "Text width",
+          "min": 40,
+          "max": 100,
+          "default": 70,
+          "unit": "%"
+        },
+        {
+          "type": "header",
+          "content": "Mobile"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile_text_below_video",
+          "label": "Show text overlaid on video",
+          "default": true
+        },
+        {
+          "type": "color",
+          "id": "pretext_color_mobile",
+          "label": "Preheading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "heading_color_mobile",
+          "label": "Heading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color_mobile",
+          "label": "Subheading",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "Width",
+          "default": "wide",
+          "options": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "standard",
+              "label": "Standard"
+            },
+            {
+              "value": "wide",
+              "label": "Wide"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Top spacing",
+          "min": 0,
+          "max": 80,
+          "default": 20,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Bottom spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_left",
+          "label": "Left spacing",
+          "min": 0,
+          "max": 80,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_right",
+          "label": "Right spacing",
+          "default": 0,
+          "min": 0,
+          "max": 80,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "animation",
+          "label": "Animation",
+          "default": "none",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "fadeIn",
+              "label": "Fade in"
+            },
+            {
+              "value": "fadeInDown",
+              "label": "Fade in down"
+            },
+            {
+              "value": "fadeInLeft",
+              "label": "Fade in left"
+            },
+            {
+              "value": "fadeInRight",
+              "label": "Fade in right"
+            },
+            {
+              "value": "slideInLeft",
+              "label": "Slide in left"
+            },
+            {
+              "value": "slideInRight",
+              "label": "Slide in right"
+            },
+            {
+              "value": "zoomIn",
+              "label": "Zoom in"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "default": {
+    "settings": {
+
+    },
+    "blocks": [
+      {
+        "type": "recommended_products",
+        "settings": {
+        }
+      }
+    ]
+  }
+}
+
+{% endschema %}

@@ -1,0 +1,889 @@
+{% comment %}
+** Contact page - additional content **
+- Uses blocks
+{% endcomment %}
+
+<section class="page-blocks">
+  {% if section.blocks.size > 0 %}
+    {% for block in section.blocks %}
+      <div id="shopify-section-{{ block.id }}" {{ block.shopify_attributes }}
+      class="shopify-section
+              block__{{ block.type | downcase | replace: '_', '-' }}
+              {% if block.type == 'map' %}
+                jsMap
+              {% endif %}">
+
+        {% if block.type == 'image_with_overlay' %}
+
+          {% include 'include-image-with-text-overlay', type: 'block' %}
+
+        {% elsif block.type == 'map' %}
+
+          {% include 'include-map', type: 'block' %}
+
+        {% elsif block.type == 'rich_text' %}
+
+          {% include 'include-rich-text', type: 'block' %}
+
+        {% endif %}
+
+      </div>
+    {% endfor %}
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Contact sections",
+    "class": "contact-section",
+    "settings": [
+    ],
+    "blocks": [
+      {
+        "type": "image_with_overlay",
+        "name": "Image with text overlay",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Image"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "1800 x 900px recommended"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link",
+            "info": "Only active in absence of buttons"
+          },
+          {
+            "type": "header",
+            "content": "Text"
+          },
+          {
+            "type": "richtext",
+            "id": "pretext",
+            "label": "Preheading",
+            "default": "<p>Preheading</p>"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Image with Text Overlay"
+          },
+          {
+            "type": "richtext",
+            "id": "subtitle",
+            "label": "Subheading",
+            "default": "<p>Additional info in the subheading</p>"
+          },
+          {
+            "type": "color",
+            "id": "pretext_color",
+            "label": "Preheading",
+            "default": "#000000"
+          },
+          {
+            "type": "color",
+            "id": "heading_color",
+            "label": "Heading",
+            "default": "#000000"
+          },
+          {
+            "type": "color",
+            "id": "subheading_color",
+            "label": "Subheading",
+            "default": "#000000"
+          },
+          {
+            "type": "select",
+            "id": "text_alignment",
+            "label": "Text alignment",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "center"
+          },
+          {
+            "type": "select",
+            "id": "text_horizontal_position",
+            "label": "Horizontal position",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "center"
+          },
+          {
+            "type": "select",
+            "id": "text_vertical_position",
+            "label": "Vertical position",
+            "options": [
+              {
+                "value": "top",
+                "label": "Top"
+              },
+              {
+                "value": "middle",
+                "label": "Middle"
+              },
+              {
+                "value": "bottom",
+                "label": "Bottom"
+              }
+            ],
+            "default": "middle"
+          },
+          {
+            "type": "header",
+            "content": "Text background"
+          },
+          {
+            "type": "color",
+            "id": "background_color",
+            "label": "Background",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "range",
+            "id": "background_opacity",
+            "label": "Background opacity",
+            "min": 0,
+            "max": 100,
+            "default": 77,
+            "unit": "%"
+          },
+          {
+            "type": "color",
+            "id": "border_color",
+            "label": "Border",
+            "default": "#FFFFFF"
+          },
+          {
+            "type": "range",
+            "id": "border_width",
+            "label": "Border width",
+            "min": 0,
+            "max": 20,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "text_width",
+            "label": "Text background width",
+            "min": 40,
+            "max": 100,
+            "default": 40,
+            "unit": "%"
+          },
+          {
+            "type": "header",
+            "content": "Buttons"
+          },
+          {
+            "type": "select",
+            "id": "button_style",
+            "label": "Button style",
+            "options": [
+              {
+                "value": "button--primary",
+                "label": "Primary"
+              },
+              {
+                "value": "button--secondary",
+                "label": "Secondary"
+              }
+            ],
+            "default": "button--secondary"
+          },
+          {
+            "type": "text",
+            "id": "button_1",
+            "label": "Button 1 label",
+            "default": "Button 1"
+          },
+          {
+            "type": "url",
+            "id": "button_1_link",
+            "label": "Button 1 link"
+          },
+          {
+            "type": "text",
+            "id": "button_2",
+            "label": "Button 2 label",
+            "default": "Button 2"
+          },
+          {
+            "type": "url",
+            "id": "button_2_link",
+            "label": "Button 2 link"
+          },
+          {
+            "type": "header",
+            "content": "Mobile"
+          },
+          {
+            "type": "select",
+            "id": "mobile_image_crop",
+            "label": "Image cropping",
+            "default": "none",
+            "options": [
+              {
+                "value": "none",
+                "label": "None"
+              },
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ]
+          },
+          {
+            "type": "checkbox",
+            "id": "mobile_text_below_image",
+            "label": "Show text below image",
+            "default": true
+          },
+          {
+            "type": "color",
+            "id": "pretext_color_mobile",
+            "label": "Preheading",
+            "default": "rgba(0,0,0,0)"
+          },
+          {
+            "type": "color",
+            "id": "heading_color_mobile",
+            "label": "Heading",
+            "default": "rgba(0,0,0,0)"
+          },
+          {
+            "type": "color",
+            "id": "subheading_color_mobile",
+            "label": "Subheading",
+            "default": "rgba(0,0,0,0)"
+          },
+          {
+            "type": "header",
+            "content": "Layout"
+          },
+          {
+            "type": "select",
+            "id": "width",
+            "label": "Width",
+            "default": "wide",
+            "options": [
+              {
+                "value": "half",
+                "label": "Half"
+              },
+              {
+                "value": "standard",
+                "label": "Standard"
+              },
+              {
+                "value": "wide",
+                "label": "Wide"
+              }
+            ]
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "label": "Top spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "label": "Bottom spacing",
+            "default": 0,
+            "min": 0,
+            "max": 80,
+            "unit": "px"
+          },
+          {
+            "type": "select",
+            "id": "animation",
+            "label": "Animation",
+            "default": "none",
+            "options": [
+              {
+                "value": "none",
+                "label": "None"
+              },
+              {
+                "value": "fadeIn",
+                "label": "Fade in"
+              },
+              {
+                "value": "fadeInDown",
+                "label": "Fade in down"
+              },
+              {
+                "value": "fadeInLeft",
+                "label": "Fade in left"
+              },
+              {
+                "value": "fadeInRight",
+                "label": "Fade in right"
+              },
+              {
+                "value": "slideInLeft",
+                "label": "Slide in left"
+              },
+              {
+                "value": "slideInRight",
+                "label": "Slide in right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "map",
+        "name": "Map",
+        "settings": [
+          {
+            "type": "text",
+            "id": "map_address",
+            "label": "Address",
+            "info": "Google Maps will find the exact location"
+          },
+          {
+            "type": "range",
+            "id": "map_height",
+            "min": 300,
+            "max": 600,
+            "step": 10,
+            "unit": "px",
+            "label": "Map height",
+            "default": 400
+          },
+          {
+            "type": "range",
+            "id": "zoom_level",
+            "min": 1,
+            "max": 20,
+            "step": 1,
+            "unit": "x",
+            "label": "Map zoom level",
+            "default": 16
+          },
+          {
+            "type": "image_picker",
+            "id": "map_image",
+            "label": "Image",
+            "info": "Displayed when map isn't loaded"
+          },
+          {
+            "type": "header",
+            "content": "API key"
+          },
+          {
+            "type": "text",
+            "id": "api_key",
+            "label": "Google Maps API key",
+            "info": "You’ll need to [register a Google Maps API Key](https://help.shopify.com/manual/using-themes/troubleshooting/map-section-api-key) to display the map"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_pin",
+            "label": "Show pin",
+            "info": "Requires use of API key",
+            "default": true
+          },
+          {
+            "type": "select",
+            "id": "map_style",
+            "label": "Map color scheme",
+            "options": [
+              {
+                "value": "default",
+                "label": "Default"
+              },
+              {
+                "value": "aubergine",
+                "label": "Aubergine"
+              },
+              {
+                "value": "night",
+                "label": "Night"
+              },
+              {
+                "value": "retro",
+                "label": "Retro"
+              },
+              {
+                "value": "silver",
+                "label": "Silver"
+              }
+            ],
+            "default": "default",
+            "info": "Requires use of API key"
+          },
+          {
+            "type": "header",
+            "content": "Layout"
+          },
+          {
+            "type": "select",
+            "id": "width",
+            "label": "Width",
+            "options": [
+              {
+                "value": "half",
+                "label": "Half"
+              },
+              {
+                "value": "standard",
+                "label": "Standard"
+              },
+              {
+                "value": "wide",
+                "label": "Wide"
+              }
+            ],
+            "default": "wide"
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "label": "Top spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "label": "Bottom spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_left",
+            "label": "Left spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_right",
+            "label": "Right spacing",
+            "default": 0,
+            "min": 0,
+            "max": 80,
+            "unit": "px"
+          },
+          {
+            "type": "select",
+            "id": "animation",
+            "label": "Animation",
+            "default": "none",
+            "options": [
+              {
+                "value": "none",
+                "label": "None"
+              },
+              {
+                "value": "fadeIn",
+                "label": "Fade in"
+              },
+              {
+                "value": "fadeInDown",
+                "label": "Fade in down"
+              },
+              {
+                "value": "fadeInLeft",
+                "label": "Fade in left"
+              },
+              {
+                "value": "fadeInRight",
+                "label": "Fade in right"
+              },
+              {
+                "value": "slideInLeft",
+                "label": "Slide in left"
+              },
+              {
+                "value": "slideInRight",
+                "label": "Slide in right"
+              },
+              {
+                "value": "zoomIn",
+                "label": "Zoom in"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "rich_text",
+        "name": "Rich text",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Heading"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Rich text"
+          },
+          {
+            "type": "font_picker",
+            "id": "heading_font",
+            "label": "Font",
+            "default": "open_sans_n4"
+          },
+          {
+            "type": "color",
+            "id": "heading_color",
+            "label": "Color",
+            "default": "rgba(0,0,0,0)"
+          },
+          {
+            "type": "select",
+            "id": "heading_alignment",
+            "label": "Text alignment",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "justify",
+                "label": "Justify"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "center"
+          },
+          {
+            "type": "range",
+            "id": "heading_size",
+            "label": "Base size",
+            "min": 20,
+            "max": 120,
+            "default": 30,
+            "unit": "px"
+          },
+          {
+            "type": "header",
+            "content": "Text"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Use this section to create some callout text on your page, or add more details about your shop, services, promotions, etc. If you have a large amount&nbsp;of text, you can opt to have it display in <strong>two columns<\/strong> instead so that it's much easier to read.<\/p>\n<p><\/p>\n<p>This section also includes&nbsp;the option to add a button&nbsp;in primary or secondary style, and also control the colors, including the option for a gradient background. Since this is rich text, you can also <em>format it as you wish<\/em> and&nbsp;<a href=\"\/collections\/all\" title=\"All Products\">include links<\/a>.<\/p>"
+          },
+          {
+            "type": "font_picker",
+            "id": "text_font",
+            "label": "Font",
+            "default": "open_sans_n4"
+          },
+          {
+            "type": "color",
+            "id": "text_color",
+            "label": "Color",
+            "default": "rgba(0,0,0,0)"
+          },
+          {
+            "type": "select",
+            "id": "text_alignment",
+            "label": "Text alignment",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "justify",
+                "label": "Justify"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "left"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "label": "Base size",
+            "min": 8,
+            "max": 40,
+            "default": 14,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "columns",
+            "label": "Columns",
+            "min": 1,
+            "max": 3,
+            "default": 2
+          },
+          {
+            "type": "header",
+            "content": "Button"
+          },
+          {
+            "type": "text",
+            "id": "button_label",
+            "label": "Button label"
+          },
+          {
+            "type": "url",
+            "id": "button_link",
+            "label": "Button link"
+          },
+          {
+            "type": "select",
+            "id": "button_alignment",
+            "label": "Alignment",
+            "info": "Does not apply to block display buttons.",
+            "options": [
+              {
+                "value": "left",
+                "label": "Left"
+              },
+              {
+                "value": "center",
+                "label": "Center"
+              },
+              {
+                "value": "right",
+                "label": "Right"
+              }
+            ],
+            "default": "center"
+          },
+          {
+            "type": "select",
+            "id": "button_style",
+            "label": "Style",
+            "options": [
+              {
+                "value": "button--primary",
+                "label": "Primary"
+              },
+              {
+                "value": "button--secondary",
+                "label": "Secondary"
+              }
+            ],
+            "default": "button--primary"
+          },
+          {
+            "type": "header",
+            "content": "Background"
+          },
+          {
+            "type": "color",
+            "id": "background",
+            "label": "Background",
+            "default": "#EEEEEE"
+          },
+          {
+            "type": "color",
+            "id": "gradient",
+            "label": "Gradient",
+            "default": "#C0C0C0"
+          },
+          {
+            "type": "range",
+            "id": "gradient_rotation",
+            "label": "Gradient rotation",
+            "min": 0,
+            "max": 180,
+            "step": 10,
+            "default": 180,
+            "unit": "deg"
+          },
+          {
+            "type": "header",
+            "content": "Layout"
+          },
+          {
+            "type": "select",
+            "id": "width",
+            "label": "Width",
+            "default": "wide",
+            "options": [
+              {
+                "value": "half",
+                "label": "Half"
+              },
+              {
+                "value": "standard",
+                "label": "Standard"
+              },
+              {
+                "value": "wide",
+                "label": "Wide"
+              }
+            ]
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "label": "Top spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "label": "Bottom spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_left",
+            "label": "Left spacing",
+            "min": 0,
+            "max": 80,
+            "default": 0,
+            "unit": "px"
+          },
+          {
+            "type": "range",
+            "id": "padding_right",
+            "label": "Right spacing",
+            "default": 0,
+            "min": 0,
+            "max": 80,
+            "unit": "px"
+          },
+          {
+            "type": "select",
+            "id": "animation",
+            "label": "Animation",
+            "default": "none",
+            "options": [
+              {
+                "value": "none",
+                "label": "None"
+              },
+              {
+                "value": "fadeIn",
+                "label": "Fade in"
+              },
+              {
+                "value": "fadeInDown",
+                "label": "Fade in down"
+              },
+              {
+                "value": "fadeInLeft",
+                "label": "Fade in left"
+              },
+              {
+                "value": "fadeInRight",
+                "label": "Fade in right"
+              },
+              {
+                "value": "slideInLeft",
+                "label": "Slide in left"
+              },
+              {
+                "value": "slideInRight",
+                "label": "Slide in right"
+              },
+              {
+                "value": "zoomIn",
+                "label": "Zoom in"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "default": {
+      "settings": {
+      },
+      "blocks": [
+        {
+          "type": "rich_text",
+          "settings": {
+            "width": "half",
+            "title": "Come and visit",
+            "heading_alignment": "left",
+            "text": "<p>You can add an address here or a short paragraph about your location(s) and hours of operation.</p><p>Mon-Fri: 9:00am - 6:00pm<br>Sat: 10:00am - 3:00pm<br>Sun: Closed</p>",
+            "columns": 1,
+            "padding_top": 0
+          }
+        },
+        {
+          "type": "map",
+          "settings": {
+            "width": "half"
+          }
+        }
+      ]
+    }
+  }
+{% endschema %}

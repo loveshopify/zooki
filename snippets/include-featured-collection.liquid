@@ -1,0 +1,122 @@
+{% comment %}
+  Snippet can be used in section
+  eg. {% include 'include-featured-collection' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% comment %}Logic and variables{% endcomment %}
+{% assign id = object.id %}
+{% assign limit = object.settings.products_limit %}
+{% assign col = object.settings.collection %}
+{% assign products = collections[col].products %}
+{% assign products_per_row  = object.settings.products_per %}
+{% assign align_height = object.settings.align_height %}
+{% assign height = object.settings.collection_height %}
+{% assign width = object.settings.width %}
+{% assign show_gutter = object.settings.show_gutter %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %}Advanced{% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Assign product length to be selected limit for onboarding {% endcomment %}
+{% if col != blank and products != blank %}
+  {%- assign section_onboarding = false -%}
+{% else %}
+  {%- assign section_onboarding = true -%}
+{% endif %}
+
+{% comment %} Check to see if enough products available to create slide {% endcomment %}
+{% if object.settings.collection_style == 'slider' %}
+  {% if object.settings.products_limit > products_per_row and collections[col].all_products_count > products_per_row %}
+    {% assign layout = 'slider' %}
+  {% else %}
+    {% assign layout = 'grid' %}
+  {% endif %}
+{% else %}
+  {% assign layout = 'grid' %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if show_gutter == false %}
+                  has-no-side-gutter
+                  has-background
+                {% else %}
+                  has-gutter-enabled
+                {% endif %}
+                "
+                {% if animation != "none" %}
+                  data-scroll-class="{{ animation }}"
+                {% endif %}>
+  {% if object.settings.title != blank %}
+    <div class="container">
+      {% include 'heading', title: object.settings.title, heading_tag: 'h2', context: 'featured-collection', text_alignment: 'center', url: collections[col].url %}
+    </div>
+  {% endif %}
+
+  <div class="container has-column-padding-bottom featured-collection layout--{{ layout }} masonry--{{ object.settings.enable_masonry_layout }} is-justify-center">
+    {% if section_onboarding == false %}
+      {% comment %} Loop through products {% endcomment %}
+      {% if layout == 'slider' %}
+        {% if collections[col].all_products_count > 0 %}
+          {% include 'product-slider', show_gutter: show_gutter %}
+        {% endif %}
+      {% else %}
+        {% if collections[col].all_products_count > 0 %}
+          {% include 'product-loop', align_height: align_height, height: height %}
+        {% endif %}
+      {% endif %}
+    {% else %}
+      {% comment %} Placeholder images {% endcomment %}
+      {% for i in (1..10) %} <!--@TODO make sure the section onboarding also shows slider styles -->
+        <div class="collection__item
+          	one-fifth
+            medium-down--one-half
+            thumbnail column">
+          {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+          {{ 'product-' | append: num | placeholder_svg_tag: 'placeholder-svg placeholder-svg--product' }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% comment %} JavaScript {% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ object.id }}"
+  data-section-data
+>
+  {
+    "enable_masonry_layout": {{ object.settings.enable_masonry_layout | json }},
+    "collection_style": {{ layout | json }},
+    "products_per": {{ object.settings.products_per_row | json}},
+    "products_available": {{ collections[col].all_products_count | json }},
+    "products_limit": {{ object.settings.products_limit | json }},
+    "align_height": {{ object.settings.align_height | json }}
+  }
+</script>
+<script data-theme-editor-load-script src="{{ 'z__jsFeaturedCollection.js' | asset_url }}"></script>

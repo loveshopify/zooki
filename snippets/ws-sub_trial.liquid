@@ -1,0 +1,66 @@
+{%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+<div class="ws_container ws_widget trial_pack">
+    <div class="ws_options">
+        <div class="ws_type">
+            <div class="ws_button">
+                <input type="radio" name="ws_type" value="one-time">
+                <div class="ws_radio_btn">
+                    <div class="ws_fill"></div>
+                </div>
+            </div>
+            <div class="ws_title">
+                <span>One time purchase</span>
+            </div>
+            <div class="ws_skirt"></div>
+        </div>
+        <div class="ws_type is-selected">
+            <div class="ws_button">
+                <input type="radio" name="ws_type" value="subscription" checked>
+                <div class="ws_radio_btn rad_selected">
+                    <div class="ws_fill"></div>
+                </div>
+            </div>
+            <div class="ws_title">
+                <span>Subscribe and save</span>
+            </div>
+            <div class="ws_skirt"></div>
+        </div>
+        <div class="ws_type">
+            <div class="ws_button">
+                <input type="radio" name="ws_type" value="trial">
+                <div class="ws_radio_btn">
+                    <div class="ws_fill"></div>
+                </div>
+            </div>
+            <div class="ws_title">
+                <span>Trial pack</span>
+            </div>
+            <div class="ws_skirt"></div>
+        </div>
+    </div>
+    <div class="ws_info">
+        <div class="ws_skirt"></div>
+        <div class="one-time">
+            {% render 'ws-sub_select' %}
+        </div>
+        <div class="subscription is-selected">
+            {% render 'ws-sub_select' %}
+            <div class="ws_details">
+                <div><span><i class="fas fa-shipping-fast"></i>Free UK next-day delivery</span></div>
+                <div><span><i class="fas fa-certificate"></i>Save 10%</span></div>
+                <div><span><i class="far fa-thumbs-up"></i>Cancel anytime</span></div>
+            </div>
+        </div>
+        <div class="trial">
+            <div class="text">
+                <span>5 sachets to try, followed by a monthly subscription after your 7-day trial period ends</span>
+            </div>
+            <div class="ws_details">
+                <div><span><i class="fas fa-shipping-fast"></i>Free UK next-day delivery</span></div>
+                <div><span><i class="fas fa-certificate"></i>10% off a monthly recurring box after your 7-day trial period ends</span></div>
+                <div><span><i class="far fa-thumbs-up"></i>Zero commitments, cancel anytime</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}

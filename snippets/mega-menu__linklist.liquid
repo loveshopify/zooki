@@ -1,0 +1,26 @@
+{% comment %}
+Required values
+menu_link: linklist
+______________
+Optional values
+linklist_class: <string>
+link_setting: <string>
+{% endcomment %}
+
+<div class="mega-menu__linklist {{ linklist_class }}">
+  {% assign menu = linklists[menu_link] %}
+  <p class="menu__heading">
+    {% if link_setting != blank %}<a href="{{ link_setting }}">{% endif %}
+      {{ menu.title }}
+    {% if link_setting != blank %}</a>{% endif %}
+  </p>
+  <ul>
+    {% for link in menu.links %}
+      <li>
+        <a href="{{ link.url }}" class="mega-menu__linklist-link {% if link.active %}is-active{% endif %}">
+          {{ link.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

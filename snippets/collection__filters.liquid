@@ -1,0 +1,40 @@
+{% if collection.handle != blank and collection.products_count > 0 %}
+  <div class="field is-grouped is-flex-wrap">
+
+    {% if collection.tags.size > 0 %}
+      <div class="collection__tag-filter select">
+        {% for tag in collection.all_tags %}
+          {% if forloop.first %}
+            <select name="tag_filter" id="tag_filter" class="tag_filter" data-default-collection="{% if collection.handle == 'all' %}{{ routes.all_products_collection_url }}{% else %}{{ collection.url }}{% endif %}">
+              <option {% unless current_tags %}selected="selected"{% endunless %} value="{% if collection.handle == "all" %}{{ routes.all_products_collection_url }}{% else %}{{ collection.url }}{% endif %}">
+                {{ 'collections.general.all_collection_title' | t: title: collection.title }}
+              </option>
+          {% endif %}
+
+          {% unless tag contains 'meta-' %}
+            <option {% if current_tags contains tag %}selected="selected"{% endif %} value="{{ routes.collections_url }}/{% if collection.handle != blank %}{{ collection.handle }}{% else %}all{% endif %}/{{ tag | handleize }}">{{ tag }}</option>
+          {% endunless %}
+
+          {% if forloop.last %}
+            </select>
+          {% endif %}
+
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="collection__sort-by-filter select">
+      <select class="sort_by" id="sort-by" data-default-sort="{{ collection.sort_by | default: collection.default_sort_by  }}">
+        <option value="manual">{{ 'collections.sorting.featured' | t }}</option>
+        <option value="best-selling">{{ 'collections.sorting.best_selling' | t }}</option>
+        <option value="title-ascending">{{ 'collections.sorting.az' | t }}</option>
+        <option value="title-descending">{{ 'collections.sorting.za' | t }}</option>
+        <option value="price-ascending">{{ 'collections.sorting.price_ascending' | t }}</option>
+        <option value="price-descending">{{ 'collections.sorting.price_descending' | t }}</option>
+        <option value="created-descending">{{ 'collections.sorting.date_descending' | t }}</option>
+        <option value="created-ascending">{{ 'collections.sorting.date_ascending' | t }}</option>
+      </select>
+    </div>
+
+  </div>
+{% endif %}

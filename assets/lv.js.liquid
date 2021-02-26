@@ -1,0 +1,158 @@
+document.addEventListener('DOMContentLoaded', (event) => {
+	setTimeout(function() {
+
+	
+	// DOCUMENT READY FUNCTION
+
+	// Hamburger menu open/close
+	const hamBtn = document.querySelector('.mobile-menu__toggle-icon');
+
+	hamBtn.addEventListener('click', hamToggling);
+
+	function hamToggling() {
+		let mobileMenuToggleIcon = document.querySelector('.mobile-dropdown.mobile-dropdown__position--left').firstElementChild; 
+
+		if (!mobileMenuToggleIcon.classList.contains('is-active')) {
+			mobileMenuToggleIcon.classList.add('is-active');
+		} else {
+			mobileMenuToggleIcon.classList.remove('is-active');
+		}
+	}
+
+	// END Hamburger menu open/close
+
+
+	// MODALS on the product page
+	var modal = document.querySelector('.ing-modal');
+	var trigger = document.querySelector('.trigger-ing');
+	var closeButton = document.querySelector('.ing-close-button');
+
+	let nutModal = document.querySelector('.nut-modal');
+	let nutTrigger = document.querySelector('.trigger-nut');
+	let nutCloseButton = document.querySelector('.nut-close-button');
+
+	const stickyTrigger = document.querySelector('.sticky-btn');
+	const stickyModal = document.querySelector('.sticky-btn-modal');
+	const stickyCloseBtn = document.querySelector('.sticky-close-button');
+
+	function toggleModal() {
+		modal.classList.toggle('ing-show-modal');
+	}
+
+	function nutToggleModal() {
+		nutModal.classList.toggle('nut-show-modal');
+	}
+
+	function stickyToggleModal() {
+		stickyModal.classList.toggle('sticky-show-modal');
+	}
+
+	function windowOnClick(event) {
+		if (event.target === modal) {
+			toggleModal();
+		} else if (event.target === nutModal) {
+			nutToggleModal();
+		} else if (event.target === stickyModal) {
+			stickyToggleModal();
+		}
+	}
+
+	nutTrigger.addEventListener('click', nutToggleModal);
+	nutCloseButton.addEventListener('click', nutToggleModal);
+
+	trigger.addEventListener('click', toggleModal);
+	closeButton.addEventListener('click', toggleModal);
+
+	stickyTrigger.addEventListener('click', stickyToggleModal);
+	// stickyCloseBtn.addEventListener('click', stickyToggleModal);
+
+	window.addEventListener('click', windowOnClick);
+
+	//end MODALS on the product page
+
+	// FAQ DROP DOWN
+
+	var acc = document.getElementsByClassName('accordion');
+	var i;
+
+	for (i = 0; i < acc.length; i++) {
+		acc[i].addEventListener('click', function() {
+			this.classList.toggle('active');
+			var panel = this.nextElementSibling;
+			if (panel.style.maxHeight) {
+				panel.style.maxHeight = null;
+			} else {
+				panel.style.maxHeight = panel.scrollHeight + 'px';
+			}
+		});
+	}
+
+	var acc = document.getElementsByClassName('faq-question');
+	var i;
+	for (i = 0; i < acc.length; i++) {
+		acc[i].addEventListener('click', function() {
+			this.classList.toggle('active');
+
+			var panel = this.nextElementSibling;
+			if (panel.style.maxHeight) {
+				panel.style.maxHeight = null;
+			} else {
+				panel.style.maxHeight = panel.scrollHeight + 'px';
+			}
+		});
+	}
+	// END FAQ DROP DOWN
+
+	// STICKY BUY NOW BUTTON
+
+	// $(document).ready(function() {
+	// 	$(window).scroll(function() {
+	// 		if ($(this).scrollTop() >= 500) {
+	// 			$('.text-fixed-buy-button').css('display', 'block');
+	// 		} else {
+	// 			$('.text-fixed-buy-button').css('display', 'none');
+	// 		}
+	// 	});
+	// });
+
+	// END STICKY BUY NOW BUTTON
+
+	// PRODUCT SECTION
+
+	// // price below the info
+	// $('.purchase-details').insertAfter( ".bold-ro__product" );
+	// // end price below the info
+
+	// // subscription bullet points
+	// let divIcons = document.createElement('div');
+	// divIcons.classList.add('product_perks');
+	// let iconsUl = document.createElement('ul');
+	// let iconsLi
+	// let iconsContainer = document.querySelector('.bold-ro__order-interval-container');
+
+	// function newLi(txt) {
+	// 	iconsLi = document.createElement('li');
+	// 	iconsLi.innerHTML += txt;
+	// 	return iconsLi;
+	// }
+
+
+	// divIcons.appendChild(iconsUl).appendChild(newLi('<img src="{{ 'truck.JPG' | asset_url }}" alt=""><span class="li-item">Free UK next-day delivery</span>'));
+	// divIcons.appendChild(iconsUl).appendChild(newLi('<img src="{{ 'sun.JPG' | asset_url }}" alt=""><span class="li-item">Save 10%</span>'));
+	// divIcons.appendChild(iconsUl).appendChild(newLi('<img src="{{ 'thumb.JPG' | asset_url }}" alt=""><span class="li-item">Cancel anytime</span>'));
+
+	// iconsContainer.appendChild(divIcons);
+
+	// // end subscription bullet points
+
+	// // changing the Add to Cart btn to Add to basket btn
+	// let btnTxt = document.querySelector('.purchase-details button .text').innerHTML = 'Add to basket';
+	// // end changing the Add to Cart btn to Add to basket btn
+
+
+	// END PRODUCT SECTION
+
+
+	// END DOCUMENT READY FUNCTION
+}, 1000);
+});

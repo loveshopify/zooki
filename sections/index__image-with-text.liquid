@@ -1,0 +1,449 @@
+{% comment %}
+** Image with text - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %} Layout {% endcomment %}
+{% assign show_gutter = section.settings.show_gutter %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% assign animation = section.settings.animation %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section
+                {{ css_class }}
+                is-width-{{ width }}
+                {% if show_gutter == false %}
+                  has-no-side-gutter
+                  has-background
+                {% else %}
+                  has-gutter-enabled
+                {% endif %}
+                {% if width == 'wide' %}
+                  equal-columns--outside-trim
+                {% endif %}
+                "
+                {% if animation != "none" %}
+                  data-scroll-class="{{ animation }}"
+                {% endif %}>
+  <div class="container
+              ">
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+
+      {% if block.type == 'text' %}
+
+        {% comment %} Is the color set to transparent? {% endcomment %}
+        {% assign background_alpha = block.settings.background | color_extract: 'alpha' %}
+        {% assign text_alpha = block.settings.text_color | color_extract: 'alpha' %}
+        {% comment %} Block specific CSS {% endcomment %}
+        {% capture block_css -%}
+
+          .image-with-text__heading {
+            color: {%- if text_alpha != 0 -%}{{ block.settings.text_color }}{%- else -%}{{ settings.heading_color }}{%- endif -%};
+          }
+
+          .image-with-text__text {
+            color: {%- if text_alpha != 0 -%}{{ block.settings.text_color }}{%- else -%}{{ settings.regular_color }}{%- endif -%};
+          }
+        {%- endcapture -%}
+
+        {% style %}
+          #shopify-section-{{ block.id }} {
+              background-color: {%- if background_alpha != 0 -%}{{ block.settings.background }}{% endif %};
+            }
+          {% include 'css-loop', css: block_css, id: block.id %}
+        {% endstyle %}
+
+        <div class="image-with-text__text-column
+                    image-with-text__column
+                    {% include 'column-width', value: forloop.length %}
+                    medium-down--one-whole
+                    column
+                    has-padding-left
+                    has-padding-right
+                    {% if background_alpha != 0 %}has-background {% endif %}
+                    is-flex
+                    is-flex-wrap
+                    is-justify-{{ block.settings.alignment }}
+                    is-align-{{ block.settings.vertical_position }}
+                    "
+                    {% if type != 'block' %}
+                      {{ block.shopify_attributes }} id="shopify-section-{{ block.id }}"
+                    {% endif %}>
+          <div class="image-with-text__wrapper">
+            {% if block.settings.title != blank %}
+              <h3 class="image-with-text__heading text-align-{{ block.settings.alignment }} is-{{ block.settings.heading_size }}" >
+                {{ block.settings.title }}
+              </h3>
+            {% endif %}
+
+            {% if block.settings.text != blank %}
+              <div class="image-with-text__text text-align-{{ block.settings.alignment }} content">
+                {{ block.settings.text }}
+              </div>
+            {% endif %}
+
+            {% if block.settings.button_label != blank %}
+              <div class="buttons is-{{ block.settings.alignment }}">
+                {% include 'button', label: block.settings.button_label, href: block.settings.link, style: block.settings.button_style, type: "link" %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      {% elsif block.type == 'image' %}
+        <div class="image-with-text__image-column
+        image-with-text__column
+        {% if forloop.length == 1 %}
+          one-whole
+        {% elsif forloop.length == 2 %}
+          one-half
+        {% elsif forloop.length == 3 %}
+          one-third
+        {% endif %}
+        medium-down--one-whole
+        column
+        is-flex
+        is-align-center
+        {% if block.settings.image_crop != 'none' %}has-image-crop{% endif %}
+        image-crop--{{ block.settings.image_crop }}" {% if type != 'block' %}{{ block.shopify_attributes }} id="shopify-section-{{ block.id }}"{% endif %}>
+          {% if block.settings.image_link %}<a class="image-with-text__link" href="{{ block.settings.image_link }}">{% endif %}
+            {% if block.settings.image != blank %}
+                {% include 'image-element', image: block.settings.image, alt: block.settings.image.alt, stretch_width: true, additional_classes: 'image-with-text__image' %}
+            {% else %}
+              {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          {% if block.settings.image_link %}</a>{% endif %}
+        </div>
+      {% endif %}
+
+    {% endfor %}
+  {% endif %}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image with text",
+  "class": "image-with-text image-with-text-1",
+  "max_blocks": 3,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gutter",
+      "label": "Show gutter",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1024 x 1024px recommended"
+        },
+        {
+          "type": "select",
+          "id": "image_crop",
+          "label": "Image cropping",
+          "default": "none",
+          "info": "Only applied when text area is taller than the image.",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading text here"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Base size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "regular",
+              "label": "Regular"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ],
+          "default": "regular"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "View all"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "button--link-style",
+              "label": "Link style"
+            }
+          ],
+          "default": "button--primary"
+        },
+        {
+          "type": "header",
+          "content": "Colors"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "select",
+          "id": "vertical_position",
+          "label": "Vertical position",
+          "options": [
+            {
+              "value": "start",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Middle"
+            },
+            {
+              "value": "end",
+              "label": "Bottom"
+            }
+          ],
+          "default": "center"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text",
+      "category": "Image",
+      "settings": {
+          "padding_top": 20,
+          "padding_bottom": 20
+      },
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "text"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,10 @@
+{% comment %}
+  The contents of the page.gallery.liquid template can be found in /sections/page-gallery__main.liquid
+{% endcomment %}
+
+<main id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section gallery-page" data-check-for-order="true">
+  {% section 'page-gallery__banner' %}
+  <section class="section__wrapper">
+    {% section 'page-gallery__main' %}
+  </section>
+</main>

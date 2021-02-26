@@ -1,0 +1,59 @@
+{% comment %}
+  To edit the contents of this file, look inside the `sections` folder for the file name that comes directly after `section`. Eg. {% section 'product__main' %} or {% section 'page__banner' %}
+
+  - https://help.shopify.com/en/themes/development/templates/collection-liquid
+{% endcomment %}
+
+<div id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section collection-page" data-check-for-order="true">
+  {% comment %} Collection banner {% endcomment %}
+  {% section 'collection__banner' %}
+  <section class="section__wrapper
+                  section
+                  ">
+    <div class="container {% if settings.heading_divider_style == 'long' %}has-heading-divider-below {% endif %}">
+      <div class="collection__breadcrumb two-fifths medium-down--one-whole column has-padding-bottom">
+        {% comment %} Collection breadcrumb {% endcomment %}
+        <div class="breadcrumb__container">
+          {% include 'breadcrumb', type: 'collection' %}
+        </div>
+      </div>
+      <div class="collection__spacer three-fifths column hide-when-banner-enabled"></div>
+      <div class="two-fifths medium-down--one-whole column has-no-side-gutter hide-when-banner-enabled">
+        {% comment %} Collection title {% endcomment %}
+        {% include 'heading', title: collection.title, heading_tag: 'h1', context: 'collection', text_alignment: 'left' %}
+      </div>
+      <div class="collection__filters three-fifths medium-down--one-whole column">
+        {% comment %} Collection filters {% endcomment %}
+        {% include 'collection__filters' %}
+      </div>
+      {% if settings.heading_divider_width != 0 and settings.heading_divider_style == 'long' %}
+        <div class="heading-divider-below heading-wrapper one-whole column hide-when-banner-enabled">
+          <div class="heading-divider
+                      heading-divider--{{ settings.heading_divider_style }}"
+                {% if settings.heading_divider_animation != "none" %}
+                  data-scroll-class="{{ settings.heading_divider_animation }}"
+                {% endif %}>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Collection description {% endcomment %}
+    {% if collection.description != blank %}
+      <div class="container">
+        <div class="one-whole column">
+          <div class="collection__description content has-padding-bottom">
+            {{ collection.description }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% comment %} Collection sidebar and main content area {% endcomment %}
+    <div class="container collection__content">
+      {% section 'collection__sidebar' %}
+      {% section 'collection__main' %}
+    </div>
+  </section>
+</div>
+

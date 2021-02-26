@@ -1,0 +1,72 @@
+<div class="logo-container">
+    <div class="logo-inner-container">
+        <div class="logo-f-3-img">
+            <div class="single-logo">
+                <img src="{{ section.settings.img_1 | img_url: '1280x' }}" alt="">
+            </div>
+            <div class="single-logo">
+                <img src="{{ section.settings.img_2 | img_url: '1280x' }}" alt="">
+            </div>
+            <div class="single-logo">
+                <img src="{{ section.settings.img_3 | img_url: '1280x' }}" alt="">
+            </div>
+        </div>
+        <div class="logo-s-3-img">
+            <div class="single-logo">
+                <img src="{{ section.settings.img_4 | img_url: '1280x' }}" alt="">
+            </div>
+            <div class="single-logo">
+                <img src="{{ section.settings.img_5 | img_url: '1280x' }}" alt="">
+            </div>
+            <div class="single-logo">
+                <img src="{{ section.settings.img_6 | img_url: '1280x' }}" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% schema %}
+{
+"name": "Logo Section",
+"settings": [
+{
+"type": "image_picker",
+"id": "img_1",
+"label": "First image",
+"info": "50px image height recommended"
+},
+{
+"type": "image_picker",
+"id": "img_2",
+"label": "Second image",
+"info": "50px image height recommended"
+},
+{
+"type": "image_picker",
+"id": "img_3",
+"label": "Third image",
+"info": "50px image height recommended"
+},
+{
+"type": "image_picker",
+"id": "img_4",
+"label": "Fourth image",
+"info": "50px image height recommended"
+},
+{
+"type": "image_picker",
+"id": "img_5",
+"label": "Fifth image",
+"info": "50px image height recommended"
+},
+{
+"type": "image_picker",
+"id": "img_6",
+"label": "Sixth image",
+"info": "50px image height recommended"
+}
+]
+}
+{% endschema %}

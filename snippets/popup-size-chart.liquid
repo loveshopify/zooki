@@ -1,0 +1,21 @@
+<div class="size-chart" id="size-chart{{ product.id }}">
+  <div class="size-chart-wrap content container {% if settings.table_styles_enabled %} table is-striped is-bordered {% endif %}">
+    <div class="one-whole column">
+      {% assign product_tags = product.tags | join: ' ' %}
+      {% if product_tags contains 'meta-size-chart-' %}
+        {% for tag in product.tags %}
+          {% if tag contains 'meta-size-chart-' %}
+            {% assign size_chart = tag | handle | remove: 'meta-size-chart-' %}
+            <h5 class="center">{{ pages[size_chart].title }}</h5>
+            <div class="feature_divider"></div>
+            {{ pages[size_chart].content }}
+          {% endif %}
+        {% endfor %}
+      {% elsif settings.size_chart != blank %}
+        <h5 class="center">{{ pages[settings.size_chart].title }}</h5>
+        <div class="feature_divider"></div>
+        {{ pages[settings.size_chart].content }}
+      {% endif %}
+    </div>
+  </div>
+</div>

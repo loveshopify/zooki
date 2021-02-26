@@ -1,0 +1,50 @@
+<div class="faq-container">
+    <div class="inner-faq-container">
+        <h4>{{ section.settings.title }}</h4>
+
+
+        {% for block in section.blocks %}
+        <button class="accordion">{{ block.settings.q }}
+            <img class="faq-arrow" src="{{ 'arrow.png' | asset_img_url: '24x' }}" alt="">
+        </button>
+        <div class="panel">
+            <p class="faq-answer">{{ block.settings.a }}
+            </p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+</div>
+
+
+{% schema %}
+{
+"name": "FAQ Section",
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Heading of the section"
+}
+],
+"blocks": [
+{
+"type": "text",
+"name": "FAQ",
+"settings": [
+{
+"type": "text",
+"id": "q",
+"label": "Question"
+},
+{
+"type": "textarea",
+"id": "a",
+"label": "Answer"
+}
+]
+}
+]
+}
+{% endschema %}

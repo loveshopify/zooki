@@ -1,0 +1,354 @@
+{% comment %}
+** Header 4 Search focused - static **
+- Static section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign logo = section.settings.logo %}
+{% assign background = section.settings.background %}
+{% assign link = section.settings.link_color %}
+{% assign link_hover = section.settings.link_hover_color %}
+{% assign text = section.settings.text_color %}
+{% comment %} Layout {% endcomment %}
+{% assign width = section.settings.width %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign header_alpha = settings.header_background | color_extract: 'alpha' %}
+
+{% if header_alpha != 0 %}
+  {% assign sticky_background_alpha = section.settings.sticky_background_opacity | divided_by: 100.00 %}
+{% endif %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+
+  .header__logo {
+    width: {{ section.settings.logo_width }}px;
+  }
+
+  .is-sticky .header__logo {
+    width: {{ section.settings.scroll_logo_width }}px;
+  }
+
+  .header__search-button {
+    color: {{ section.settings.search_icon }};
+    background-color: {{ section.settings.search_background }};
+    border-color: {{ section.settings.search_background }};
+  }
+
+  .header__search-button:hover {
+    background-color: {{ section.settings.search_background | color_darken: 05 }}
+  }
+
+  {%- if section.settings.enable_sticky -%}
+    .header-sticky-wrapper.is-sticky .header {
+      background-color: {{ settings.header_background | color_modify: 'alpha', sticky_background_alpha }};
+    }
+
+    .mobile-menu--opened #mobile-header-sticky-wrapper.is-sticky .mobile-header {
+      background-color: {{ settings.header_background }};
+    }
+  {%- endif -%}
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% include 'header__structured-data' %}
+
+{% comment %} HTML markup {% endcomment %}
+<div class="is-relative {{ css_class }}" data-enable_sticky="{{ section.settings.enable_sticky }}">
+  <header id="header" class="header header--search-focus dropdown-style-{{ settings.dropdown_style }}">
+    <section class="section
+                    is-width-{{ width }}">
+      <div class="header__inner-content">
+        <div class="header__link header__menu-toggle is-medium">
+          <div class="header__open-menu">
+            {% include settings.icon, name: 'menu' %}
+          </div>
+          <div class="header__close-menu">
+            {% include settings.icon, name: 'x' %}
+          </div>
+        </div>
+
+        {% comment %} Logo {% endcomment %}
+        <div class="header__brand">
+          {% if section.settings.logo != blank %}
+            {% if template contains 'index' %}
+              <h1 class="visuallyhidden">{{ shop.name }}</h1>
+            {% endif %}
+            <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+              {% include 'image-element', image: section.settings.logo, alt: section.settings.logo.alt, additional_classes: 'primary-logo' %}
+            </a>
+          {% else %}
+            {% if template contains 'index' %}
+              <h1 class="header__logo-text">
+                <a href="{{ shop.url }}" class="header__link primary-brand">
+                  {{ shop.name }}
+                </a>
+              </h1>
+            {% else %}
+              <a href="{{ shop.url }}" class="header__logo-text header__link primary-brand">
+                {{ shop.name }}
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        {% comment %} Search bar {% endcomment %}
+        <div class="header__search">
+          <form class="header__search-form search-form" action="{{ routes.search_url }}">
+            {% if settings.search_option != 'everything' %}
+              <input class="visuallyhidden" type="text" name="type" value="product" />
+            {% endif %}
+            <div class="field has-addons">
+              <div class="control header__search-bar is-relative">
+                <ul class="predictive-results"></ul>
+                <input class="input" id="q" type="text" name="q" placeholder="{{ settings.search_placeholder }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+              </div>
+              <div class="control">
+                <button class="button header__search-button">{% include settings.icon, name: 'search' %}</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {% include 'header__action-icons' %}
+
+      </div>
+
+      {% comment %} Menu {% endcomment %}
+      <nav class="sticky-menu-wrapper is-align-center" role="navigation" aria-label="main navigation">
+        <div class="header__menu">
+          <div class="header__menu-items
+                      header__dropdown--{{ settings.dropdown_position }}
+                      is-flex
+                      is-flex-wrap
+                      is-align-center
+                      is-justify-{{ section.settings.menu_alignment }}">
+            {% assign main_menu = linklists[section.settings.main_linklist] %}
+            {% for link in main_menu.links %}
+              {% if link.links == blank %}
+                <div class="navbar-item header__item {% if link.active or link.child_active %}is-active{% endif %}" data-navlink-handle="{{ link.title | handleize }}">
+                  <a href="{{ link.url }}" class="navbar-link header__link {% if link.active %}is-active{% endif %} is-arrowless">
+                    {{ link.title }}
+                  </a>
+                </div>
+              {% else %}
+                <div class="navbar-item header__item has-dropdown has-dropdown--{{ settings.dropdown_style }} is-hoverable {% if link.active or link.child_active %}is-active{% endif %}" aria-haspopup="true" aria-expanded="false" data-navlink-handle="{{ link.title | handleize }}">
+                  <a class="navbar-link header__link {% if link.active or link.child_active %}is-active{% endif %}"
+                  {% unless link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %} href="{{ link.url }}" {% endunless %}>
+                    {{ link.title }}
+                  </a>
+
+                  {% include 'header__dropdown-menu' %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </nav>
+    </section>
+  </header>
+
+  {% include 'mobile-header' %}
+
+  {% if settings.search_display_style == 'overlay' %}
+    {% include 'search-overlay' %}
+  {% endif %}
+
+</div>
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "enable_sticky": {{ section.settings.enable_sticky | json }},
+    "header_layout": {{ settings.header_layout | json }}
+  }
+</script>
+<script src="{{ 'z__jsHeader.js' | asset_url }}"></script>
+
+{% comment %}Schema{% endcomment %}
+{% schema %}
+
+{
+  "name": "Header",
+  "class": "header--search-focus jsHeader header-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "600 x 200px recommended"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Width",
+      "step": 5,
+      "min": 80,
+      "max": 300,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Search button"
+    },
+    {
+      "type": "color",
+      "id": "search_background",
+      "label": "Background",
+      "default": "#363636"
+    },
+    {
+      "type": "color",
+      "id": "search_icon",
+      "label": "Icon",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "icons",
+          "label": "Icons only"
+        },
+        {
+          "value": "text",
+          "label": "Text only"
+        },
+        {
+          "value": "icons_text",
+          "label": "Icons and text"
+        }
+      ],
+      "default": "icons"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "main_linklist",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_alignment",
+      "label": "Menu alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "header",
+      "content": "Sticky header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky",
+      "label": "Enable sticky on scroll"
+    },
+    {
+      "type": "range",
+      "id": "sticky_background_opacity",
+      "label": "Background opacity",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "scroll_logo_width",
+      "label": "Logo width",
+      "step": 5,
+      "min": 30,
+      "max": 300,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+
+{% endschema %}

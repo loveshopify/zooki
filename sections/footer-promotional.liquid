@@ -1,0 +1,568 @@
+{% comment %}
+** Footer - promotional - static **
+- Static section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .footer__promo-container {
+    background-color: {{ section.settings.promo_background }};
+    color: {{ section.settings.promo_text }};
+  }
+{%- endcapture -%}
+{% style %}
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+<footer class="footer__container {{ css_class }}">
+  <div class="container footer__promo has-no-side-gutter is-flex-{{ section.settings.promo_position }}">
+    <div class="footer__content {% if section.settings.enable_promo %} two-thirds {% else %} one-whole {% endif %} column medium-down--one-whole has-padding-top has-padding-bottom">
+      <div class="footer__wrap container equal-columns--outside-trim ws_footer_wrapper">
+        {% for block in section.blocks %}
+          <div id="shopify-section-{{ block.id }}" class="footer__block block__{{ block.id }} block__{{ block.type | downcase | replace: '_', '-' }}
+                      one-whole
+                      column
+            {%- comment -%}Added by WSDEV-200821-MM - Custom classes added to the elements{%- endcomment -%}
+            {% if block.type == 'logo' %}
+              ws_logo_wrapper
+            {% elsif block.type == 'link_list' %}
+              ws_list_wrapper
+            {% endif %}"
+            {%- comment -%}End of Added by WSDEV-200821-MM - Custom classes added to the elements{%- endcomment -%}
+                      {{ block.shopify_attributes }}>
+            {% if block.type == 'logo' %}
+              {% comment %} Logo {% endcomment %}
+              <div class="is-flex is-justify-{{ block.settings.alignment }}">
+                <a class="footer__logo-wrapper is-{{ block.settings.size }}" href="{{ shop.url }}" title="{{ shop.name }}">
+                  {% if block.settings.logo %}
+                      {% include 'image-element', image: block.settings.logo, alt: block.settings.logo.alt, additional_classes: 'footer__logo' %}
+                  {% else %}
+                    <h2 class="footer__heading text-align-center">{{ shop.name }}</h2>
+                  {% endif %}
+                </a>
+              </div>
+
+            {%- comment -%}Added by WSDEV-200821-MM - Custom display of footer links{%- endcomment -%}
+            {% elsif block.type == 'link_list' %}
+              {% comment %} Menu {% endcomment %}
+              <!-- <div class="container">
+                <div class="one-third medium-down--one-whole column link-list__block">
+                  {% include 'footer__menu', menu_link: block.settings.menu_1 %}
+                </div>
+                {% if block.settings.menu_2 != blank %}
+                  <div class="one-third medium-down--one-whole column link-list__block">
+                    {% include 'footer__menu', menu_link: block.settings.menu_2 %}
+                  </div>
+                {% endif %}
+                {% if block.settings.menu_3 != blank %}
+                  <div class="one-third medium-down--one-whole column link-list__block">
+                    {% include 'footer__menu', menu_link: block.settings.menu_3 %}
+                  </div>
+                {% endif %}
+              </div> -->
+              <div class='ws_footer'>
+                <div class="ws_accordion_toggle">
+                  <dl class="accordion">
+                    {% assign menu_1 = linklists[block.settings.menu_1] %}
+                    <dt>
+                      <a href="#" class="ws_accordion_title">{{ menu_1.title }}{% include settings.icon, name: 'down-caret', icon_class: 'header__icon' %}</a>
+                    </dt>
+                    <dd style="display: none;">
+                      <ul>
+                        {% for link in menu_1.links %}
+                          <li>
+                            <a href="{{ link.url }}" class="footer__menu-link {% if link.active %}is-active{% endif %}">
+                              {{ link.title }}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </dd>
+                    
+                    {% if block.settings.menu_2 %}
+                      {% assign menu_2 = linklists[block.settings.menu_2] %}
+                      <dt><a href="#" class="ws_accordion_title">{{ menu_2.title }}{% include settings.icon, name: 'down-caret', icon_class: 'header__icon' %}</a></dt>
+                      <dd>
+                        <ul>
+                          {% for link in menu_2.links %}
+                            <li>
+                              <a href="{{ link.url }}" class="footer__menu-link {% if link.active %}is-active{% endif %}">
+                                {{ link.title }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </dd>
+                    {% endif %}
+                    
+                    {% if block.settings.menu_3 %}
+                      {% assign menu_3 = linklists[block.settings.menu_3] %}
+                      <dt><a href="#" class="ws_accordion_title">{{ menu_3.title }}{% include settings.icon, name: 'down-caret', icon_class: 'header__icon' %}</a></dt>
+                      <dd>
+                        <ul>
+                          {% for link in menu_3.links %}
+                            <li>
+                              <a href="{{ link.url }}" class="footer__menu-link {% if link.active %}is-active{% endif %}">
+                                {{ link.title }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </dd>
+                    {% endif %}
+                  </dl>
+                </div>
+                <div class="container ws_list_social_wrapper ws_links_toggle">
+                  <div class="one-third column link-list__block">
+                    {% include 'footer__menu', menu_link: block.settings.menu_1 %}
+                  </div>
+                  {% if block.settings.menu_2 != blank %}
+                    <div class="one-third column link-list__block">
+                      {% include 'footer__menu', menu_link: block.settings.menu_2 %}
+                    </div>
+                  {% endif %}
+                  {% if block.settings.menu_3 != blank %}
+                    <div class="one-third column link-list__block">
+                      {% include 'footer__menu', menu_link: block.settings.menu_3 %}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="ws_icons_container">
+                  {%- comment -%}Social media icons{%- endcomment -%}
+                  <div class="ws_social_icons_footer">
+                    <a href="https://facebook.com/YourZooki/">
+                      <div class="ws_icon_wrapper ws_fb">
+                        <i class="fab fa-facebook-f"></i>
+                      </div>
+                    </a>
+                    <a href="https://instagram.com/yourzooki/">
+                      <div class="ws_icon_wrapper ws_ig">
+                        <i class="fab fa-instagram"></i>
+                      </div>
+                    </a>
+                    <a href="https://twitter.com/yourzooki">
+                      <div class="ws_icon_wrapper ws_tw">
+                        <i class="fab fa-twitter"></i>
+                      </div>
+                    </a>
+                    <a href="https://linkedin.com/company/yourzooki/about/">
+                      <div class="ws_icon_wrapper ws_lk">
+                        <i class="fab fa-linkedin-in"></i>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="container ws_footer_container">
+                    <div class="footer__credits one-whole column ws_footer_copyright">
+                      <p>&copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.</p>
+                      {{ section.settings.copyright_text }}
+                      {% if section.settings.display_designed_by %}
+                        <p>{{ 'layout.general.designer_credits_html' | t }}</p>
+                      {% endif %}
+                      {% if section.settings.display_shopify %}
+                        <p>{{ powered_by_link | split: '" ' | join: '&ref=out-of-the-sandbox" ' | split: '">' | join: '&ref=out-of-the-sandbox">' }}</p>
+                      {% endif %}
+                    </div>
+                    {% if section.settings.display_payment_methods %}
+                      <div class="footer__payment-methods payment-methods one-whole column ws_footer_payment">
+                        {% for type in shop.enabled_payment_types %}
+                        {%- comment -%}Wrapper for payment type{%- endcomment -%}
+                        <div class="ws_payment_wrapper">
+                          {{ type | payment_type_svg_tag: class:'payment-icon' }}
+                        </div>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {%- comment -%}End of Added by WSDEV-200821-MM - Custom display of footer links{%- endcomment -%}
+
+            {% elsif block.type == 'text' %}
+              {% comment %} Text {% endcomment %}
+              <p class="footer__heading">{{ block.settings.title }}</p>
+              {{ block.settings.content }}
+
+            {% elsif block.type == 'social' %}
+              {% comment %} Social media {% endcomment %}
+              {% include 'social-icons' %}
+
+            {% elsif block.type == 'html' %}
+
+              {{ block.settings.html_content }}
+
+            {% elsif block.type == 'newsletter' %}
+              {% comment %} Newsletter {% endcomment %}
+              {% if block.settings.newsletter_title != blank %}
+                <h3 class="footer__heading">{{ block.settings.newsletter_title }}</h3>
+              {% endif %}
+              {% if block.settings.newsletter_richtext != blank %}
+                <div class="content">
+                  {{ block.settings.newsletter_richtext }}
+                </div>
+              {% endif %}
+              {% include 'newsletter-form', type: 'block' %}
+
+            {% endif %}
+          </div>
+        {% endfor %}
+        {%- comment -%}Added by WSDEV-200820-MM - Fix to display footer extra content{%- endcomment -%}
+        <section class="footer__extra-content ws_extra_section_footer">
+          <!-- <div class="container">
+            <div class="footer__credits one-whole column">
+              <p>&copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.</p>
+              {{ section.settings.copyright_text }}
+              {% if section.settings.display_designed_by %}
+                <p>{{ 'layout.general.designer_credits_html' | t }}</p>
+              {% endif %}
+              {% if section.settings.display_shopify %}
+                <p>{{ powered_by_link | split: '" ' | join: '&ref=out-of-the-sandbox" ' | split: '">' | join: '&ref=out-of-the-sandbox">' }}</p>
+              {% endif %}
+            </div>
+            {% if section.settings.display_payment_methods %}
+              <div class="footer__payment-methods payment-methods one-whole column">
+                {% for type in shop.enabled_payment_types %}
+                  {{ type | payment_type_svg_tag: class:'payment-icon' }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div> -->
+        </section>
+        {%- comment -%}End of Added by WSDEV-200820-MM - Fix to display footer extra content{%- endcomment -%}
+      </div>
+    </div>
+    {% if section.settings.enable_promo %}
+      <aside class="one-third  is-align-center column medium-down--one-whole footer__promo-container card-content">
+        <div class="footer__promo-image">
+          {% if section.settings.promo_link %}
+            <a href="{{ section.settings.promo_link }}">
+          {% endif %}
+            {% if section.settings.promo_image %}
+              {% include 'image-element', image: section.settings.promo_image, alt: block.settings.logo.alt %}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          {% if section.settings.promo_link %}
+            </a>
+          {% endif %}
+        </div>
+        <div class="footer__promo-content container text-align-center">
+          <div class="one-whole column">
+            {% if section.settings.richtext != blank %}
+              <div class="has-padding-top">
+                {{ section.settings.richtext }}
+              </div>
+            {% endif %}
+
+            {% if section.settings.button_label != blank %}
+              <div class="has-padding-top">
+                {% include 'button', label: section.settings.button_label, href: section.settings.promo_link, type: "link", style: section.settings.button_style %}
+              </div>
+            {% endif %}
+
+          </div>
+        </div>
+      </aside>
+    {% endif %}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "footer footer--promotional",
+  "max_blocks": 7,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "copyright_text",
+      "label": "Copyright text"
+    },
+    {
+      "type": "checkbox",
+      "id": "display_designed_by",
+      "label": "Show theme designer credits",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_shopify",
+      "label": "Show Powered by Shopify",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_payment_methods",
+      "label": "Show payment method icons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Promotion"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_promo",
+      "label": "Enable promotion",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "promo_background",
+      "label": "Background",
+      "default": "#EEEEEE"
+    },
+    {
+      "type": "color",
+      "id": "promo_text",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "promo_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "row-reverse",
+          "label": "Left"
+        },
+        {
+          "value": "row",
+          "label": "Right"
+        }
+      ],
+      "default": "row-reverse"
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Image",
+      "info": "800 x 500px recommended"
+    },
+    {
+      "type": "richtext",
+      "id": "richtext",
+      "label": "Text",
+      "default": "<p>Use this area for promotional information.</p>"
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button Style",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ],
+      "default": "button--primary"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "html",
+      "name": "Custom HTML",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "html_content",
+          "label": "HTML",
+          "default": "<h2 class='footer__heading'>Your own custom HTML</h2>"
+        }
+      ]
+    },
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo",
+          "info": "500 x 200px recommended"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Logo size",
+          "default": "small",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small"
+            },
+            {
+              "value": "medium",
+              "label": "Medium"
+            },
+            {
+              "value": "large",
+              "label": "Large"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "start"
+        }
+      ]
+    },
+    {
+      "type": "link_list",
+      "name": "Menus",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu_1",
+          "label": "Menu 1",
+          "info": "This menu won't show drop-down items.",
+          "default": "footer"
+        },
+        {
+          "type": "link_list",
+          "id": "menu_2",
+          "label": "Menu 2",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "link_list",
+          "id": "menu_3",
+          "label": "Menu 3",
+          "info": "This menu won't show drop-down items."
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "newsletter_title",
+          "label": "Heading",
+          "default": "Subscribe"
+        },
+        {
+          "type": "richtext",
+          "id": "newsletter_richtext",
+          "label": "Text",
+          "default": "<p>Sign up to get the latest on sales, new releases and more …</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_first_name",
+          "label": "Show first name"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_last_name",
+          "label": "Show last name"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Text",
+          "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social icons",
+      "limit": 1,
+      "settings": [
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "logo"
+      },
+      {
+        "type": "link_list",
+        "settings": {
+          "menu_1": "main-menu"
+        }
+      },
+      {
+        "type": "text"
+      }
+    ]
+  }
+}
+{% endschema %}

@@ -1,0 +1,438 @@
+{% comment %}
+** Slideshow with text - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% assign id = section.id %}
+{% assign show_gutter = section.settings.show_gutter %}
+{% assign text_alignment = section.settings.text_alignment %}
+{% assign text_transition = section.settings.text_transition %}
+{% assign show_nav_buttons = section.settings.show_nav_buttons %}
+{% assign image_position = section.settings.image_position %}
+{% comment %} Layout {% endcomment %}
+{% assign width = section.settings.width %}
+{% assign padding_top = section.settings.padding_top %}
+{% assign padding_bottom = section.settings.padding_bottom %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = section.settings.background_color | color_extract: 'alpha' %}
+{% assign text_alpha = section.settings.text_color | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+
+{%- capture section_css -%}
+
+.text-slideshow-column {
+  background: {% if background_alpha != 0 %}{{ section.settings.background_color }}{% else %}{{ settings.shop_bg_color }}{% endif %};
+}
+
+.text-slideshow__content .banner__subheading p,
+.text-slideshow__content .title {
+  color: {% if text_alpha != 0 %}{{ section.settings.text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+}
+
+.flickity-page-dots .dot {
+  background: {% if text_alpha != 0 %}{{ section.settings.text_color }}{% else %}{{ settings.regular_color }}{% endif %};
+}
+
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup  {% endcomment %}
+{% if section.blocks.size > 0 %}
+  <section class="section
+        {{ css_class }}
+        is-width-{{ width }}
+        {% if show_gutter == false %}
+          has-no-side-gutter
+          has-background
+        {% else %}
+          has-gutter-enabled
+        {% endif %}
+        {% if width == 'wide' %}
+          equal-columns--outside-trim
+        {% endif %}
+        ">
+  <div class="slideshow-with-text__container container">
+    <div class="image-slideshow-column
+                three-fifths
+                medium-down--one-whole
+                column
+                image-slideshow-position--{{ image_position }}">
+      <div class="image-slideshow image-slideshow--{{ section.settings.image_transition }}" data-image-slideshow>
+        {% for block in section.blocks %}
+          <div id="shopify-section-{{ block.id }}" class="image-slideshow__slide" data-slide-index={{ forloop.index0 }} {{ block.shopify_attributes }}>
+            {% if block.settings.button_label == blank and block.settings.button_link != blank %}
+              <a href="{{ block.settings.button_link }}">
+            {% endif %}
+              {% if block.settings.image != blank %}
+                {% include 'image-element', image: block.settings.image, alt: block.settings.image.alt %}
+              {% else %}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            {% if block.settings.button_label == blank and block.settings.button_link != blank %}
+              </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="text-slideshow-column
+                two-fifths
+                medium-down--one-whole
+                column
+                is-align-center
+                is-flex-wrap">
+      <div class="text-slideshow {% if show_dots == false %} flickity-page-dots--hidden {% endif %}" data-text-slideshow data-slide-index={{ forloop.index0 }} {{ block.shopify_attributes }}>
+        {% for block in section.blocks %}
+
+        <div id="shopify-section-{{ block.id }}" class="text-slideshow__slide
+                                                        text-slideshow__slide--{{ block.id }}"
+                                                        >
+            <div class="text-slideshow__content text-align-{{ text_alignment }}">
+              {% if block.settings.pretext != blank %}
+                <div class="text-slideshow__heading banner__subheading">{{ block.settings.pretext }}</div>
+              {% endif %}
+              {% if block.settings.title != blank %}
+                <h2 class="text-slideshow__heading banner__heading title">{{ block.settings.title }}</h2>
+              {% endif %}
+              {% if block.settings.text != blank %}
+                <div class="text-slideshow__heading banner__subheading subtitle content">{{ block.settings.text }}</div>
+              {% endif %}
+              {% if block.settings.button_label != blank %}
+                {% include 'button', label: block.settings.button_label, href: block.settings.button_link, style: section.settings.button_style, type: "link" %}
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
+  <div class="container has-padding-top has-padding-bottom text-align-center">
+    <div class="one-whole column">
+      <p>{{ 'homepage.onboarding.no_content' | t }}</p>
+    </div>
+  </div>
+{% endif %}
+
+{% comment %}JavaScript{% endcomment %}
+<script
+    type="application/json"
+    data-section-id="{{ section.id }}"
+    data-section-data
+  >
+  {
+    "text_transition": {{ section.settings.text_transition | json }},
+    "image_transition": {{ section.settings.image_transition | json }},
+    "image_slideshow_speed": {{ section.settings.image_slideshow_speed | json }},
+    "show_arrows": {{ section.settings.show_arrows | json }},
+    "show_nav_buttons": {{ section.settings.show_nav_buttons | json }},
+    "number_of_slides": {{ section.blocks.size | json }}
+  }
+</script>
+<script data-theme-editor-load-script src="{{ 'z__jsSlideshowWithText.js' | asset_url }}"></script>
+
+{% schema %}
+
+{
+  "name": "Slideshow with text",
+  "class": "jsSlideshowWithText slideshow-with-text",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#EEEEEE"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_transition",
+      "label": "Text transition",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "zoomIn",
+          "label": "Zoom in"
+        }
+      ],
+      "default": "fadeIn"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "button--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "button--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "button--link-style",
+          "label": "Link style"
+        }
+      ],
+      "default": "button--primary"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav_buttons",
+      "label": "Show navigation dots",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "image_transition",
+      "label": "Image transition",
+      "options": [
+        {
+          "value": "fade",
+          "label": "Fade"
+        },
+        {
+          "value": "slide",
+          "label": "Slide"
+        }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "range",
+      "id": "image_slideshow_speed",
+      "label": "Change image every",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "unit": "sec"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gutter",
+      "label": "Show gutter",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "min": 0,
+      "max": 80,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1600 x 1000px recommended"
+        },
+        {
+          "type": "richtext",
+          "id": "pretext",
+          "label": "Preheading",
+          "default": "<p>Preheading</p>"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Your headline"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Each slide can have its own text and button link. Use it to describe the product, collection, page, etc. that the image depicts.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Slide link"
+        }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Slideshow with text",
+    "category": "Image",
+    "settings": {
+    },
+    "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "pretext": "<p>Add a preheader</p>",
+            "title": "Slideshow with Text",
+            "text": "<p>Each slide can have its own text and button link. Use it to describe the product, collection, page, etc. that the image depicts.</p>",
+            "button_label": "Click here"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "pretext": "<p>Add a preheader</p>",
+            "title": "Second slide",
+            "text": "<p>Each slide can use different text to accompany the image.</p>",
+            "button_label": "Link to product"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

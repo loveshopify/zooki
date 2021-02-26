@@ -1,0 +1,217 @@
+{% comment %}
+** Gallery - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% include 'include-gallery' %}
+
+{% schema %}
+  {
+    "name": "Gallery",
+    "class": "gallery jsGallery",
+    "max_blocks": 20,
+    "settings": [
+      {
+        "type": "select",
+        "id": "gallery_type",
+        "label": "Gallery style",
+        "default": "classic",
+        "options": [
+          {
+            "value": "classic",
+            "label": "Classic"
+          },
+          {
+            "value": "horizontal-masonry",
+            "label": "Horizontal masonry"
+          },
+          {
+            "value": "masonry",
+            "label": "Vertical masonry"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "crop_images",
+        "label": "Crop images",
+        "default": false,
+        "info": "Applies to classic only."
+      },
+      {
+        "type": "range",
+        "id": "images_per_row",
+        "label": "Images per row",
+        "min": 2,
+        "max": 5,
+        "step": 1,
+        "default": 4,
+        "info": "Applies to vertical masonry and classic only."
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_lightbox",
+        "label": "Enable lightbox",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color",
+        "id": "overlay_color",
+        "label": "Overlay",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "link_color",
+        "label": "Icons",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "standard",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "show_gutter",
+        "label": "Show gutter",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "select",
+        "id": "animation",
+        "label": "Animation",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "fadeIn",
+            "label": "Fade in"
+          },
+          {
+            "value": "fadeInDown",
+            "label": "Fade in down"
+          },
+          {
+            "value": "fadeInLeft",
+            "label": "Fade in left"
+          },
+          {
+            "value": "fadeInRight",
+            "label": "Fade in right"
+          },
+          {
+            "value": "slideInLeft",
+            "label": "Slide in left"
+          },
+          {
+            "value": "slideInRight",
+            "label": "Slide in right"
+          },
+          {
+            "value": "zoomIn",
+            "label": "Zoom in"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "800 x 800px recommended"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Gallery",
+        "category": "Image",
+        "blocks": [
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

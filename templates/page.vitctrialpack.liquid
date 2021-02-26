@@ -1,0 +1,18 @@
+{% comment %}
+  To edit the contents of this file, look inside the `sections` folder for the file name that comes directly after `section`. Eg. {% section 'product__main' %} or {% section 'page__banner' %}
+{% endcomment %}
+<body>
+<main id="template-{{ template | replace: '.', '-' | handle }}" class="shopify-section default-page">
+  <section>
+    <div>
+      {% section 'vitc-banner' %}
+      {% section 'logo-section' %}
+      {% section 'TitleAndIcons' %}
+      {% section 'page-vitctrial__main' %}
+      {% section 'Directions-for-use' %}
+      {% section 'image-with-text-vc' %}
+      {% section 'claimtrialpack' %}
+    </div>
+  </section>
+</main>
+</body>

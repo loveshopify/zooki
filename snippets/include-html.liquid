@@ -1,0 +1,51 @@
+{% comment %}
+  Snippet can be used in section or block
+  eg. {% include 'include-html' %}
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% comment %}Layout{% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% comment %} Advanced {% endcomment %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' -%}
+      width: 100%;
+    {%- elsif width == 'half' -%}
+      width: 50%;
+    {%- endif %}
+  }
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+<section class="section {{ css_class }}
+                is-width-{{ width }}
+                {% if background_alpha != 0 or gradient_alpha != 0  %}
+                  has-background
+                {% endif %}
+                "
+          data-section-id="{{ section.id }}"
+          {% if animation != "none" and animation != blank %}
+            data-scroll-class="{{ animation }}"
+          {% endif %}>
+  {{ object.settings.html_content }}
+</section>

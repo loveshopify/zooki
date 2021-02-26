@@ -1,0 +1,453 @@
+{% comment %}
+** Header - vertical - static **
+- Static section
+{% endcomment %}
+
+{%- assign id = section.id -%}
+{% comment %} Advanced {% endcomment %}
+{%- assign css_class = section.settings.css_class -%}
+{%- assign custom_css = section.settings.custom_css -%}
+
+{%- capture flex_alignment -%}
+  is-flex is-justify-{{ section.settings.alignment }}
+{%- endcapture -%}
+
+{%- capture text_alignment -%}
+  text-align-{{ section.settings.alignment }}
+{%- endcapture -%}
+
+{%- capture header_icons_alignment -%}
+  header__icons--{{ section.settings.alignment }}
+{%- endcapture -%}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style -%}
+{% include 'css-loop', css: custom_css, id: id %}
+{%- endstyle -%}
+
+{% include 'header__structured-data' %}
+
+{% comment %} HTML markup {% endcomment %}
+<div class="{{ css_class }} header-sticky-wrapper is-flex is-justify-{{ section.settings.alignment }} is-flex-column vertical-header__content">
+  {%- for block in section.blocks -%}
+    <div id="shopify-section-{{ block.id }}" class="vertical-header__block block__{{ block.type | downcase | replace: '_', '-' }} has-padding-bottom" {{ block.shopify_attributes }}>
+
+      {%- if block.type == 'copyright' -%}
+
+        {% comment %} Block specific CSS {% endcomment %}
+        {% capture block_css -%}
+          .credits {
+            color: {{ settings.header_link_color }}
+          }
+
+          .credits a,
+          .credits__copyright {
+            color: {{ settings.header_link_color }}
+          }
+
+          .credits a:hover {
+            color: {{ settings.header_link_hover_color }}
+          }
+        {%- endcapture -%}
+
+        {% style %}
+          {% include 'css-loop', css: block_css, id: block.id %}
+        {% endstyle %}
+        {% comment %} Copyright {% endcomment %}
+        <div class="credits text-is-small text-align-{{ section.settings.alignment }}">
+          <p class="credits__copyright">&copy; {{ "now" | date: "%Y" }} {{ shop.name | link_to: '/' }}.</p>
+          {{ block.settings.copyright_text }}
+          {% if block.settings.display_designed_by %}
+            <p>{{ 'layout.general.designer_credits_html' | t }}</p>
+          {% endif %}
+          {% if block.settings.display_shopify %}
+            <p>{{ powered_by_link | split: '" ' | join: '?ref=out-of-the-sandbox" ' | split: '">' | join: '?ref=out-of-the-sandbox">' }}</p>
+          {% endif %}
+        </div>
+
+      {%- elsif block.type == 'icons' -%}
+
+        {% comment %} Icons {% endcomment %}
+        {% include 'header__action-icons', type: 'block', header_icon_class: header_icons_alignment %}
+
+      {%- elsif block.type == 'logo' -%}
+
+        {% comment %} Block specific CSS {% endcomment %}
+        {% capture block_css -%}
+          .header__logo {
+            width: {{ block.settings.logo_width }}%;
+          }
+        {%- endcapture -%}
+
+        {%- style -%}
+          {%- include 'css-loop', css: block_css, id: block.id -%}
+        {%- endstyle -%}
+        {% comment %} Logo {% endcomment %}
+        <div class="header__brand is-flex is-justify-{{ section.settings.alignment }} text-align-{{ section.settings.alignment }}">
+          {% if block.settings.logo != blank %}
+            {% if template contains 'index' %}
+              <h1 class="visuallyhidden">{{ shop.name }}</h1>
+            {% endif %}
+            <a class="header__logo header__link primary-logo" href="{{ shop.url }}" title="{{ shop.name }}">
+              {% include 'image-element', image: block.settings.logo, alt: block.settings.logo.alt, back_to_basics: true %}
+            </a>
+          {% else %}
+            {% if template contains 'index' %}
+              <h1 class="header__logo-text">
+                <a href="{{ shop.url }}" class="header__link primary-brand">
+                  {{ shop.name }}
+                </a>
+              </h1>
+            {% else %}
+              <a href="{{ shop.url }}" class="header__logo-text header__link primary-brand">
+                {{ shop.name }}
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% elsif block.type == 'navigation' %}
+
+        {% comment %} Is the color set to transparent? {% endcomment %}
+        {% assign navBackground = block.settings.nav_background | color_extract: 'alpha' | floor %}
+        {% assign navLink = block.settings.nav_link_color | color_extract: 'alpha' | floor %}
+        {% assign navLinkHover = block.settings.nav_link_hover_color | color_extract: 'alpha' | floor  %}
+
+
+        {% comment %} Block specific CSS {% endcomment %}
+        {% capture block_css -%}
+
+          {% if navBackground != 0 %}
+            .vertical-header__menu-items {
+              background: {{ block.settings.nav_background }};
+            }
+          {% endif %}
+
+
+          .vertical-header__first-level-link {
+            {% if navLink != 0 %}color: {{ block.settings.nav_link_color }};{% endif %}
+            justify-content: {{ section.settings.alignment }};
+            text-align: {{ section.settings.alignment }};
+          }
+
+
+          {% if navLinkHover != 0 %}
+            .vertical-header__first-level-link:hover {
+              color: {{ block.settings.nav_link_hover_color }};
+            }
+          {% endif %}
+        {%- endcapture -%}
+
+        {% style %}
+          {% include 'css-loop', css: block_css, id: block.id %}
+        {% endstyle %}
+        {% comment %} Navigation menu {% endcomment %}
+
+        {% assign main_menu = linklists[block.settings.main_linklist] %}
+
+        <nav id="vertical-header" class="vertical-header__menu-items header__menu menu-alignment--{{ section.settings.alignment }}" role="navigation" aria-label="main navigation">
+          {% for link in main_menu.links %}
+            {% if link.links == blank %}
+              <div class="navbar-item vertical-header__first-level {% if link.active or link.child_active %}is-active{% endif %}" data-navlink-handle="{{ link.title | handleize }}">
+                <a href="{{ link.url }}" class="navbar-link vertical-header__first-level-link header__link {% if link.active %}is-active{% endif %} is-arrowless">
+                  {{ link.title }}
+                </a>
+              </div>
+            {% else %}
+              <div class="navbar-item vertical-header__first-level has-dropdown has-dropdown--{{ settings.dropdown_style }} is-hoverable {% if link.active or link.child_active %}is-active{% endif %}" aria-haspopup="true" aria-expanded="false" data-navlink-handle="{{ link.title | handleize }}">
+                <a class="navbar-link vertical-header__first-level-link header__link {% if link.active or link.child_active %}is-active{% endif %}"
+                  {% unless link.url == 'http://' or link.url == '' or link.url == '/' or link.url == 'https://' or link.url == '#' %} href="{{ link.url }}" {% endunless %}>
+                  {{ link.title }}
+                </a>
+                {% include 'header__dropdown-menu' %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </nav>
+
+      {% elsif block.type == 'payment_icons' %}
+        {% comment %} Payment icons {% endcomment %}
+        <div class="payment-methods text-align-{{ section.settings.alignment }}">
+          {% for type in shop.enabled_payment_types %}
+            {{ type | payment_type_svg_tag: class:'payment-icon' }}
+          {% endfor %}
+        </div>
+
+      {% elsif block.type == 'menu' %}
+        {% comment %} Basic menu {% endcomment %}
+          {% assign menu = block.settings.menu %}
+          {% if menu %}
+
+          {% else %}
+
+          {% endif %}
+          <ul class="text-align-center">
+            {% for link in menu.links %}
+              <li>
+                <a href="{{ link.url }}" class="{% if link.active %}is-active{% endif %}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+
+      {%- elsif block.type == 'search' -%}
+        {% comment %} Search {% endcomment %}
+        {% include 'sidebar__search', context: 'header' %}
+
+      {%- elsif block.type == 'social_media' -%}
+        {% comment %} Social media {% endcomment %}
+        {% include 'social-icons', flex_alignment_class: flex_alignment %}
+
+      {%- elsif block.type == 'text' -%}
+
+        {% comment %} Block specific CSS {% endcomment %}
+        {% capture block_css -%}
+          .sidebar-block__heading,
+          .sidebar-block__content {
+            color: {{ settings.regular_color }}
+          }
+        {%- endcapture -%}
+
+        {% style %}
+          {% include 'css-loop', css: block_css, id: block.id %}
+        {% endstyle %}
+        {% comment %} Text {% endcomment %}
+        {% include 'sidebar__text', text_alignment_class: text_alignment %}
+
+      {%- endif -%}
+
+    </div>
+  {%- endfor -%}
+</div>
+
+{% assign header_blocks = section.blocks %}
+{% include 'mobile-header', nav_blocks: header_blocks %}
+
+{% if settings.search_display_style == 'overlay' %}
+  {% include 'search-overlay' %}
+{% endif %}
+
+{% comment %}JavaScript{% endcomment %}
+<script
+  type="application/json"
+  data-section-id="{{ section.id }}"
+  data-section-data
+>
+  {
+    "header_layout": {{ settings.header_layout | json }}
+  }
+</script>
+<script src="{{ 'z__jsHeader.js' | asset_url }}"></script>
+
+{% comment %}Schema{% endcomment %}
+{% schema %}
+
+{
+  "name": "Header",
+  "class": "header header--vertical jsHeader header-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "copyright",
+      "name": "Copyright",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "copyright_text",
+          "label": "Copyright text"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_designed_by",
+          "label": "Show theme designer credits",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "display_shopify",
+          "label": "Show Powered by Shopify",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "icons",
+      "name": "Icons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "icons",
+              "label": "Icons only"
+            },
+            {
+              "value": "text",
+              "label": "Text only"
+            },
+            {
+              "value": "icons_text",
+              "label": "Icons and text"
+            }
+          ],
+          "default": "icons"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_search",
+          "label": "Show search icon",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo",
+          "info": "600 x 200px recommended"
+        },
+        {
+          "type": "range",
+          "id": "logo_width",
+          "label": "Width",
+          "min": 20,
+          "max": 100,
+          "default": 80,
+          "unit": "%"
+        }
+      ]
+    },
+    {
+      "type": "navigation",
+      "name": "Navigation",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "main_linklist",
+          "label": "Main menu",
+          "default": "main-menu"
+        },
+        {
+          "type": "color",
+          "id": "nav_background",
+          "label": "Background",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "nav_link_color",
+          "label": "Links",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "color",
+          "id": "nav_link_hover_color",
+          "label": "Links hover",
+          "default": "rgba(0,0,0,0)"
+        }
+      ]
+    },
+    {
+      "type": "payment_icons",
+      "name": "Payment icons",
+      "limit": 1
+    },
+    {
+      "type": "search",
+      "name": "Search form",
+      "limit": 1
+    },
+    {
+      "type": "social_media",
+      "name": "Social media",
+      "limit": 1
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Text area can be used for details about blog authors or general information.</p>"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "settings": {
+    },
+    "blocks": [
+      {
+        "type": "logo"
+      },
+      {
+        "type": "icons"
+      },
+      {
+        "type": "search"
+      },
+      {
+        "type": "navigation"
+      },
+      {
+        "type": "payment_icons"
+      },
+      {
+        "type": "copyright"
+      }
+    ]
+  }
+}
+
+{% endschema %}

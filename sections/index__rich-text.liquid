@@ -1,0 +1,341 @@
+{% comment %}
+** Rich text - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% include 'include-rich-text' %}
+
+{% schema %}
+  {
+    "name": "Rich text",
+    "class": "rich-text",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Heading"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Rich text"
+      },
+      {
+        "type": "font_picker",
+        "id": "heading_font",
+        "label": "Font",
+        "default": "open_sans_n4"
+      },
+      {
+        "type": "color",
+        "id": "heading_color",
+        "label": "Heading",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "select",
+        "id": "heading_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "justify",
+            "label": "Justify"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "range",
+        "id": "heading_size",
+        "label": "Base size",
+        "min": 20,
+        "max": 120,
+        "default": 30,
+        "unit": "px"
+      },
+      {
+        "type": "header",
+        "content": "Text"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text",
+        "default": "<p>Use this section to create some callout text on your page, or add more details about your shop, services, promotions, etc. If you have a large amount&nbsp;of text, you can opt to have it display in <strong>two columns<\/strong> instead so that it's much easier to read.<\/p>\n<p><\/p>\n<p>This section also includes&nbsp;the option to add a button&nbsp;in primary or secondary style, and also control the colors, including the option for a gradient background. Since this is rich text, you can also <em>format it as you wish<\/em> and&nbsp;<a href=\"\/collections\/all\" title=\"All Products\">include links<\/a>.<\/p>"
+      },
+      {
+        "type": "font_picker",
+        "id": "text_font",
+        "label": "Font",
+        "default": "open_sans_n4"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "rgba(0,0,0,0)"
+      },
+      {
+        "type": "select",
+        "id": "text_alignment",
+        "label": "Text alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "justify",
+            "label": "Justify"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left"
+      },
+      {
+        "type": "range",
+        "id": "text_size",
+        "label": "Base size",
+        "min": 8,
+        "max": 40,
+        "default": 14,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "columns",
+        "label": "Columns",
+        "min": 1,
+        "max": 3,
+        "default": 2
+      },
+      {
+        "type": "header",
+        "content": "Button"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label"
+      },
+      {
+        "type": "url",
+        "id": "button_link",
+        "label": "Button link"
+      },
+      {
+        "type": "select",
+        "id": "button_alignment",
+        "label": "Alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "select",
+        "id": "button_style",
+        "label": "Style",
+        "options": [
+          {
+            "value": "button--primary",
+            "label": "Primary"
+          },
+          {
+            "value": "button--secondary",
+            "label": "Secondary"
+          },
+          {
+            "value": "button--link-style",
+            "label": "Link style"
+          }
+        ],
+        "default": "button--primary"
+      },
+      {
+        "type": "header",
+        "content": "Background"
+      },
+      {
+        "type": "color",
+        "id": "background",
+        "label": "Background",
+        "default": "#EEEEEE"
+      },
+      {
+        "type": "color",
+        "id": "gradient",
+        "label": "Gradient",
+        "default": "#C0C0C0"
+      },
+      {
+        "type": "range",
+        "id": "gradient_rotation",
+        "label": "Gradient rotation",
+        "min": 0,
+        "max": 180,
+        "step": 10,
+        "default": 180,
+        "unit": "deg"
+      },
+      {
+        "type": "header",
+        "content": "Layout"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "wide",
+        "options": [
+          {
+            "value": "half",
+            "label": "Half"
+          },
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "wide",
+            "label": "Wide"
+          }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Top spacing",
+        "min": 0,
+        "max": 80,
+        "default": 20,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Bottom spacing",
+        "min": 0,
+        "max": 80,
+        "default": 0,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_left",
+        "label": "Left spacing",
+        "min": 0,
+        "max": 80,
+        "default": 0,
+        "unit": "px"
+      },
+      {
+        "type": "range",
+        "id": "padding_right",
+        "label": "Right spacing",
+        "default": 0,
+        "min": 0,
+        "max": 80,
+        "unit": "px"
+      },
+      {
+        "type": "select",
+        "id": "animation",
+        "label": "Animation",
+        "default": "none",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "fadeIn",
+            "label": "Fade in"
+          },
+          {
+            "value": "fadeInDown",
+            "label": "Fade in down"
+          },
+          {
+            "value": "fadeInLeft",
+            "label": "Fade in left"
+          },
+          {
+            "value": "fadeInRight",
+            "label": "Fade in right"
+          },
+          {
+            "value": "slideInLeft",
+            "label": "Slide in left"
+          },
+          {
+            "value": "slideInRight",
+            "label": "Slide in right"
+          },
+          {
+            "value": "zoomIn",
+            "label": "Zoom in"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Advanced"
+      },
+      {
+        "type": "paragraph",
+        "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+      },
+      {
+        "type": "text",
+        "id": "css_class",
+        "label": "CSS Class"
+      },
+      {
+        "type": "textarea",
+        "id": "custom_css",
+        "label": "Custom CSS"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Rich text",
+        "category": "Text",
+        "settings": {
+
+        }
+      }
+    ]
+  }
+{% endschema %}

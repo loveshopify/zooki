@@ -1,0 +1,95 @@
+{% comment %}
+** FAQ page - custom view **
+- Page template section
+- Uses blocks
+{% endcomment %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% style %}
+  .section__wrapper {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    {% if section.settings.width == 'wide' -%}
+      width: 100%;
+      max-width: 95%;
+    {%- endif %}
+  }
+
+  {% include 'css-loop', css: section.settings.custom_css, id: section.id %}
+{% endstyle %}
+
+<section class="{{ section.settings.css_class }}">
+  <div class="container hide-when-banner-enabled">
+    {% include 'heading', title: page.title, heading_tag: 'h1', context: 'faq', text_alignment: 'left' %}
+  </div>
+  <div class="container">
+    {% include 'page-multi-column', content: page.content %}
+  </div>
+</section>
+
+<script data-theme-editor-load-script src="{{ 'z__jsFAQ.js' | asset_url }}"></script>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "class": "faq-template-section jsFAQ",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "default": 40,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "default": 40,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ]
+}
+{% endschema %}

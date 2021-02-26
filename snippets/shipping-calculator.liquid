@@ -1,0 +1,84 @@
+{% comment %}
+Create new variables for the province and zip code to be used in the shipping calculator inputs
+{% endcomment %}
+{% assign default_province = '' %}
+{% assign default_zip = '' %}
+
+{% comment %}
+Check if the user has added a default country from within the theme editor settings
+{% endcomment %}
+
+{% if settings.shipping_calculator_default_country != blank %}
+  {% assign default_country = settings.shipping_calculator_default_country | escape %}
+{% else %}
+  {% assign default_country = '' %}
+{% endif %}
+
+{% comment %}
+If the customer's default address, province, and zip code exists in the backend, use those for the shipping calculator.
+{% endcomment %}
+
+{% if shop.customer_accounts_enabled and customer %}
+  {% if customer.default_address.country != '' %}
+    {% assign default_country = customer.default_address.country %}
+  {% endif %}
+
+  {% if customer.default_address.province != '' %}
+    {% assign default_province = customer.default_address.province %}
+  {% endif %}
+
+  {% if customer.default_address.zip != '' %}
+    {% assign default_zip = customer.default_address.zip %}
+  {% endif %}
+{% endif %}
+
+<div class="cart__shipping-calculator" id="shipping-calculator" data-cart-shipping>
+  <div class="cart__shipping-calculator-form has-no-side-gutter">
+    {% assign title = 'cart.shipping_calculator.title' | t %}
+    {% include 'heading', title: title, heading_tag: 'h2', context: 'shipping-calculator-form', text_alignment: 'left', enable_divider: false %}
+  </div>
+  <div class="shipping-calculator is-flex is-justify-space-between">
+    <div id="address_country_container" class="calc-field one-fourth column">
+      <label for="address_country">{{ 'cart.shipping_calculator.country' | t }}</label>
+      <div class="control">
+        <div class="select">
+          <select placeholder="{{ 'cart.shipping_calculator.country' | t }}" id="address_country" name="address[country]" data-default="{{ default_country}}">{{ country_option_tags }}</select>
+        </div>
+      </div>
+    </div>
+
+    <div id="address_province_container" class="calc-field one-fourth column" style="display: none">
+      <label for="address_province">{{ 'cart.shipping_calculator.province' | t }}</label>
+      <div class="control">
+        <div class="select">
+          <select placeholder="{{ 'cart.shipping_calculator.province' | t }}" id="address_province" name="address[province]" data-default="{{ default_province }}"></select style="display: none">
+        </div>
+      </div>
+    </div>
+
+    <div id="address_zip_container" class="calc-field one-fourth column">
+      <label for="address_zip">{{ 'cart.shipping_calculator.zip_code' | t }}</label>
+      <div class="control">
+        <input class="input" placeholder="{{ 'cart.shipping_calculator.zip_code' | t }}" type="text" id="address_zip" name="address[zip]" value="{{ default_zip }}"/>
+      </div>
+    </div>
+
+    <div id="get-rates-container" class="is-flex is-align-end one-fourth">
+      {% assign calculate_label = 'cart.shipping_calculator.submit_button_label' | t %}
+      {% include 'button', type: 'button', label: calculate_label, value: "{{ 'cart.shipping_calculator.submit_button_label' | t }}", style: settings.form_button_style, class: 'get-rates continue-button button is-within-form is-fullwidth' %}
+    </div>
+
+  </div>
+
+  <div class="shipping-calculator__response-container" data-cart-shipping-response-container>
+    <div class="shipping-rates__response-title has-no-side-gutter">
+      {% assign title = 'cart.shipping_calculator.estimated_shipping' | t %}
+      {% include 'heading', title: title, heading_tag: 'h2', context: 'shipping-rates', text_alignment: 'left', enable_divider: false %}
+    </div>
+    <div class="shipping-calculator__response" data-cart-shipping-response>
+      <div class="shipping-calculator__message" data-cart-shipping-message></div>
+      <ul class="shipping-calculator__rates" data-cart-shipping-rates>
+      </ul>
+    </div>
+  </div>
+</div>

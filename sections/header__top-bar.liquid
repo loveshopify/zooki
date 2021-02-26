@@ -1,0 +1,296 @@
+{% comment %}
+** Top bar - static **
+- Static section
+{% endcomment %}
+
+{% assign id = section.id %}
+{% comment %}Colors{% endcomment %}
+{% assign background = section.settings.background %}
+{% assign link = section.settings.link_color %}
+{% assign link_hover = section.settings.link_hover_color %}
+{% assign text = section.settings.text_color %}
+{% comment %}Layout{% endcomment %}
+{% assign width = section.settings.width %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = section.settings.css_class %}
+{% assign custom_css = section.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign background_alpha = background | color_extract: 'alpha' %}
+{% assign link_alpha = link | color_extract: 'alpha' %}
+{% assign link_hover_alpha = link_hover | color_extract: 'alpha' %}
+{% assign text_alpha = text | color_extract: 'alpha' %}
+
+{% comment %} Section specific CSS {% endcomment %}
+{% capture section_css -%}
+  .top-bar {
+    font-family: {{ section.settings.font.family }}, {{ section.settings.font.fallback_families }};
+    font-weight: {{ section.settings.font.weight }};
+    font-style: {{ section.settings.font.style }};
+    letter-spacing: {{ section.settings.letter_spacing }}px;
+    font-size: {{ section.settings.font_size }}px;
+    text-transform: {{ section.settings.font_style }};
+  }
+
+
+
+  a {
+    color: {%- if link_alpha != 0 -%}{{ link }}{%- endif -%};
+  }
+
+  a:hover {
+    color: {%- if link_hover_alpha != 0 -%}{{ link_hover }}{%- endif -%};
+  }
+
+  p {
+    color: {%- if text_alpha != 0 -%}{{ text }}{%- endif -%};
+  }
+{%- endcapture -%}
+
+{% style %}
+  {{ section.settings.font | font_face }}
+
+  #shopify-section-{{ id }} {
+    background-color: {%- if background_alpha != 0 -%}{{ background }}{%- endif -%};
+    {% if width == 'wide' %}
+      width: 100%;
+    {% endif %}
+  }
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+{% if section.settings.show_top_bar and section.blocks.size > 0 %}
+<section class="{{ css_class }}
+                section
+                is-width-{{ width }}">
+  <div class="container">
+    <header class="top-bar navbar is-justify-space-between one-whole column">
+      {% for block in section.blocks %}
+        {% if block.type == 'menu' %}
+          {% comment %}Menu{% endcomment %}
+          <div class="top-bar__{{ block.type | replace: '_', '-' }} is-justify-{{ block.settings.menu_alignment }}">
+            <div class="top-bar__menu-items is-flex is-flex-wrap ">
+              {% assign main_menu = linklists[block.settings.menu] %}
+              {% for link in main_menu.links %}
+                <a href="{{ link.url }}" class="navbar-link is-arrowless {% if link.active %}is-active{% endif %}">
+                  {{ link.title }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% elsif block.type == 'social_media' %}
+          {% comment %}Social media{% endcomment %}
+          <div class="top-bar__item top-bar__{{ block.type | replace: '_', '-' }}">
+            <div class="navbar-item ">
+              {% include 'social-icons' %}
+            </div>
+          </div>
+        {% elsif block.type == 'text' %}
+          {% comment %}Phone number{% endcomment %}
+          <div class="top-bar__item top-bar__{{ block.type | replace: '_', '-' }}">
+            <p class="navbar-item is-flex is-flex-wrap">
+              {{ block.settings.text }}
+            </p>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </header>
+  </div>
+</section>
+{% endif %}
+
+{% schema %}
+
+{
+  "name": "Top bar",
+  "class": "top-bar",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_top_bar",
+      "label": "Show top bar",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "font",
+      "label": "Font",
+      "default": "open_sans_n4"
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Capitalization",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Base size",
+      "min": 10,
+      "max": 20,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 6,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "rgba(0,0,0,0)"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "This menu won't show drop-down items."
+        },
+        {
+          "type": "select",
+          "id": "menu_alignment",
+          "label": "Menu alignment",
+          "options": [
+            {
+              "value": "start",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        }
+      ]
+    },
+    {
+      "type": "social_media",
+      "name": "Social media",
+      "limit": 1
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "123 Main Street, Pleasantville USA"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "text"
+      },
+      {
+        "type": "social_media"
+      }
+    ]
+  }
+}
+
+{% endschema %}

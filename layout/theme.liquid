@@ -1,0 +1,307 @@
+{% capture content %}
+<!doctype html>
+<html lang="{{ shop.locale }}">
+
+<head>
+  <meta name="google-site-verification" content="DBZ9DEPPyN8jagZ0E7UZOon2G-P15T6ZQfuQFXK3JZk" />
+  <script type="text/javascript">(function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/k0IAuyThXyme1JBslOqgEiFmcbJjRtEklrR2NNhE/widget.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();</script>
+  <meta charset="utf-8">
+  <meta http-equiv="cleartype" content="on">
+  <meta name="robots" content="index,follow">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.shop_bg_color }}">
+  <link rel="canonical" href="{{ canonical_url }}" />
+  {%- comment -%} Added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+  <!-- Add the style -->
+  <link type="text/css" href="{{ 'ws-styles.css' | asset_url }}" rel="stylesheet">
+  <link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" rel="stylesheet">
+  {%- comment -%} End of added by WestmountSolutions.com WSDEV20200727-DV {%- endcomment -%}
+
+  {%- if current_tags -%}{%- assign meta_tags = current_tags | join: ', ' -%}{%- endif -%}
+  <title>{%- if template contains "index" -%}{{ page_title }}{%- else -%}{{ page_title }}{% if current_tags %}
+    {{ 'general.meta.tagged_html' | t: tags: meta_tags }}{%- endif -%}{% if current_page != 1 %}
+    {{ 'general.meta.page' | t: page_number: current_page }}{% endif %}{% unless page_title contains shop.name %} -
+    {{ shop.name }}{% endunless %}{% endif %}</title>
+  
+  {% if handle contains 'mb' %}
+<meta name="robots" content="noindex, follow">
+{% endif %}
+  
+    {% if handle contains 'jhbn' %}
+<meta name="robots" content="noindex, follow">
+{% endif %}
+
+  <link rel="preconnect dns-prefetch" href="https://fonts.shopifycdn.com" />
+  <link rel="preconnect dns-prefetch" href="https://cdn.shopify.com" />
+  <link rel="preconnect dns-prefetch" href="https://v.shopify.com" />
+  <link rel="preconnect dns-prefetch" href="https://cdn.shopifycloud.com" />
+
+  {% if settings.enable_shopify_review_comments %}
+  <link rel="preconnect dns-prefetch" href="https://productreviews.shopifycdn.com" />
+  {% endif %}
+
+  {{ 'fancybox.css' | asset_url | stylesheet_tag }}
+  <!-- Stylesheets for Flex "1.1.5" -->
+  {{ 'styles.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'navigation-custom.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'custom.scss.css' | asset_url | stylesheet_tag }}
+
+  {% if settings.show_multiple_currencies or shop.enabled_currencies.size > 1 %}
+  <script type="text/javascript" src="/services/javascripts/currencies.js"></script>
+  {% endif %}
+  <script>
+    {% include 'js-variables' %}
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script defer src="{{ 'vendors.js' | asset_url }}"></script>
+  <script defer src="{{ 'utilities.js' | asset_url }}"></script>
+  <script defer src="{{ 'app.js' | asset_url }}"></script>
+  <script src="https://cdn.jsdelivr.net/g/lazysizes(lazysizes.min.js+plugins/rias/ls.rias.min.js+plugins/optimumx/ls.optimumx.min.js)" async=""></script>
+
+  {%- if settings.show_multiple_currencies or shop.enabled_currencies.size > 1 -%}
+  <script defer src="{{ 'currencyConversion.js' | asset_url }}"></script>
+  {%- endif -%}
+
+  {%- if settings.enable_shipping_calculator and template contains "cart" -%}
+  <script defer type="text/javascript" src="{{ 'shopify_common.js' | shopify_asset_url }}"></script>
+  <script defer type="text/javascript" src="{{ 'api.jquery.js' | shopify_asset_url }}"></script>
+  <script defer type="text/javascript" src="/services/javascripts/countries.js"></script>
+  {%- endif -%}
+  <script defer src="{{ 'custom.js' | asset_url }}"></script>
+  <script defer src="{{ 'password-checker.js' | asset_url }}"></script>
+  <noscript>
+    <style>
+      /* Insert styles for styles when JS is not loaded */
+    </style>
+  </noscript>
+
+  {%- if page_description -%}
+  <meta name="description"
+    content="{{ page_description | escape }}{% if current_tags %} {{ 'general.meta.tagged_html' | t: tags: meta_tags | escape }}.{% endif %}{% if current_page != 1 %} {{ 'general.meta.page' | t: page_number: current_page }}.{% endif %}" />
+  {%- endif -%}
+
+  {%- if settings.favicon != nil -%}
+  <link rel="shortcut icon" type="image/x-icon" href="{{ settings.favicon | img_url: '180x180' }}">
+  <link rel="apple-touch-icon" href="{{ settings.favicon | img_url: '180x180' }}" />
+  <link rel="apple-touch-icon" sizes="57x57" href="{{ settings.favicon | img_url: '57x57' }}" />
+  <link rel="apple-touch-icon" sizes="60x60" href="{{ settings.favicon | img_url: '60x60' }}" />
+  <link rel="apple-touch-icon" sizes="72x72" href="{{ settings.favicon | img_url: '72x72' }}" />
+  <link rel="apple-touch-icon" sizes="76x76" href="{{ settings.favicon | img_url: '76x76' }}" />
+  <link rel="apple-touch-icon" sizes="114x114" href="{{ settings.favicon | img_url: '114x114' }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.favicon | img_url: '180x180' }}" />
+  <link rel="apple-touch-icon" sizes="228x228" href="{{ settings.favicon | img_url: '228x228' }}" />
+  {%- else -%}
+  <link rel="shortcut icon" type="image/x-icon" href="{{ 'favicon.png' | asset_url }}">
+  {%- endif -%}
+
+  {%- if template.directory == 'customers' -%}
+  <script defer src="{{ 'shopify_common.js' | shopify_asset_url }}"></script>
+  <script defer src="{{ 'customer_area.js' | shopify_asset_url }}"></script>
+  {%- endif -%}
+
+<!--   <div class="dropdown_overlay"></div> -->
+  {% if request.host != 'yourzooki-usa.myshopify.com' or content_for_header contains 'designMode'%}
+
+  {% endif %}
+
+  {{ content_for_header }}
+  {%- render 'bold-common' -%}
+  {%- render 'bold-ro-init' -%}
+{{ 'bold-ro.css' | asset_url | stylesheet_tag }}
+  {{ 'bold-cart-hook-fix.js' | asset_url | script_tag }}
+  {% include 'social-meta-info' %}
+  {% if collection.previous_product %}
+  <link rel="prev" href="{{ collection.previous_product }}">{% endif %}
+  {% if collection.next_product %}
+  <link rel="next" href="{{ collection.next_product }}">{% endif %}
+
+  {{ 'tailwind.css' | asset_url | stylesheet_tag }}
+  {{ 'lv.scss.css' | asset_url | stylesheet_tag }}
+<meta name="google-site-verification" content="JCHJAOJVfez7fLNzHxaHA7i5altv_TFPTHHjbYQoy5c" />
+  
+  <link rel="alternate" hreflang="x-default" href="{{ canonical_url | replace: shop.domain, 'yourzooki.com' }}" />
+  <link rel="alternate" href="{{ canonical_url | replace: shop.domain, 'yourzooki.com' }}" hreflang="en-gb" />
+  <link rel="alternate" href="{{ canonical_url | replace: shop.domain, 'us.yourzooki.com' }}" hreflang="en-us" />
+  
+
+
+{%- assign yotpo_offload_content = shop.metafields.yotpo.yotpo_offload_content %}
+{%- assign time_now = 'now' | date: '%s' %}
+{%- assign yotpo_live_time = shop.metafields.yotpo.yotpo_live | date: '%s' %}
+{%- assign diffSeconds = time_now | minus: yotpo_live_time %}
+{%- if yotpo_offload_content == 'yes' and diffSeconds < 86400 -%}
+{{ 'yotpo-full-css.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+  <script src="https://cdn-widgetsrepository.yotpo.com/v1/loader/czeF1vuwJS-0sfaFTHD-cg" async></script>
+</head>
+
+{% if template.name == 'index' %}
+<script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": "{{ shop.name }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ routes.search_url }}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "url": "{{ shop.url }}{{ page.url }}"
+    }
+  </script>
+{% endif %}
+
+<body class="{%- if template == '404' -%}
+              error-404
+            {% else -%}
+              {{ template | replace: '.', '-' | handle }}
+            {%- endif -%}
+            {% if template == "product" && product.available %}
+              product--unavailable
+            {% else %}
+              product--available
+            {% endif %}
+            {% if settings.header_layout == 'vertical' -%}
+              has-vertical-header
+            {%- endif -%}" data-money-format="{{ shop.money_format }}" data-shop-url="{{ shop.url }}">
+
+  {%- if settings.show_announcement_bar -%}
+  {% section 'announcement-bar' %}
+  {%- endif -%}
+
+  {%- if settings.header_layout == "classic" -%}
+  {% section 'header__top-bar' %}
+  {% section 'header-classic' %}
+  {%- elsif settings.header_layout == "centered" -%}
+  {% section 'header-centered__top-bar' %}
+  {% section 'header-centered' %}
+  {%- elsif settings.header_layout == "vertical" -%}
+  {% section 'header-vertical' %}
+  {%- elsif settings.header_layout == "search_focus" -%}
+  {% section 'header__top-bar' %}
+  {% section 'header-search-focus' %}
+  {%- endif -%}
+
+  {%- if settings.cart_action == 'drawer' -%}
+  {% include 'ajax-cart' %}
+  {%- endif -%}
+
+  {% if settings.mega_menu_1 == true %}
+  {% section 'mega-menu-1' %}
+  {% endif %}
+  {% if settings.mega_menu_2 == true %}
+  {% section 'mega-menu-2' %}
+  {% endif %}
+  {% if settings.mega_menu_3 == true %}
+  {% section 'mega-menu-3' %}
+  {% endif %}
+  {% if settings.mega_menu_4 == true %}
+  {% section 'mega-menu-4' %}
+  {% endif %}
+  {% if settings.mega_menu_5 == true %}
+  {% section 'mega-menu-5' %}
+  {% endif %}
+  {% if settings.mega_menu_6 == true %}
+  {% section 'mega-menu-6' %}
+  {% endif %}
+  {% if settings.mega_menu_7 == true %}
+  {% section 'mega-menu-7' %}
+  {% endif %}
+  {% if settings.mega_menu_8 == true %}
+  {% section 'mega-menu-8' %}
+  {% endif %}
+  {% if settings.mega_menu_9 == true %}
+  {% section 'mega-menu-9' %}
+  {% endif %}
+  {% if settings.mega_menu_10 == true %}
+  {% section 'mega-menu-10' %}
+  {% endif %}
+
+  {% if settings.header_layout == "vertical" %}
+  <div class="is-beside-vertical-header">
+    {% endif %}
+
+    {{ content_for_layout }}
+
+    {% if settings.footer_layout == "centered" %}
+    {% section 'footer__icon-bar' %}
+    {% section 'footer-centered' %}
+    {% elsif settings.footer_layout == "classic" %}
+    {% section 'footer__icon-bar' %}
+    {% section 'footer-classic' %}
+    {% elsif settings.footer_layout == "promotional" %}
+    {% section 'footer__icon-bar' %}
+    {% section 'footer-promotional' %}
+    {% endif %}
+    <div id="main_overlay"></div>
+    {% if settings.header_layout == "vertical" %}
+  </div>
+  {% endif %}
+  
+
+  {% if settings.show_fixed_message %}
+  {% section 'fixed-message' %}
+  {% endif %}
+
+  {% if settings.enable_quickshop %}
+  {% include 'quick-shop' %}
+  {% endif %}
+
+  {% if settings.search_display_style == 'popup' %}
+  {% include 'search-popup' %}
+  {% endif %}
+
+  {% if settings.show_popup %}
+  {% section 'popup' %}
+  {% endif %}
+
+  <script>console.log("template name: {{ template }}");</script>
+  {% if template contains "product" %}
+    {% include "ik-product-modal" %}
+  {% endif %}
+
+
+  {% if settings.disqus_enabled %}
+  {% if template contains "blog" or template contains "article" or template contains "index" %}
+  <script id="dsq-count-scr" src="//{{ settings.disqus_shortname }}.disqus.com/count.js" async></script>
+  {% endif %}
+  {% endif %}
+  {{ 'lv.js' | asset_url | script_tag }}
+  {%- comment -%} Added by WestmountSolutions.com WSDEV20200722-DV {%- endcomment -%}
+  {% render 'ws-scripts' %}
+  {%- comment -%} End of added by WestmountSolutions.com WSDEV20200722-DV {%- endcomment -%}
+    <!-- FRESHCHAT Snippet Start -->
+    {% if customer %} <script> 
+                        if (typeof window.fcSettings === 'undefined') {
+                          window.fcSettings = {};
+                        }
+                        window.fcSettings.email = '{{ customer.email }}';
+                        window.fcSettings.firstName = '{{ customer.first_name }}';
+                        window.fcSettings.lastName = '{{ customer.last_name }}'; 
+                        window.fcSettings.externalId = '{{ customer.email }}';
+                        window.fcSettings.customerId = {{ customer.id }};
+                        {% if customer.phone}}%}
+                          window.fcSettings.phone = {{ customer.phone}};
+                        {% endif %}
+                        window.fcSettings.shopify_token = '9306f95b0f3dd8729da76544c253058c';
+                        {% if customer.metafields.freshchat.restoreId} %}
+                          window.fcSettings.restoreId ='{{ customer.metafields.freshchat.restoreId }}';
+                        {% endif %}
+                      </script> {% endif %}  <!-- FRESHCHAT Snippet End -->
+<script>
+  function initFreshChat() {
+    window.fcWidget.init({
+      token: "b93f46d5-7144-40f1-9530-167c496d56d1",
+      host: "https://wchat.eu.freshchat.com"
+    });
+  }
+  function initialize(i,t){var e;i.getElementById(t)?initFreshChat():((e=i.createElement("script")).id=t,e.async=!0,e.src="https://wchat.eu.freshchat.com/js/widget.js",e.onload=initFreshChat,i.head.appendChild(e))}function initiateCall(){initialize(document,"freshchat-js-sdk")}window.addEventListener?window.addEventListener("load",initiateCall,!1):window.attachEvent("load",initiateCall,!1);
+</script>
+<script src="https://www.dwin1.com/20647.js" type="text/javascript" defer="defer"></script>
+</body>
+
+</html>
+{% endcapture %}
+{% assign content = content | replace_first: '<!doctype', '!doctype' | split: ' <' %}
+{%- for html in content -%}{%- assign htmlblock = html | strip | prepend: ' <' -%}{{htmlblock | replace: ' </', '</'}}{%- endfor -%}

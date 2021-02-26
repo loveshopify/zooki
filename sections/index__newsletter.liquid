@@ -1,0 +1,388 @@
+{% comment %}
+** Newsletter - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %}Assign object as block or section{% endcomment %}
+{% if type == 'block' %}
+  {% assign object = block %}
+{% else %}
+  {% assign object = section %}
+{% endif %}
+
+{% assign id = object.id %}
+{% assign image = object.settings.image %}
+{% assign image_crop = object.settings.image_cropping %}
+{% assign image_position = object.settings.image_position %}
+{% assign background_image = object.settings.background_image %}
+{% assign background_color = object.settings.background_color %}
+{% assign show_icons = settings.show_form_icons %}
+{% comment %} Text {% endcomment %}
+{% assign heading = object.settings.newsletter_title %}
+{% assign subheading = object.settings.newsletter_richtext %}
+{% assign text_alignment = object.settings.newsletter_section_text_align %}
+{% assign text_color = object.settings.text_color %}
+{% assign display_first_name = object.settings.display_first_name %}
+{% assign display_last_name = object.settings.display_last_name %}
+{% capture button_classes %}
+  is-{{ settings.form_border_style }} is-{{ settings.form_size }}
+{% endcapture %}
+{% comment %} Layout {% endcomment %}
+{% assign width = object.settings.width %}
+{% assign padding_top = object.settings.padding_top %}
+{% assign padding_bottom = object.settings.padding_bottom %}
+{% assign padding_left = object.settings.padding_left %}
+{% assign padding_right = object.settings.padding_right %}
+{% assign animation = object.settings.animation | default: 'none' %}
+{% comment %} Advanced {% endcomment %}
+{% assign css_class = object.settings.css_class %}
+{% assign custom_css = object.settings.custom_css %}
+
+{% comment %} Is the color set to transparent? {% endcomment %}
+{% assign text_alpha = text_color | color_extract: 'alpha' %}
+
+{%- capture section_css -%}
+
+  {% if background_image != blank %}
+    .section.has-background {
+      background-image: url({{ background_image | img_url: '2000x' }} );
+    }
+  {% endif %}
+
+  .section {
+    background-color: {{ background_color }};
+  }
+
+  .newsletter-container {
+    {% if width == 'wide' %}
+    width: 100%;
+    {% endif %}
+  }
+
+  .newsletter__text {
+    color: {% if text_alpha != 0 %}{{ text_color }}{% else %}{{ settings.regular_color }}{% endif %}
+  }
+
+{%- endcapture -%}
+
+{% style %}
+  #shopify-section-{{ id }} {
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+    padding-left: {{ padding_left }}px;
+    padding-right: {{ padding_right }}px;
+    {% if width == 'wide' %}
+      width: 100%;
+    {% elsif width == 'half' %}
+      width: 50%;
+    {% endif %}
+  }
+
+  #shopify-section-{{ id }} .newsletter__wrapper {
+    {% if width == 'half' %}
+      max-width: 100%;
+    {% endif %}
+  }
+
+  {% include 'css-loop', css: section_css, id: id %}
+  {% include 'css-loop', css: custom_css, id: id %}
+{% endstyle %}
+
+{% comment %} HTML markup {% endcomment %}
+{% if image != blank %}
+  <div class="newsletter__image--mobile-wrapper has-image-crop image-crop--{{ image_crop }}">
+    {% include 'image-element', image: object.settings.image, alt: object.settings.image.alt, stretch_width: true %}
+  </div>
+{% endif %}
+<section class="section newsletter-section
+                {{ css_class }}
+                {{ newsletter_class }}
+                is-width-{{ width }}
+                {% if image != blank %}
+                  has-full-width-crop
+                {% endif %}
+                {% if background_alpha != 0 or gradient_alpha != 0 or background_image != blank %}
+                  has-background
+                {% endif %}
+                {% if background_image != blank %}
+                  dark-overlay-{{ object.settings.image_darken }}
+                {% endif %}"
+                {% if animation != "none" %}
+                  data-scroll-class="{{ animation }}"
+                {% endif %} >
+  <div class="newsletter-container is-flex
+              {% if image_position == 'right' %}is-flex-row-reverse{% endif %}">
+    {% if image != blank %}
+      <div class="newsletter__image one-half column has-image-crop image-crop--{{ image_crop }}">
+        {% include 'image-element', image: object.settings.image, alt: object.settings.image.alt, stretch_width: true, calculate_wrap: true %}
+      </div>
+    {% endif %}
+
+    <div class="newsletter__wrapper column {% if image != blank %} is-active-image one-half medium-down--one-whole{% else %} one-whole {% endif %}">
+      <div class="newsletter__text-wrapper text-align-{{ text_alignment }}">
+        <h2 class="newsletter__heading newsletter__text title">{{ heading }}</h2>
+        <div class="newsletter__subheading newsletter__text">{{ subheading }}</div>
+      </div>
+
+      {% include 'newsletter-form' %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+
+{
+  "name": "Newsletter",
+  "class": "newsletter",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "display_first_name",
+      "label": "Show first name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "display_last_name",
+      "label": "Show last name",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Heading",
+      "default": "Subscribe"
+    },
+    {
+      "type": "richtext",
+      "id": "newsletter_richtext",
+      "label": "Subheading",
+      "default": "<p>Sign up to get the latest on sales, new releases and more …</p>"
+    },
+    {
+      "type": "select",
+      "id": "newsletter_section_text_align",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "1600 x 300px recommended"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_darken",
+      "label": "Darken image",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Feature image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1024 x 1024px recommended"
+    },
+    {
+      "type": "select",
+      "id": "image_cropping",
+      "label": "Image cropping",
+      "info": "Crops image to same height as text content.",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wide",
+      "options": [
+        {
+          "value": "half",
+          "label": "Half"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left spacing",
+      "min": 0,
+      "max": 80,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right spacing",
+      "default": 0,
+      "min": 0,
+      "max": 80,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fadeIn",
+          "label": "Fade in"
+        },
+        {
+          "value": "fadeInDown",
+          "label": "Fade in down"
+        },
+        {
+          "value": "fadeInLeft",
+          "label": "Fade in left"
+        },
+        {
+          "value": "fadeInRight",
+          "label": "Fade in right"
+        },
+        {
+          "value": "slideInLeft",
+          "label": "Slide in left"
+        },
+        {
+          "value": "slideInRight",
+          "label": "Slide in right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "paragraph",
+      "content": "[Learn more](https://help.outofthesandbox.com/hc/en-us/articles/360022329373)"
+    },
+    {
+      "type": "text",
+      "id": "css_class",
+      "label": "CSS Class"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [{
+    "name": "Newsletter",
+    "category": "Social",
+    "settings": {
+    }
+  }]
+}
+
+{% endschema %}
